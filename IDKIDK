@@ -33,7 +33,7 @@ workspace:WaitForChild("Balls").ChildAdded:Connect(function(Ball)
 			--print(`Distance: {Distance}\nVelocity: {Magnitude}\nTime: {Distance / Magnitude}`)
 
 			if (Distance / Magnitude) <= 12 then
-				Remotes:WaitForChild("ParryAttempt"):FireServer()
+				Remotes:WaitForChild("ParryButtonPress"):FireServer()
 				Notifyclient("Hit!")
 			end
 		end
