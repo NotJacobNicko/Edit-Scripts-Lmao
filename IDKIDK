@@ -18,7 +18,7 @@ local function VerifyBall(Ball)
 	end
 end
 Notifyclient("Loaded Auto Parry")
-workspace.DescendantAdded:Connect(function(Ball)
+workspace:WaitForChild("Balls").ChildAdded:Connect(function(Ball)
 	if not VerifyBall(Ball) then
 		return
 	end
