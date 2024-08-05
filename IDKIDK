@@ -1,15 +1,8 @@
-local Debug = false -- Set this to true if you want my debug output.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer or Players.PlayerAdded:Wait()
-local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9)
-local Balls = workspace:WaitForChild("Balls", 9e9)
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 
-local function print(...)
-	if Debug then
-		warn(...)
-	end
-end
 function Notifyclient(Text)
 	local goofynotiids = {6823153536,6823153536,7991347388,6879335951,217548941,4891171429,17660225827,6879335951}
 	local Notisong = Instance.new("Sound",game:GetService("SoundService"))
@@ -20,27 +13,27 @@ function Notifyclient(Text)
 	Notisong:Destroy()
 end
 local function VerifyBall(Ball)
-	if typeof(Ball) == "Instance" and Ball:IsA("BasePart") and Ball:IsDescendantOf(Balls) and Ball:GetAttribute("realBall") == true then
+	if typeof(Ball) == "Instance" and Ball:IsA("BasePart") and Ball:IsDescendantOf(Ball) and Ball:FindFirstChildWhichIsA("Highlight") and Ball:GetAttribute("realBall") == true then
 		return true
 	end
 end
 Notifyclient("Loaded Auto Parry")
-Balls.ChildAdded:Connect(function(Ball)
+workspace.DescendantAdded:Connect(function(Ball)
 	if not VerifyBall(Ball) then
 		return
 	end
-	print(`Ball Spawned: {Ball}`)
+	--print(`Ball Spawned: {Ball}`)
 	local OldPosition = Ball.Position
 	local OldTick = tick()
 	Ball:GetPropertyChangedSignal("Position"):Connect(function()
-		if (Player.Character and Player.Character:FindFirstChild("Highlight") or Ball:FindFirstChild("Highlight").FillColor == Color3.new(1, 0, 0)) then
+		if (Player.Character and Player.Character:FindFirstChildWhichIsA("Highlight") or Ball:FindFirstChildWhichIsA("Highlight").FillColor == Color3.new(1, 0, 0)) then
 			local Distance = (Ball.Position - workspace.CurrentCamera.Focus.Position).Magnitude
 			local Magnitude = (OldPosition - Ball.Position).Magnitude
 
-			print(`Distance: {Distance}\nVelocity: {Magnitude}\nTime: {Distance / Magnitude}`)
+			--print(`Distance: {Distance}\nVelocity: {Magnitude}\nTime: {Distance / Magnitude}`)
 
-			if math.random(1,5000) ~= 1 and (Distance / Magnitude) <= 10 then
-				Remotes:WaitForChild("ParryButtonPress"):Fire()
+			if math.random(1,5000) ~= 1 and (Distance / Magnitude) <= 12 then
+				Remotes:WaitForChild("ParryButtonPress"):FireServer()
 				Notifyclient("Hit!")
 			end
 		end
