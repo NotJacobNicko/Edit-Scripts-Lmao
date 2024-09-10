@@ -4,14 +4,12 @@ local tween = game:GetService("TweenService")
 local tweeninfo = TweenInfo.new
 local input = game:GetService("UserInputService")
 local run = game:GetService("RunService")
-
+local plr = game:GetService("Players").LocalPlayer
+local ms = plr:GetMouse()
 local Utility = {}
 local Objects = {}
 function Kavo:DraggingEnabled(frame, parent)
-
 	parent = parent or frame
-
-	-- stolen from wally or kiriot, kek
 	local dragging = false
 	local dragInput, mousePos, framePos
 
@@ -122,22 +120,8 @@ local themeStyles = {
 }
 local oldTheme = ""
 
-local SettingsT = {
+local SettingsT = {}
 
-}
-
-local Name = "KavoConfig.JSON"
-if not isfile("KavoConfig.JSON") then
-	writefile(Name, "{}") 
-end
-pcall(function()
-
-	if not pcall(function() readfile(Name) end) then
-		writefile(Name, game:service'HttpService':JSONEncode(SettingsT))
-	end
-
-	Settings = game:service'HttpService':JSONEncode(readfile(Name))
-end)
 
 local LibName = tostring(math.random(1, 100))..tostring(math.random(1,50))..tostring(math.random(1, 100))
 
@@ -468,7 +452,12 @@ function Kavo.CreateLib(kavName, themeList)
 			else
 				sectionHead.Visible = true
 			end
-
+			local function updateSectionFrame()
+				local innerSc = sectionElListing.AbsoluteContentSize
+				sectionInners.Size = UDim2.new(1, 0, 0, innerSc.Y)
+				local frameSc = sectionlistoknvm.AbsoluteContentSize
+				sectionFrame.Size = UDim2.new(0, 352, 0, frameSc.Y)
+			end
 			sectionFrame.Name = "sectionFrame"
 			sectionFrame.Parent = page
 			sectionFrame.BackgroundColor3 = themeList.Background--36, 37, 43
@@ -482,7 +471,7 @@ function Kavo.CreateLib(kavName, themeList)
 			for i,v in pairs(sectionInners:GetChildren()) do
 				while wait() do
 					if v:IsA("Frame") or v:IsA("TextButton") then
-						function size(pro)
+						local function size(pro)
 							if pro == "Size" then
 								UpdateSize()
 								updateSectionFrame()
@@ -545,17 +534,10 @@ function Kavo.CreateLib(kavName, themeList)
 				end
 			end)()
 
-			local function updateSectionFrame()
-				local innerSc = sectionElListing.AbsoluteContentSize
-				sectionInners.Size = UDim2.new(1, 0, 0, innerSc.Y)
-				local frameSc = sectionlistoknvm.AbsoluteContentSize
-				sectionFrame.Size = UDim2.new(0, 352, 0, frameSc.Y)
-			end
 			updateSectionFrame()
 			UpdateSize()
 			local Elements = {}
 			function Elements:NewButton(bname,tipINf, callback)
-				showLogo = showLogo or true
 				local ButtonFunction = {}
 				tipINf = tipINf or "Tip: Clicking this nothing will happen!"
 				bname = bname or "Click Me!"
@@ -616,7 +598,7 @@ function Kavo.CreateLib(kavName, themeList)
 				moreInfo.Position = UDim2.new(0, 0, 2, 0)
 				moreInfo.Size = UDim2.new(0, 353, 0, 33)
 				moreInfo.ZIndex = 9
-				moreInfo.Font = Enum.Font.GothamSemibold
+				moreInfo.Font = Enum.Font.GothamBold
 				moreInfo.Text = "  "..tipINf
 				moreInfo.RichText = true
 				moreInfo.TextColor3 = themeList.TextColor
@@ -648,7 +630,7 @@ function Kavo.CreateLib(kavName, themeList)
 				btnInfo.BackgroundTransparency = 1.000
 				btnInfo.Position = UDim2.new(0.096704483, 0, 0.272727281, 0)
 				btnInfo.Size = UDim2.new(0, 314, 0, 14)
-				btnInfo.Font = Enum.Font.GothamSemibold
+				btnInfo.Font = Enum.Font.GothamBold
 				btnInfo.Text = bname
 				btnInfo.RichText = true
 				btnInfo.TextColor3 = themeList.TextColor
@@ -666,7 +648,7 @@ function Kavo.CreateLib(kavName, themeList)
 				updateSectionFrame()
 				UpdateSize()
 
-				local ms = game.Players.LocalPlayer:GetMouse()
+				
 
 				local btn = buttonElement
 				local sample = Sample
@@ -829,7 +811,7 @@ function Kavo.CreateLib(kavName, themeList)
 				togName.BackgroundTransparency = 1.000
 				togName.Position = UDim2.new(0.096704483, 0, 0.272727281, 0)
 				togName.Size = UDim2.new(0, 138, 0, 14)
-				togName.Font = Enum.Font.GothamSemibold
+				togName.Font = Enum.Font.GothamBold
 				togName.Text = tname
 				togName.RichText = true
 				togName.TextColor3 = themeList.TextColor
@@ -845,7 +827,7 @@ function Kavo.CreateLib(kavName, themeList)
 				moreInfo.Position = UDim2.new(0, 0, 2, 0)
 				moreInfo.Size = UDim2.new(0, 353, 0, 33)
 				moreInfo.ZIndex = 9
-				moreInfo.Font = Enum.Font.GothamSemibold
+				moreInfo.Font = Enum.Font.GothamBold
 				moreInfo.RichText = true
 				moreInfo.Text = "  "..tTip
 				moreInfo.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1010,7 +992,7 @@ function Kavo.CreateLib(kavName, themeList)
 				togName.BackgroundTransparency = 1.000
 				togName.Position = UDim2.new(0.096704483, 0, 0.272727281, 0)
 				togName.Size = UDim2.new(0, 288, 0, 14)
-				togName.Font = Enum.Font.GothamSemibold
+				togName.Font = Enum.Font.GothamBold
 				togName.Text = tname
 				togName.RichText = true
 				togName.TextColor3 = themeList.TextColor
@@ -1046,7 +1028,7 @@ function Kavo.CreateLib(kavName, themeList)
 				moreInfo.Position = UDim2.new(0, 0, 2, 0)
 				moreInfo.Size = UDim2.new(0, 353, 0, 33)
 				moreInfo.ZIndex = 9
-				moreInfo.Font = Enum.Font.GothamSemibold
+				moreInfo.Font = Enum.Font.GothamBold
 				moreInfo.RichText = true
 				moreInfo.Text = "  "..nTip
 				moreInfo.TextColor3 = themeList.TextColor
@@ -1056,7 +1038,7 @@ function Kavo.CreateLib(kavName, themeList)
 				UICorner.CornerRadius = UDim.new(0, 4)
 				UICorner.Parent = moreInfo
 
-				local ms = game.Players.LocalPlayer:GetMouse()
+				
 
 				if themeList.SchemeColor == Color3.fromRGB(255,255,255) then
 					Utility:TweenObject(moreInfo, {TextColor3 = Color3.fromRGB(0,0,0)}, 0.2)
@@ -1179,7 +1161,7 @@ function Kavo.CreateLib(kavName, themeList)
 					end
 				end)
 				function TogFunction:UpdateToggle(newText, isTogOn)
-					isTogOn = isTogOn or toggle
+					isTogOn = isTogOn
 					if newText ~= nil then 
 						togName.Text = newText
 					end
@@ -1205,7 +1187,6 @@ function Kavo.CreateLib(kavName, themeList)
 				slidTip = slidTip or "Slider tip here"
 				maxvalue = maxvalue or 500
 				minvalue = minvalue or 16
-				startVal = startVal or 0
 				callback = callback or function() end
 
 				local sliderElement = Instance.new("TextButton")
@@ -1240,7 +1221,7 @@ function Kavo.CreateLib(kavName, themeList)
 				togName.BackgroundTransparency = 1.000
 				togName.Position = UDim2.new(0.096704483, 0, 0.272727281, 0)
 				togName.Size = UDim2.new(0, 138, 0, 14)
-				togName.Font = Enum.Font.GothamSemibold
+				togName.Font = Enum.Font.GothamBold
 				togName.Text = slidInf
 				togName.RichText = true
 				togName.TextColor3 = themeList.TextColor
@@ -1304,7 +1285,7 @@ function Kavo.CreateLib(kavName, themeList)
 				val.BackgroundTransparency = 1.000
 				val.Position = UDim2.new(0.352386296, 0, 0.272727281, 0)
 				val.Size = UDim2.new(0, 41, 0, 14)
-				val.Font = Enum.Font.GothamSemibold
+				val.Font = Enum.Font.GothamBold
 				val.Text = minvalue
 				val.TextColor3 = themeList.TextColor
 				val.TextSize = 14.000
@@ -1320,7 +1301,7 @@ function Kavo.CreateLib(kavName, themeList)
 				moreInfo.Position = UDim2.new(0, 0, 2, 0)
 				moreInfo.Size = UDim2.new(0, 353, 0, 33)
 				moreInfo.ZIndex = 9
-				moreInfo.Font = Enum.Font.GothamSemibold
+				moreInfo.Font = Enum.Font.GothamBold
 				moreInfo.Text = "  "..slidTip
 				moreInfo.TextColor3 = themeList.TextColor
 				moreInfo.TextSize = 14.000
@@ -1342,7 +1323,7 @@ function Kavo.CreateLib(kavName, themeList)
 				UpdateSize()
 				local mouse = game:GetService("Players").LocalPlayer:GetMouse();
 
-				local ms = game.Players.LocalPlayer:GetMouse()
+				
 				local uis = game:GetService("UserInputService")
 				local btn = sliderElement
 				local infBtn = viewInfo
@@ -1391,7 +1372,7 @@ function Kavo.CreateLib(kavName, themeList)
 							callback(Value)
 						end)
 						sliderDrag:TweenSize(UDim2.new(0, math.clamp(mouse.X - sliderDrag.AbsolutePosition.X, 0, 149), 0, 6), "InOut", "Linear", 0.05, true)
-						moveconnection = mouse.Move:Connect(function()
+						local moveconnection = mouse.Move:Connect(function()
 							val.Text = Value
 							Value = math.floor((((tonumber(maxvalue) - tonumber(minvalue)) / 149) * sliderDrag.AbsoluteSize.X) + tonumber(minvalue))
 							pcall(function()
@@ -1399,6 +1380,7 @@ function Kavo.CreateLib(kavName, themeList)
 							end)
 							sliderDrag:TweenSize(UDim2.new(0, math.clamp(mouse.X - sliderDrag.AbsolutePosition.X, 0, 149), 0, 6), "InOut", "Linear", 0.05, true)
 						end)
+						local releaseconnection
 						releaseconnection = uis.InputEnded:Connect(function(Mouse)
 							if Mouse.UserInputType == Enum.UserInputType.MouseButton1 or Mouse.UserInputType == Enum.UserInputType.Touch then
 								Value = math.floor((((tonumber(maxvalue) - tonumber(minvalue)) / 149) * sliderDrag.AbsoluteSize.X) + tonumber(minvalue))
@@ -1443,7 +1425,7 @@ function Kavo.CreateLib(kavName, themeList)
 					end
 				end)        
 			end
-
+			local oHover = false
 			function Elements:NewDropdown(dropname, dropinf, list, callback)
 				local DropFunction = {}
 				dropname = dropname or "Dropdown"
@@ -1464,7 +1446,7 @@ function Kavo.CreateLib(kavName, themeList)
 				local UIListLayout = Instance.new("UIListLayout")
 				local Sample = Instance.new("ImageLabel")
 
-				local ms = game.Players.LocalPlayer:GetMouse()
+				
 				Sample.Name = "Sample"
 				Sample.Parent = dropOpen
 				Sample.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1566,7 +1548,7 @@ function Kavo.CreateLib(kavName, themeList)
 				itemTextbox.BackgroundTransparency = 1.000
 				itemTextbox.Position = UDim2.new(0.0970000029, 0, 0.273000002, 0)
 				itemTextbox.Size = UDim2.new(0, 138, 0, 14)
-				itemTextbox.Font = Enum.Font.GothamSemibold
+				itemTextbox.Font = Enum.Font.GothamBold
 				itemTextbox.Text = dropname
 				itemTextbox.RichText = true
 				itemTextbox.TextColor3 = themeList.TextColor
@@ -1605,7 +1587,7 @@ function Kavo.CreateLib(kavName, themeList)
 				updateSectionFrame() 
 				UpdateSize()
 
-				local ms = game.Players.LocalPlayer:GetMouse()
+				
 				local uis = game:GetService("UserInputService")
 				local infBtn = viewInfo
 
@@ -1619,7 +1601,7 @@ function Kavo.CreateLib(kavName, themeList)
 				moreInfo.Size = UDim2.new(0, 353, 0, 33)
 				moreInfo.ZIndex = 9
 				moreInfo.RichText = true
-				moreInfo.Font = Enum.Font.GothamSemibold
+				moreInfo.Font = Enum.Font.GothamBold
 				moreInfo.Text = "  "..dropinf
 				moreInfo.TextColor3 = themeList.TextColor
 				moreInfo.TextSize = 14.000
@@ -1692,7 +1674,7 @@ function Kavo.CreateLib(kavName, themeList)
 					local UICorner_2 = Instance.new("UICorner")
 					local Sample1 = Instance.new("ImageLabel")
 
-					local ms = game.Players.LocalPlayer:GetMouse()
+					
 					Sample1.Name = "Sample1"
 					Sample1.Parent = optionSelect
 					Sample1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1709,7 +1691,7 @@ function Kavo.CreateLib(kavName, themeList)
 					optionSelect.Position = UDim2.new(0, 0, 0.235294119, 0)
 					optionSelect.Size = UDim2.new(0, 352, 0, 33)
 					optionSelect.AutoButtonColor = false
-					optionSelect.Font = Enum.Font.GothamSemibold
+					optionSelect.Font = Enum.Font.GothamBold
 					optionSelect.Text = "  "..v
 					optionSelect.TextColor3 = Color3.fromRGB(themeList.TextColor.r * 255 - 6, themeList.TextColor.g * 255 - 6, themeList.TextColor.b * 255 - 6)
 					optionSelect.TextSize = 14.000
@@ -1751,8 +1733,7 @@ function Kavo.CreateLib(kavName, themeList)
 
 					UICorner_2.CornerRadius = UDim.new(0, 4)
 					UICorner_2.Parent = optionSelect
-
-					local oHover = false
+					
 					optionSelect.MouseEnter:Connect(function()
 						if not focusing then
 							game.TweenService:Create(optionSelect, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
@@ -1791,7 +1772,7 @@ function Kavo.CreateLib(kavName, themeList)
 						local optionSelect = Instance.new("TextButton")
 						local UICorner_2 = Instance.new("UICorner")
 						local Sample11 = Instance.new("ImageLabel")
-						local ms = game.Players.LocalPlayer:GetMouse()
+						
 						Sample11.Name = "Sample11"
 						Sample11.Parent = optionSelect
 						Sample11.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1808,7 +1789,7 @@ function Kavo.CreateLib(kavName, themeList)
 						optionSelect.Position = UDim2.new(0, 0, 0.235294119, 0)
 						optionSelect.Size = UDim2.new(0, 352, 0, 33)
 						optionSelect.AutoButtonColor = false
-						optionSelect.Font = Enum.Font.GothamSemibold
+						optionSelect.Font = Enum.Font.GothamBold
 						optionSelect.Text = "  "..v
 						optionSelect.TextColor3 = Color3.fromRGB(themeList.TextColor.r * 255 - 6, themeList.TextColor.g * 255 - 6, themeList.TextColor.b * 255 - 6)
 						optionSelect.TextSize = 14.000
@@ -1905,7 +1886,7 @@ function Kavo.CreateLib(kavName, themeList)
 				local Sample = Instance.new("ImageLabel")
 				local togName_2 = Instance.new("TextLabel")
 
-				local ms = game.Players.LocalPlayer:GetMouse()
+				
 				local uis = game:GetService("UserInputService")
 				local infBtn = viewInfo
 
@@ -1971,7 +1952,7 @@ function Kavo.CreateLib(kavName, themeList)
 				moreInfo.Size = UDim2.new(0, 353, 0, 33)
 				moreInfo.ZIndex = 9
 				moreInfo.RichText = true
-				moreInfo.Font = Enum.Font.GothamSemibold
+				moreInfo.Font = Enum.Font.GothamBold
 				moreInfo.Text = "  "..keyinf
 				moreInfo.TextColor3 = themeList.TextColor
 				moreInfo.TextSize = 14.000
@@ -1992,7 +1973,7 @@ function Kavo.CreateLib(kavName, themeList)
 				togName.BackgroundTransparency = 1.000
 				togName.Position = UDim2.new(0.096704483, 0, 0.272727281, 0)
 				togName.Size = UDim2.new(0, 222, 0, 14)
-				togName.Font = Enum.Font.GothamSemibold
+				togName.Font = Enum.Font.GothamBold
 				togName.Text = keytext
 				togName.RichText = true
 				togName.TextColor3 = themeList.TextColor
@@ -2081,7 +2062,7 @@ function Kavo.CreateLib(kavName, themeList)
 				togName_2.BackgroundTransparency = 1.000
 				togName_2.Position = UDim2.new(0.727386296, 0, 0.272727281, 0)
 				togName_2.Size = UDim2.new(0, 70, 0, 14)
-				togName_2.Font = Enum.Font.GothamSemibold
+				togName_2.Font = Enum.Font.GothamBold
 				togName_2.Text = oldKey
 				togName_2.TextColor3 = themeList.SchemeColor
 				togName_2.TextSize = 14.000
@@ -2109,8 +2090,8 @@ function Kavo.CreateLib(kavName, themeList)
 				colText = colText or "ColorPicker"
 				callback = callback or function() end
 				defcolor = defcolor or Color3.fromRGB(1,1,1)
-				local h, s, v = Color3.toHSV(defcolor)
-				local ms = game.Players.LocalPlayer:GetMouse()
+				local h, s, v = Color3:ToHSV(defcolor)
+				
 				local colorOpened = false
 				local colorElement = Instance.new("TextButton")
 				local UICorner = Instance.new("UICorner")
@@ -2245,7 +2226,7 @@ function Kavo.CreateLib(kavName, themeList)
 				togName.BackgroundTransparency = 1.000
 				togName.Position = UDim2.new(0.096704483, 0, 0.272727281, 0)
 				togName.Size = UDim2.new(0, 288, 0, 14)
-				togName.Font = Enum.Font.GothamSemibold
+				togName.Font = Enum.Font.GothamBold
 				togName.Text = colText
 				togName.TextColor3 = themeList.TextColor
 				togName.TextSize = 14.000
@@ -2261,7 +2242,7 @@ function Kavo.CreateLib(kavName, themeList)
 				moreInfo.Position = UDim2.new(0, 0, 2, 0)
 				moreInfo.Size = UDim2.new(0, 353, 0, 33)
 				moreInfo.ZIndex = 9
-				moreInfo.Font = Enum.Font.GothamSemibold
+				moreInfo.Font = Enum.Font.GothamBold
 				moreInfo.Text = "  "..colInf
 				moreInfo.TextColor3 = themeList.TextColor
 				moreInfo.TextSize = 14.000
@@ -2408,7 +2389,7 @@ function Kavo.CreateLib(kavName, themeList)
 				togName_2.BackgroundTransparency = 1.000
 				togName_2.Position = UDim2.new(0.779999971, 0, 0.100000001, 0)
 				togName_2.Size = UDim2.new(0, 278, 0, 14)
-				togName_2.Font = Enum.Font.GothamSemibold
+				togName_2.Font = Enum.Font.GothamBold
 				togName_2.Text = "Rainbow"
 				togName_2.TextColor3 = themeList.TextColor
 				togName_2.TextSize = 14.000
@@ -2465,7 +2446,6 @@ function Kavo.CreateLib(kavName, themeList)
 				end)()
 				updateSectionFrame()
 				UpdateSize()
-				local plr = game.Players.LocalPlayer
 				local mouse = plr:GetMouse()
 				local uis = game:GetService('UserInputService')
 				local rs = game:GetService("RunService")
