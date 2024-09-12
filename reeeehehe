@@ -131,7 +131,7 @@ function NoclipLoope()
 end
 function EffectCharacter(Char)
 	local RootPart = Char:FindFirstChild("HumanoidRootPart")
-	local HumanoidChar = Char:FindFirstChildWhichIsA("Humanoid")
+	local HumanoidChar = Char:FindFirstChild("Humanoid")
 	HumanoidChar.Died:Connect(function()
 		Dead = true
 		plrlol.CharacterAdded:Connect(function(char)
