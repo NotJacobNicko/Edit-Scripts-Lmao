@@ -1,6 +1,12 @@
 local Flyye,VELO,BODY = false,nil,nil
 local OriginPos = CFrame.new()
 local plrlol = game:GetService("Players").LocalPlayer
+local Dead = false
+local ExtraBebounfly = false
+local NoclipEnabled = true
+local CharacterParented = nil
+local Clip = true
+local Noclipping
 function randomstring()
 	local e = {}
 	for i = 1,math.random(5,50) do
@@ -23,9 +29,20 @@ button1.MouseButton1Click:Connect(function()
 	if not Flyye then
 		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
 		Flyye = true
+		ExtraBebounfly = true
+		NoclipEnabled = true
+		
+		Clip = false
+		Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
 	else
 		button1.BackgroundColor3 = Color3.new(1, 0, 0)
 		Flyye = false
+		ExtraBebounfly = false
+		NoclipEnabled = false
+		Clip = true
+		if Noclipping then
+			Noclipping:Disconnect()
+		end
 		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
 			if VELO and BODY then
 				VELO:Destroy()
@@ -37,21 +54,26 @@ button1.MouseButton1Click:Connect(function()
 		end
 	end
 end)
+local PlrCamera = workspace.CurrentCamera
 function loopcheck()
 	local function uh()
-		local PlrCamera = workspace.CurrentCamera
-		local Humanoid = plrlol.Character:FindFirstChildWhichIsA("Humanoid")
-		local RootPart = plrlol.Character:WaitForChild("HumanoidRootPart")
-		if Flyye then
+		local Humanoid = plrlol.Character:WaitForChild("Humanoid")
+		local RootPart = plrlol.Character:FindFirstChild("HumanoidRootPart")
+		if Flyye and plrlol.Character and Humanoid and RootPart then
 			local PlayerModuleMoment = plrlol.PlayerScripts:WaitForChild("PlayerModule")
 			if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO and BODY then
-				if Humanoid.Sit then
-					Humanoid.PlatformStand = false
-					PlrCamera.CameraSubject = Humanoid
-					PlrCamera.CameraType = Enum.CameraType.Track
+				if Humanoid ~= nil then
+					if Humanoid.Sit then
+						Humanoid.PlatformStand = false
+						PlrCamera.CameraSubject = Humanoid
+						PlrCamera.CameraType = Enum.CameraType.Track
+					else
+						Humanoid.PlatformStand = true
+						PlrCamera.CameraType = Enum.CameraType.Custom
+					end
 				else
-					PlrCamera.CameraType = Enum.CameraType.Custom
-					Humanoid.PlatformStand = true
+					Humanoid = plrlol.Character:FindFirstChildWhichIsA("Humanoid")
+					RootPart = plrlol.Character:WaitForChild("HumanoidRootPart")
 				end
 				BODY.CFrame = CFrame.new(OriginPos.X,OriginPos.Y,OriginPos.Z)*CFrame.lookAt(RootPart.Position, RootPart.Position + PlrCamera.CFrame.LookVector)
 				VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
@@ -59,25 +81,31 @@ function loopcheck()
 				VELO.Velocity = Vector3.new()
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
 					VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * 100)
-					OriginPos = PlrCamera.CFrame
+					if not Dead and plrlol.Character then
+						OriginPos = RootPart.CFrame
+					end
 				end
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
 					VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * 100)
-					OriginPos = PlrCamera.CFrame
+					if not Dead and plrlol.Character then
+						OriginPos = RootPart.CFrame
+					end
 				end
-			elseif plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and not VELO and not BODY then
-				VELO = Instance.new("BodyVelocity")
-				VELO.Name = randomstring()
-				VELO.Parent = plrlol.Character.HumanoidRootPart
-				VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
-				VELO.Velocity = Vector3.new()
+			else
+				if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO == nil and BODY == nil then
+					VELO = Instance.new("BodyVelocity")
+					VELO.Name = randomstring()
+					VELO.Parent = plrlol.Character.HumanoidRootPart
+					VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+					VELO.Velocity = Vector3.new()
 
-				BODY = Instance.new("BodyGyro")
-				BODY.Name = randomstring()
-				BODY.Parent = plrlol.Character.HumanoidRootPart
-				BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-				BODY.P = 1000
-				BODY.D = 200
+					BODY = Instance.new("BodyGyro")
+					BODY.Name = randomstring()
+					BODY.Parent = plrlol.Character.HumanoidRootPart
+					BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+					BODY.P = 1000
+					BODY.D = 200
+				end
 			end
 		end
 	end
@@ -90,4 +118,80 @@ function loopcheck()
 	end))
 	uh()
 end
+local count = 0
+
+function NoclipLoope()
+	if Clip == false and plrlol.Character then
+		for _, child in pairs(plrlol.Character:GetDescendants()) do
+			if child:IsA("BasePart") and child.CanCollide == true then
+				child.CanCollide = false
+			end
+		end
+	end
+end
+function EffectCharacter(Char)
+	local RootPart = Char:FindFirstChild("HumanoidRootPart")
+	local HumanoidChar = Char:FindFirstChildWhichIsA("Humanoid")
+	HumanoidChar.Died:Connect(function()
+		Dead = true
+		plrlol.CharacterAdded:Connect(function(char)
+			local Character = nil
+			repeat
+				if CharacterParented:FindFirstChild(plrlol.Name) and CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
+					Character = plrlol.Character or char
+					EffectCharacter(Character)
+					if Character and ExtraBebounfly then
+						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
+					end
+				end
+				wait()
+			until Character ~= nil
+		end)
+	end)
+	CharacterParented.ChildRemoved:Connect(function(model)
+		if not Dead and model == Char then
+			Dead = true
+			local Character = nil
+			repeat
+				if CharacterParented:FindFirstChild(plrlol.Name) then
+					Character = plrlol.Character
+					EffectCharacter(Character)
+					if Character and ExtraBebounfly then
+						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
+					end
+				end
+				wait()
+			until Character ~= nil
+		end
+	end)
+	Dead = false
+	Clip = true
+	if Noclipping then
+		Noclipping:Disconnect()
+	end
+	if Flyye then
+		task.delay(.005,function()
+			Flyye = true
+			loopcheck()
+		end)
+		Flyye = false
+		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
+			if VELO and BODY then
+				VELO:Destroy()
+				BODY:Destroy()
+				VELO = nil
+				BODY = nil
+				plrlol.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
+			end
+		end
+		
+		if NoclipEnabled then
+			Clip = false
+			Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
+		end
+	end
+end
+CharacterParented = plrlol.Character.Parent or workspace
+OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
 loopcheck()
+EffectCharacter(plrlol.Character)
