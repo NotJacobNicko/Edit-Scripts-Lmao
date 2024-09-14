@@ -98,7 +98,7 @@ function loopcheck()
 					VELO.Parent = plrlol.Character.HumanoidRootPart
 					VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
 					VELO.Velocity = Vector3.new()
-
+ 
 					BODY = Instance.new("BodyGyro")
 					BODY.Name = randomstring()
 					BODY.Parent = plrlol.Character.HumanoidRootPart
@@ -110,17 +110,31 @@ function loopcheck()
 		end
 		local function FastSpam()
 			if Flyye then
+				
+				
+				-- enable player controlls when game restricts it >:(
 				game:GetService("UserInputService").ModalEnabled = false
+				local PlayerModule = require(plrlol:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
+				local PlayerControls = PlayerModule:GetControls()
+				local MobileGui = plrlol.PlayerGui:FindFirstChild("TouchGui")
+				local MobileFrame = MobileGui:FindFirstChild("TouchControlFrame")
+				if MobileGui and not MobileGui.Enabled or not MobileGui:FindFirstChild("TouchControlFrame").Visible or not MobileGui:FindFirstChild("TouchControlFrame"):FindFirstChild("JumpButton").Visible or not MobileGui:FindFirstChild("TouchControlFrame"):FindFirstChild("DynamicThumbstickFrame").Visible then
+					MobileGui.Enabled = true
+					MobileFrame.Visible = true
+					MobileFrame:FindFirstChild("JumpButton").Visible = true
+					MobileFrame:FindFirstChild("DynamicThumbstickFrame").Visible = true
+				end
+				PlayerControls:Enable(true)
 			end
 		end
 		task.spawn(function()
 			FastSpam()
-			for i=1,10 do
+			for i=1,50 do
 				FastSpam()
 			end
 			FastSpam()
 		end)
-		
+
 	end
 	uh()
 	coroutine.resume(coroutine.create(function()
