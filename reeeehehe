@@ -31,7 +31,7 @@ button1.MouseButton1Click:Connect(function()
 		Flyye = true
 		ExtraBebounfly = true
 		NoclipEnabled = true
-		
+
 		Clip = false
 		Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
 	else
@@ -108,6 +108,19 @@ function loopcheck()
 				end
 			end
 		end
+		local function FastSpam()
+			if Flyye then
+				game:GetService("UserInputService").ModalEnabled = false
+			end
+		end
+		task.spawn(function()
+			FastSpam()
+			for i=1,10 do
+				FastSpam()
+			end
+			FastSpam()
+		end)
+		
 	end
 	uh()
 	coroutine.resume(coroutine.create(function()
@@ -141,7 +154,7 @@ function EffectCharacter(Char)
 					Character = plrlol.Character or char
 					EffectCharacter(Character)
 					if Character and ExtraBebounfly then
-						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
+						Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
 					end
 				end
 				wait()
@@ -157,7 +170,7 @@ function EffectCharacter(Char)
 					Character = plrlol.Character
 					EffectCharacter(Character)
 					if Character and ExtraBebounfly then
-						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
+						Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
 					end
 				end
 				wait()
@@ -184,7 +197,7 @@ function EffectCharacter(Char)
 				plrlol.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
 			end
 		end
-		
+
 		if NoclipEnabled then
 			Clip = false
 			Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
