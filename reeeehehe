@@ -1,16 +1,12 @@
-local Stats = game:GetService('Stats')
-local Players = game:GetService('Players')
-local RunService = game:GetService('RunService')
-local ReplicatedStorage = game:GetService('ReplicatedStorage')
-local local_player = Players.LocalPlayer
-local camera = workspace.CurrentCamera
-local closest_Entity = nil
-local parry_remote = nil
-local SwordModel = nil
-local MainSword,NeonSwordPart = nil,nil
-local Swordlight,SwordSlashEffect,ThemeSong = nil,nil,nil
-local SwordWeld1 = nil
-local connections = {}
+local Flyye,VELO,BODY = false,nil,nil
+local OriginPos = CFrame.new()
+local plrlol = game:GetService("Players").LocalPlayer
+local Dead = false
+local ExtraBebounfly = false
+local NoclipEnabled = true
+local CharacterParented = nil
+local Clip = true
+local Noclipping
 function randomstring()
 	local e = {}
 	for i = 1,math.random(5,50) do
@@ -18,1193 +14,185 @@ function randomstring()
 	end
 	return table.concat(e)
 end
-local TogglSetting = {}
-TogglSetting.aura_Enabled = false
-TogglSetting.hit_sound_Enabled = false
-TogglSetting.hit_effect_Enabled = false
-TogglSetting.night_mode_Enabled = false
-TogglSetting.trail_Enabled = false
-TogglSetting.self_effect_Enabled = false
-TogglSetting.AutoSpam = false
-TogglSetting.TestParry = false
-TogglSetting.CustomSword = false
-local RGBtable = {}
-task.defer(function()
-	while true do
-		for a = 1,360,1*6 do 
-			wait()
-			local RGBColor = Color3.fromHSV(a/360,1,1)
-			pcall(function()
-				if NeonSwordPart and Swordlight then
-					Swordlight.Color = RGBColor
-					NeonSwordPart.Color = RGBColor
-					if SwordSlashEffect ~= nil then
-						SwordSlashEffect.Color = ColorSequence.new(RGBColor)
-					end
-				end
-				for i,Partrgb in pairs(RGBtable) do
-					if Partrgb:IsA("ParticleEmitter") or Partrgb:IsA("Beam") and Partrgb ~= nil then
-						Partrgb.Color = ColorSequence.new(RGBColor)
-					else
-						if Partrgb:IsA("BasePart") and Partrgb ~= nil then
-							Partrgb.Color = RGBColor
-						end
-					end
-				end
-			end)
+local GUI = Instance.new("ScreenGui",plrlol.PlayerGui)
+GUI.Name = randomstring()
+GUI.ResetOnSpawn = false
+GUI.IgnoreGuiInset = true
+local button1 = Instance.new("TextButton",GUI)
+button1.Name = randomstring()
+button1.Size = UDim2.new(0,60,0,20)
+button1.BackgroundColor3 = Color3.new(1, 0, 0)
+button1.Position = UDim2.new(0.467, 0,0.728, 0)
+button1.Text = "Fly"
+button1.Visible = true
+button1.MouseButton1Click:Connect(function()
+	if not Flyye then
+		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
+		Flyye = true
+		ExtraBebounfly = true
+		NoclipEnabled = true
+		
+		Clip = false
+		Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
+	else
+		button1.BackgroundColor3 = Color3.new(1, 0, 0)
+		Flyye = false
+		ExtraBebounfly = false
+		NoclipEnabled = false
+		Clip = true
+		if Noclipping then
+			Noclipping:Disconnect()
+		end
+		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
+			if VELO and BODY then
+				VELO:Destroy()
+				BODY:Destroy()
+				VELO = nil
+				BODY = nil
+				plrlol.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
+			end
 		end
 	end
 end)
-local ThemePos = 0
-function AddSword(Character)
-	local UserSword = nil
-	for i,Model in pairs(Character:GetChildren()) do
-		if Model:IsA("Model") and Model.Name == "Dark Blade" then
-			local SwordDetect = Model:FindFirstChildWhichIsA("MeshPart")
-			if SwordDetect and SwordDetect.Name == "KatanaMesh" then
-				if SwordDetect:FindFirstChildWhichIsA("Model") then
-					SwordDetect:FindFirstChildWhichIsA("Model"):Destroy()
+local PlrCamera = workspace.CurrentCamera
+function loopcheck()
+	local function uh()
+		local Humanoid = plrlol.Character:WaitForChild("Humanoid")
+		local RootPart = plrlol.Character:FindFirstChild("HumanoidRootPart")
+		if Flyye and plrlol.Character and Humanoid and RootPart then
+			local PlayerModuleMoment = plrlol.PlayerScripts:WaitForChild("PlayerModule")
+			if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO and BODY then
+				if Humanoid ~= nil then
+					if Humanoid.Sit then
+						Humanoid.PlatformStand = false
+						PlrCamera.CameraSubject = Humanoid
+						PlrCamera.CameraType = Enum.CameraType.Track
+					else
+						Humanoid.PlatformStand = true
+						PlrCamera.CameraType = Enum.CameraType.Custom
+					end
+				else
+					Humanoid = plrlol.Character:FindFirstChildWhichIsA("Humanoid")
+					RootPart = plrlol.Character:WaitForChild("HumanoidRootPart")
 				end
-				SwordDetect.Transparency = 1
-				UserSword = SwordDetect
+				BODY.CFrame = CFrame.new(OriginPos.X,OriginPos.Y,OriginPos.Z)*CFrame.lookAt(RootPart.Position, RootPart.Position + PlrCamera.CFrame.LookVector)
+				VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+				BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+				VELO.Velocity = Vector3.new()
+				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
+					VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * 100)
+					if not Dead and plrlol.Character then
+						OriginPos = RootPart.CFrame
+					end
+				end
+				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
+					VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * 100)
+					if not Dead and plrlol.Character then
+						OriginPos = RootPart.CFrame
+					end
+				end
+			else
+				if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO == nil and BODY == nil then
+					VELO = Instance.new("BodyVelocity")
+					VELO.Name = randomstring()
+					VELO.Parent = plrlol.Character.HumanoidRootPart
+					VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+					VELO.Velocity = Vector3.new()
+
+					BODY = Instance.new("BodyGyro")
+					BODY.Name = randomstring()
+					BODY.Parent = plrlol.Character.HumanoidRootPart
+					BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+					BODY.P = 1000
+					BODY.D = 200
+				end
 			end
 		end
 	end
-	
-	MainSword = game:GetService("InsertService"):CreateMeshPartAsync("rbxassetid://18858973664",Enum.CollisionFidelity.Default,Enum.RenderFidelity.Performance)
-	NeonSwordPart = game:GetService("InsertService"):CreateMeshPartAsync("rbxassetid://18858973949",Enum.CollisionFidelity.Default,Enum.RenderFidelity.Performance)
-	SwordModel = Instance.new("Model",UserSword)
-	SwordModel.Name = randomstring()
+	uh()
+	coroutine.resume(coroutine.create(function()
+		while wait() do
+			uh()
+			uh()
+		end
+	end))
+	uh()
+end
+local count = 0
 
-	MainSword.Name = randomstring()
-	MainSword.Parent = SwordModel
-	MainSword.TextureID = "rbxassetid://18858973774"
-	MainSword.CanCollide = false 
-	MainSword.Size = Vector3.new(1.732, 8.075, 0.572)
-	MainSword.Massless = true
-	MainSword.CFrame = CFrame.new(0,10,0)
-
-	NeonSwordPart.Name = randomstring()
-	NeonSwordPart.Parent = SwordModel
-	NeonSwordPart.Material = Enum.Material.Neon
-	NeonSwordPart.Size = Vector3.new(0.219, 7.007, 0.371)
-	NeonSwordPart.Color = Color3.new(0.968627, 0, 1)
-	NeonSwordPart.CanCollide = false
-	NeonSwordPart.Massless = true
-	Swordlight = Instance.new("PointLight",NeonSwordPart)
-	Swordlight.Name = randomstring()
-	Swordlight.Brightness = 1
-	Swordlight.Range = 15
-	local SwordWeld = Instance.new("Weld",MainSword)
-	SwordWeld.Name = randomstring()
-	SwordWeld.C0 = CFrame.new(0,-0.5,0)
-	SwordWeld.Part0 = MainSword
-	SwordWeld.Part1 = NeonSwordPart
-	SwordWeld1 = Instance.new("Weld",MainSword)
-	SwordWeld1.Name = randomstring()
-	SwordWeld1.C0 = CFrame.new(0.200000003, -0.550000012, -2.29999995, 0.99619472, 0.0871556923, 3.80969611e-09, 0, -4.37113883e-08, 1, 0.0871556923, -0.99619472, -4.35450538e-08)
-	SwordWeld1.C1 = CFrame.new(0, 0, 0, 0.939692616, 0, 0.342020154, 0, 1, 0, -0.342020154, 0, 0.939692616)
-	SwordWeld1.Part0 = UserSword
-	SwordWeld1.Part1 = MainSword
-	local Att1 = Instance.new("Attachment",MainSword)
-	Att1.Name = randomstring()
-	Att1.CFrame = CFrame.new(0,-1.65,0)
-	local Att2 = Instance.new("Attachment",MainSword)
-	Att2.Name = randomstring()
-	Att2.CFrame = CFrame.new(0,4.05,0)
-	SwordSlashEffect = Instance.new("Trail",MainSword)
-	SwordSlashEffect.Name = randomstring()
-	SwordSlashEffect.Enabled = false
-	SwordSlashEffect.Brightness = 3
-	SwordSlashEffect.Texture = "rbxassetid://1978704853"
-	SwordSlashEffect.TextureLength = 0.625
-	SwordSlashEffect.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)}
-	SwordSlashEffect.Attachment0 = Att1
-	SwordSlashEffect.Attachment1 = Att2
-	SwordSlashEffect.Lifetime = 0.5
-	SwordSlashEffect.MinLength = 0
-	ThemeSong = Instance.new("Sound",MainSword)
-	ThemeSong.Name = randomstring()
-	ThemeSong.Looped = true
-	ThemeSong.PlaybackSpeed = 0.85
-	ThemeSong.SoundId = "rbxassetid://1842802040"
-	ThemeSong.Volume = .5
-	ThemeSong.TimePosition = ThemePos
-	ThemeSong:Play()
-	local Variables = {} 
-	Variables['effe'] = Instance.new('ParticleEmitter');Variables['effe'].Name = randomstring()
-	Variables['effe'].FlipbookFramerate = NumberRange.new(1, 1)
-	Variables['effe'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-	Variables['effe'].FlipbookLayout = Enum.ParticleFlipbookLayout.None
-	Variables['effe'].TimeScale = 1
-	Variables['effe'].Drag = 5
-	Variables['effe'].VelocityInheritance = 0
-	Variables['effe'].LockedToPart = true
-	Variables['effe'].Speed = NumberRange.new(0, 5.894961357116699)
-	Variables['effe'].RotSpeed = NumberRange.new(-360, 360)
-	Variables['effe'].Rotation = NumberRange.new(90, 90)
-	Variables['effe'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-	Variables['effe'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-	Variables['effe'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-	Variables['effe'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['effe'].SpreadAngle = Vector2.new(720, 720)
-	Variables['effe'].Rate = 45
-	Variables['effe'].Lifetime = NumberRange.new(0.5, 2)
-	Variables['effe'].LightEmission = 1
-	Variables['effe'].LightInfluence = 0
-	Variables['effe'].Orientation = Enum.ParticleOrientation.VelocityParallel
-	Variables['effe'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,1.2592592239379883),NumberSequenceKeypoint.new(1,0.48148155212402344,0)}
-	Variables['effe'].ZOffset = 1.3905969858169556
-	Variables['effe'].EmissionDirection = Enum.NormalId.Back
-	Variables['effe'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(1,0.25882354378700256,0.2705882489681244)),ColorSequenceKeypoint.new(1,Color3.new(1,0.25882354378700256,0.2705882489681244))}
-	Variables['effe'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['effe'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(0.49852943420410156,0.036843474954366684,0.036843474954366684),NumberSequenceKeypoint.new(0.89973384141922,0,0),NumberSequenceKeypoint.new(1,0,0)}
-	Variables['effe'].Texture = 'rbxassetid://11755027734'
-	Variables['effe'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-	Variables['effe'].Brightness = 25
-	Variables['effe'].Enabled = true
-	Variables['Instance3'] = Instance.new('Attachment');Variables['Instance3'].Name = 'SecondStar'
-	Variables['Instance3'].CFrame = CFrame.new(0, -3.74000072, 1.90734863e-06, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-	Variables['Instance4'] = Instance.new('ParticleEmitter');Variables['Instance4'].Name = 'Shine'
-	Variables['Instance4'].FlipbookFramerate = NumberRange.new(1, 1)
-	Variables['Instance4'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-	Variables['Instance4'].FlipbookLayout = Enum.ParticleFlipbookLayout.None
-	Variables['Instance4'].TimeScale = 1
-	Variables['Instance4'].Drag = 0
-	Variables['Instance4'].VelocityInheritance = 0
-	Variables['Instance4'].LockedToPart = true
-	Variables['Instance4'].Speed = NumberRange.new(0.00024175446014851332, 0.00024175446014851332)
-	Variables['Instance4'].RotSpeed = NumberRange.new(-20, 20)
-	Variables['Instance4'].Rotation = NumberRange.new(-360, 360)
-	Variables['Instance4'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-	Variables['Instance4'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-	Variables['Instance4'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-	Variables['Instance4'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['Instance4'].SpreadAngle = Vector2.new(0, 0)
-	Variables['Instance4'].Rate = 5
-	Variables['Instance4'].Lifetime = NumberRange.new(0.75, 0.75)
-	Variables['Instance4'].LightEmission = 1
-	Variables['Instance4'].LightInfluence = 0
-	Variables['Instance4'].Orientation = Enum.ParticleOrientation.VelocityParallel
-	Variables['Instance4'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-	Variables['Instance4'].ZOffset = -1
-	Variables['Instance4'].EmissionDirection = Enum.NormalId.Top
-	Variables['Instance4'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(1,0.3333333432674408,1)),ColorSequenceKeypoint.new(1,Color3.new(1,0.3333333432674408,1))}
-	Variables['Instance4'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['Instance4'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,0.47461003065109253,0),NumberSequenceKeypoint.new(1,2.091250419616699,0)}
-	Variables['Instance4'].Texture = 'rbxassetid://15741242354'
-	Variables['Instance4'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.10538116842508316,0.6871165633201599,0.03750002384185791),NumberSequenceKeypoint.new(0.7525337934494019,0.875,0.006249964237213135),NumberSequenceKeypoint.new(1,1,0)}
-	Variables['Instance4'].Brightness = 1
-	Variables['Instance4'].Enabled = true
-	Variables['Instance5'] = Instance.new('ParticleEmitter');Variables['Instance5'].Name = 'Shard_Long'
-	Variables['Instance5'].FlipbookFramerate = NumberRange.new(1, 1)
-	Variables['Instance5'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-	Variables['Instance5'].FlipbookLayout = Enum.ParticleFlipbookLayout.None
-	Variables['Instance5'].TimeScale = 1
-	Variables['Instance5'].Drag = 5
-	Variables['Instance5'].VelocityInheritance = 0
-	Variables['Instance5'].LockedToPart = true
-	Variables['Instance5'].Speed = NumberRange.new(0.0005091082421131432, 0.0005091082421131432)
-	Variables['Instance5'].RotSpeed = NumberRange.new(-10, 10)
-	Variables['Instance5'].Rotation = NumberRange.new(0, 0)
-	Variables['Instance5'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-	Variables['Instance5'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-	Variables['Instance5'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-	Variables['Instance5'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['Instance5'].SpreadAngle = Vector2.new(0, 0)
-	Variables['Instance5'].Rate = 15
-	Variables['Instance5'].Lifetime = NumberRange.new(0.10000000149011612, 0.20000000298023224)
-	Variables['Instance5'].LightEmission = 1
-	Variables['Instance5'].LightInfluence = 0
-	Variables['Instance5'].Orientation = Enum.ParticleOrientation.VelocityParallel
-	Variables['Instance5'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,11.112053871154785,2.444444417953491)}
-	Variables['Instance5'].ZOffset = 0.3499999940395355
-	Variables['Instance5'].EmissionDirection = Enum.NormalId.Top
-	Variables['Instance5'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(1,0.3333333432674408,1)),ColorSequenceKeypoint.new(1,Color3.new(1,0.3333333432674408,1))}
-	Variables['Instance5'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['Instance5'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,0.3292803466320038,0),NumberSequenceKeypoint.new(0.4358519911766052,0.55689537525177,0.31579113006591797),NumberSequenceKeypoint.new(1,0,0)}
-	Variables['Instance5'].Texture = 'http://www.roblox.com/asset/?id=15831917405'
-	Variables['Instance5'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-	Variables['Instance5'].Brightness = 10
-	Variables['Instance5'].Enabled = true
-	Variables['Instance6'] = Instance.new('ParticleEmitter');Variables['Instance6'].Name = 'Shard_Long'
-	Variables['Instance6'].FlipbookFramerate = NumberRange.new(1, 1)
-	Variables['Instance6'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-	Variables['Instance6'].FlipbookLayout = Enum.ParticleFlipbookLayout.None
-	Variables['Instance6'].TimeScale = 1
-	Variables['Instance6'].Drag = 5
-	Variables['Instance6'].VelocityInheritance = 0
-	Variables['Instance6'].LockedToPart = true
-	Variables['Instance6'].Speed = NumberRange.new(0.0005091082421131432, 0.0005091082421131432)
-	Variables['Instance6'].RotSpeed = NumberRange.new(-10, 10)
-	Variables['Instance6'].Rotation = NumberRange.new(90, 90)
-	Variables['Instance6'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-	Variables['Instance6'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-	Variables['Instance6'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-	Variables['Instance6'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['Instance6'].SpreadAngle = Vector2.new(0, 0)
-	Variables['Instance6'].Rate = 15
-	Variables['Instance6'].Lifetime = NumberRange.new(0.10000000149011612, 0.20000000298023224)
-	Variables['Instance6'].LightEmission = 1
-	Variables['Instance6'].LightInfluence = 0
-	Variables['Instance6'].Orientation = Enum.ParticleOrientation.VelocityParallel
-	Variables['Instance6'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,11.112053871154785,2.444444417953491)}
-	Variables['Instance6'].ZOffset = 0.3499999940395355
-	Variables['Instance6'].EmissionDirection = Enum.NormalId.Top
-	Variables['Instance6'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(1,0.3333333432674408,1)),ColorSequenceKeypoint.new(1,Color3.new(1,0.3333333432674408,1))}
-	Variables['Instance6'].Shape = Enum.ParticleEmitterShape.Box
-	Variables['Instance6'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,0.3292803466320038,0),NumberSequenceKeypoint.new(0.4358519911766052,0.55689537525177,0.31579113006591797),NumberSequenceKeypoint.new(1,0,0)}
-	Variables['Instance6'].Texture = 'http://www.roblox.com/asset/?id=15831917405'
-	Variables['Instance6'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-	Variables['Instance6'].Brightness = 10
-	Variables['Instance6'].Enabled = true
-	Variables['Instance7'] = Instance.new('Attachment');Variables['Instance7'].Name = 'Blade'
-	Variables['Instance7'].CFrame = CFrame.new(9.53674316e-07, -1.70000076, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-	Variables['Instance8'] = Instance.new('Folder');Variables['Instance8'].Name = 'Beams2'
-	Variables['Instance10'] = Instance.new('Attachment');Variables['Instance10'].Name = '2'
-	Variables['Instance10'].CFrame = CFrame.new(0, 0.0410000011, 0, 1, 0, 0, 0, 0, -1, 0, 1, 0)
-	Variables['Instance11'] = Instance.new('Attachment');Variables['Instance11'].Name = '1'
-	Variables['Instance11'].CFrame = CFrame.new(0, 4.88399982, 0, 1, 0, 0, 0, 0, -1, 0, 1, 0)
-	Variables['Instance9'] = Instance.new('Beam');Variables['Instance9'].Name = 'MidLiquid'
-	Variables['Instance9'].FaceCamera = true
-	Variables['Instance9'].Segments = 55
-	Variables['Instance9'].Width1 = 0.125
-	Variables['Instance9'].Width0 = 1.7000000476837158
-	Variables['Instance9'].CurveSize0 = 0
-	Variables['Instance9'].CurveSize0 = 0
-	Variables['Instance9'].Attachment0 = Variables['Instance10']
-	Variables['Instance9'].Attachment1 = Variables['Instance11']
-	Variables['Instance9'].TextureSpeed = 0.5
-	Variables['Instance9'].TextureLength = 1.625
-	Variables['Instance9'].TextureMode = Enum.TextureMode.Stretch
-	Variables['Instance9'].LightEmission = 0
-	Variables['Instance9'].LightInfluence = 0
-	Variables['Instance9'].ZOffset = 0.019999999552965164
-	Variables['Instance9'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.48235294222831726,0.0784313753247261,1)),ColorSequenceKeypoint.new(1,Color3.new(0.48235294222831726,0.0784313753247261,1))}
-	Variables['Instance9'].Texture = 'http://www.roblox.com/asset/?id=15937996601'
-	Variables['Instance9'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0.9750000238418579,0),NumberSequenceKeypoint.new(0.49890831112861633,0.1265060305595398,0),NumberSequenceKeypoint.new(1,1,0)}
-	Variables['Instance9'].Brightness = 0
-	Variables['Instance9'].Enabled = true
-	Variables['Instance12'] = Instance.new('Folder');Variables['Instance12'].Name = 'Beams1'
-	Variables['Instance13'] = Instance.new('Beam');Variables['Instance13'].Name = 'Beam'
-	Variables['Instance13'].FaceCamera = true
-	Variables['Instance13'].Segments = 55
-	Variables['Instance13'].Width1 = 1
-	Variables['Instance13'].Width0 = 1
-	Variables['Instance13'].CurveSize0 = 0
-	Variables['Instance13'].CurveSize0 = 0
-	Variables['Instance13'].Attachment0 = Variables['Instance10']
-	Variables['Instance13'].Attachment1 = Variables['Instance11']
-	Variables['Instance13'].TextureSpeed = 0.5
-	Variables['Instance13'].TextureLength = 0.375
-	Variables['Instance13'].TextureMode = Enum.TextureMode.Stretch
-	Variables['Instance13'].LightEmission = 0
-	Variables['Instance13'].LightInfluence = 0
-	Variables['Instance13'].ZOffset = -0.10000000149011612
-	Variables['Instance13'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.25882354378700256,0.35686275362968445,1)),ColorSequenceKeypoint.new(1,Color3.new(0.25882354378700256,0.35686275362968445,1))}
-	Variables['Instance13'].Texture = 'rbxassetid://16353232646'
-	Variables['Instance13'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.15878379344940186,0.4375,0),NumberSequenceKeypoint.new(0.4755067825317383,0.19374996423721313,0),NumberSequenceKeypoint.new(0.7863175868988037,0.46875,0),NumberSequenceKeypoint.new(1,1,0)}
-	Variables['Instance13'].Brightness = 0
-	Variables['Instance13'].Enabled = true
-	Variables['Instance14'] = Instance.new('Beam');Variables['Instance14'].Name = 'Blade'
-	Variables['Instance14'].FaceCamera = true
-	Variables['Instance14'].Segments = 100
-	Variables['Instance14'].Width1 = 0.75
-	Variables['Instance14'].Width0 = 3.75
-	Variables['Instance14'].CurveSize0 = 0
-	Variables['Instance14'].CurveSize0 = 0
-	Variables['Instance14'].Attachment0 = Variables['Instance10']
-	Variables['Instance14'].Attachment1 = Variables['Instance11']
-	Variables['Instance14'].TextureSpeed = 0.699999988079071
-	Variables['Instance14'].TextureLength = 0.375
-	Variables['Instance14'].TextureMode = Enum.TextureMode.Stretch
-	Variables['Instance14'].LightEmission = 0
-	Variables['Instance14'].LightInfluence = 0
-	Variables['Instance14'].ZOffset = 0
-	Variables['Instance14'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3333333432674408,0.6666666865348816,1)),ColorSequenceKeypoint.new(1,Color3.new(0.3333333432674408,0.6666666865348816,1))}
-	Variables['Instance14'].Texture = 'rbxassetid://12781855685'
-	Variables['Instance14'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.20945946872234344,0.375,0),NumberSequenceKeypoint.new(0.5010570883750916,0,0),NumberSequenceKeypoint.new(0.8310810923576355,0.4624999761581421,0),NumberSequenceKeypoint.new(1,1,0)}
-	Variables['Instance14'].Brightness = 1
-	Variables['Instance14'].Enabled = true
-	Variables['Instance15'] = Instance.new('Beam');Variables['Instance15'].Name = 'Ripple'
-	Variables['Instance15'].FaceCamera = true
-	Variables['Instance15'].Segments = 100
-	Variables['Instance15'].Width1 = 0
-	Variables['Instance15'].Width0 = 1
-	Variables['Instance15'].CurveSize0 = 0
-	Variables['Instance15'].CurveSize0 = 0
-	Variables['Instance15'].Attachment0 = Variables['Instance10']
-	Variables['Instance15'].Attachment1 = Variables['Instance11']
-	Variables['Instance15'].TextureSpeed = 0.5
-	Variables['Instance15'].TextureLength = 0.875
-	Variables['Instance15'].TextureMode = Enum.TextureMode.Stretch
-	Variables['Instance15'].LightEmission = 0
-	Variables['Instance15'].LightInfluence = 0.550000011920929
-	Variables['Instance15'].ZOffset = 0.009999999776482582
-	Variables['Instance15'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(1,0.6666666865348816,1)),ColorSequenceKeypoint.new(1,Color3.new(1,0.6666666865348816,1))}
-	Variables['Instance15'].Texture = 'http://www.roblox.com/asset/?id=18871362882'
-	Variables['Instance15'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.18243244290351868,0.15625,0),NumberSequenceKeypoint.new(0.5010570883750916,0,0),NumberSequenceKeypoint.new(0.8378378748893738,0.19999998807907104,0),NumberSequenceKeypoint.new(1,1,0)}
-	Variables['Instance15'].Brightness = 5
-	Variables['Instance15'].Enabled = true
-	Variables['Instance16'] = Instance.new('Beam');Variables['Instance16'].Name = 'Blade'
-	Variables['Instance16'].FaceCamera = true
-	Variables['Instance16'].Segments = 100
-	Variables['Instance16'].Width1 = 0.5
-	Variables['Instance16'].Width0 = 1.5
-	Variables['Instance16'].CurveSize0 = 0
-	Variables['Instance16'].CurveSize0 = 0
-	Variables['Instance16'].Attachment0 = Variables['Instance10']
-	Variables['Instance16'].Attachment1 = Variables['Instance11']
-	Variables['Instance16'].TextureSpeed = 0.699999988079071
-	Variables['Instance16'].TextureLength = 0.375
-	Variables['Instance16'].TextureMode = Enum.TextureMode.Stretch
-	Variables['Instance16'].LightEmission = 1
-	Variables['Instance16'].LightInfluence = 0
-	Variables['Instance16'].ZOffset = 0.25
-	Variables['Instance16'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(1,0.3333333432674408,1)),ColorSequenceKeypoint.new(1,Color3.new(1,0.3333333432674408,1))}
-	Variables['Instance16'].Texture = 'rbxassetid://12781855685'
-	Variables['Instance16'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.20945946872234344,0.375,0),NumberSequenceKeypoint.new(0.5010570883750916,0,0),NumberSequenceKeypoint.new(0.8310810923576355,0.4624999761581421,0),NumberSequenceKeypoint.new(1,1,0)}
-	Variables['Instance16'].Brightness = 2
-	Variables['Instance16'].Enabled = true
-	Variables['Instance3'].Parent = MainSword
-	Variables['effe'].Parent = MainSword
-	Variables['Instance4'].Parent = Variables['Instance3']
-	Variables['Instance5'].Parent = Variables['Instance3']
-	Variables['Instance6'].Parent = Variables['Instance3']
-	Variables['Instance7'].Parent = MainSword
-	Variables['Instance8'].Parent = Variables['Instance7']
-	Variables['Instance9'].Parent = Variables['Instance8']
-	Variables['Instance10'].Parent = Variables['Instance7']
-	Variables['Instance11'].Parent = Variables['Instance7']
-	Variables['Instance12'].Parent = Variables['Instance7']
-	Variables['Instance13'].Parent = Variables['Instance12']
-	Variables['Instance14'].Parent = Variables['Instance12']
-	Variables['Instance15'].Parent = Variables['Instance12']
-	Variables['Instance16'].Parent = Variables['Instance12']
-	for i,v in pairs(MainSword:GetDescendants()) do
-		if v:IsA("ParticleEmitter") or v:IsA("Beam") then
-			table.insert(RGBtable,v)
+function NoclipLoope()
+	if Clip == false and plrlol.Character then
+		for _, child in pairs(plrlol.Character:GetDescendants()) do
+			if child:IsA("BasePart") and child.CanCollide == true then
+				child.CanCollide = false
+			end
 		end
 	end
 end
-local parrycurrently = false
-function parryeffect(rootpart)
-	task.spawn(function()
-		if SwordWeld1 then
-			parrycurrently = true
-			SwordWeld1.C0 = CFrame.new(0,0.5,0)
-			SwordWeld1.C1 = CFrame.new(0,0,0)
-		end
-		if rootpart then
-			local hit_Sound = Instance.new('Sound',local_player.Character:WaitForChild("HumanoidRootPart"))
-			hit_Sound.SoundId = 'rbxassetid://1884209317'
-			hit_Sound.Volume = 2
-			hit_Sound.PlaybackSpeed = 1.8
-			hit_Sound:Play()
-			task.delay(3,function()
-				hit_Sound:Destroy()
-			end)
-		end
-		local Variables = {} 
-		Variables['Instance3'] = Instance.new('Part');Variables['Instance3'].Name = 'BladeSlash'
-		Variables['Instance3'].Shape = Enum.PartType.Block
-		Variables['Instance3'].Massless = true
-		Variables['Instance3'].CanCollide = false
-		Variables['Instance3'].CFrame = rootpart.CFrame*CFrame.Angles(0,90,0)
-		Variables['Instance3'].Anchored = true
-		Variables['Instance3'].Color = Color3.new(0.639216, 0.635294, 0.647059)
-		Variables['Instance3'].Shape = Enum.PartType.Block
-		Variables['Instance3'].Size = Vector3.new(2, 2, 1)
-		Variables['Instance3'].Material = Enum.Material.Plastic
-		Variables['Instance3'].Transparency = 1
-		Variables['Instance3'].CastShadow = true
-		Variables['Instance4'] = Instance.new('Attachment');Variables['Instance4'].Name = 'Attachment'
-		Variables['Instance4'].CFrame = CFrame.new(-3.81469727e-06, 0, -3.81469727e-06, 0.996191859, 0, 0.0871884301, 0, -1, 0, 0.0871884301, 0, -0.996191859)
-		Variables['Instance5'] = Instance.new('ParticleEmitter');Variables['Instance5'].Name = 'Smoke'
-		Variables['Instance5'].FlipbookFramerate = NumberRange.new(1, 1)
-		Variables['Instance5'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance5'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance5'].TimeScale = 1
-		Variables['Instance5'].Drag = 20
-		Variables['Instance5'].VelocityInheritance = 0
-		Variables['Instance5'].LockedToPart = true
-		Variables['Instance5'].Speed = NumberRange.new(124.73074340820312, 187.0961151123047)
-		Variables['Instance5'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance5'].Rotation = NumberRange.new(-360, 360)
-		Variables['Instance5'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance5'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-		Variables['Instance5'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance5'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance5'].SpreadAngle = Vector2.new(0, 90)
-		Variables['Instance5'].Rate = 40
-		Variables['Instance5'].Lifetime = NumberRange.new(1, 1.5)
-		Variables['Instance5'].LightEmission = 0
-		Variables['Instance5'].LightInfluence = 0
-		Variables['Instance5'].Orientation = Enum.ParticleOrientation.FacingCamera
-		Variables['Instance5'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance5'].ZOffset = 1.5591343641281128
-		Variables['Instance5'].EmissionDirection = Enum.NormalId.Front
-		Variables['Instance5'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance5'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance5'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(0.25158563256263733,4.96973991394043,4.96973991394043),NumberSequenceKeypoint.new(1,6.236537456512451,0)}
-		Variables['Instance5'].Texture = 'rbxassetid://13008153944'
-		Variables['Instance5'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.20348836481571198,0.7437499761581421,0.2562500238418579),NumberSequenceKeypoint.new(1,1,0)}
-		Variables['Instance5'].Brightness = 1
-		Variables['Instance5'].Enabled = true
-		Variables['Instance6'] = Instance.new('ParticleEmitter');Variables['Instance6'].Name = 'Slash'
-		Variables['Instance6'].FlipbookFramerate = NumberRange.new(1, 1)
-		Variables['Instance6'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance6'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance6'].TimeScale = 1
-		Variables['Instance6'].Drag = 5
-		Variables['Instance6'].VelocityInheritance = 0
-		Variables['Instance6'].Speed = NumberRange.new(0.005132083781063557, 0.005132083781063557)
-		Variables['Instance6'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance6'].Rotation = NumberRange.new(-180, -180)
-		Variables['Instance6'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance6'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-		Variables['Instance6'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance6'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance6'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance6'].Rate = 15
-		Variables['Instance6'].Lifetime = NumberRange.new(0.20000000298023224, 0.20000000298023224)
-		Variables['Instance6'].LightEmission = 0
-		Variables['Instance6'].LightInfluence = 0
-		Variables['Instance6'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance6'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance6'].ZOffset = 0.22117458283901215
-		Variables['Instance6'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance6'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance6'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance6'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,15.924570083618164,0),NumberSequenceKeypoint.new(1,15.924570083618164,0)}
-		Variables['Instance6'].Texture = 'rbxassetid://15730883980'
-		Variables['Instance6'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance6'].Brightness = 2
-		Variables['Instance6'].Enabled = true
-		Variables['Instance7'] = Instance.new('ParticleEmitter');Variables['Instance7'].Name = 'Slash'
-		Variables['Instance7'].FlipbookFramerate = NumberRange.new(1, 1)
-		Variables['Instance7'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance7'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance7'].TimeScale = 1
-		Variables['Instance7'].Drag = 5
-		Variables['Instance7'].VelocityInheritance = 0
-		Variables['Instance7'].Speed = NumberRange.new(0.005132083781063557, 0.005132083781063557)
-		Variables['Instance7'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance7'].Rotation = NumberRange.new(-180, -180)
-		Variables['Instance7'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance7'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-		Variables['Instance7'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance7'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance7'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance7'].Rate = 15
-		Variables['Instance7'].Lifetime = NumberRange.new(0.20000000298023224, 0.20000000298023224)
-		Variables['Instance7'].LightEmission = 0
-		Variables['Instance7'].LightInfluence = 0
-		Variables['Instance7'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance7'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance7'].ZOffset = 0
-		Variables['Instance7'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance7'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance7'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance7'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,16.799999237060547,0),NumberSequenceKeypoint.new(1,16.799999237060547,0)}
-		Variables['Instance7'].Texture = 'rbxassetid://15730883980'
-		Variables['Instance7'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance7'].Brightness = 0
-		Variables['Instance7'].Enabled = true
-		Variables['Instance8'] = Instance.new('ParticleEmitter');Variables['Instance8'].Name = '5'
-		Variables['Instance8'].FlipbookFramerate = NumberRange.new(4, 4)
-		Variables['Instance8'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance8'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance8'].TimeScale = 1
-		Variables['Instance8'].Drag = 0
-		Variables['Instance8'].VelocityInheritance = 0
-		Variables['Instance8'].Speed = NumberRange.new(0.0007934820023365319, 0.0007934820023365319)
-		Variables['Instance8'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance8'].Rotation = NumberRange.new(35, 110)
-		Variables['Instance8'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance8'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-		Variables['Instance8'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance8'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance8'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance8'].Rate = 21
-		Variables['Instance8'].Lifetime = NumberRange.new(0.30000001192092896, 0.6000000238418579)
-		Variables['Instance8'].LightEmission = 1
-		Variables['Instance8'].LightInfluence = 0
-		Variables['Instance8'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance8'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance8'].ZOffset = 0
-		Variables['Instance8'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance8'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance8'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance8'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,2.030609369277954,1.107606053352356),NumberSequenceKeypoint.new(0.0954580008983612,8.809321403503418,3.093564033508301),NumberSequenceKeypoint.new(0.327457994222641,14.513522148132324,3.388195276260376),NumberSequenceKeypoint.new(1,21.14855194091797,5.92896032333374)}
-		Variables['Instance8'].Texture = 'rbxassetid://12018086505'
-		Variables['Instance8'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.12050739675760269,0.9750000238418579,0),NumberSequenceKeypoint.new(0.21035940945148468,0.9375,0),NumberSequenceKeypoint.new(0.30000001192092896,0.8206662535667419,0),NumberSequenceKeypoint.new(0.4000000059604645,0.829325795173645,0),NumberSequenceKeypoint.new(0.5,0.8400025963783264,0),NumberSequenceKeypoint.new(0.5608531832695007,0.887499988079071,0),NumberSequenceKeypoint.new(0.6624842882156372,0.9375,0),NumberSequenceKeypoint.new(0.7427854537963867,0.9624999761581421,0),NumberSequenceKeypoint.new(0.7954830527305603,0.981249988079071,0),NumberSequenceKeypoint.new(1,1,0)}
-		Variables['Instance8'].Brightness = 10
-		Variables['Instance8'].Enabled = true
-		Variables['Instance9'] = Instance.new('ParticleEmitter');Variables['Instance9'].Name = '5'
-		Variables['Instance9'].FlipbookFramerate = NumberRange.new(4, 4)
-		Variables['Instance9'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance9'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance9'].TimeScale = 1
-		Variables['Instance9'].Drag = 0
-		Variables['Instance9'].VelocityInheritance = 0
-		Variables['Instance9'].Speed = NumberRange.new(0.0006689297733828425, 0.0006689297733828425)
-		Variables['Instance9'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance9'].Rotation = NumberRange.new(35, 110)
-		Variables['Instance9'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance9'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-		Variables['Instance9'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance9'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance9'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance9'].Rate = 21
-		Variables['Instance9'].Lifetime = NumberRange.new(0.30000001192092896, 0.6000000238418579)
-		Variables['Instance9'].LightEmission = 1
-		Variables['Instance9'].LightInfluence = 0
-		Variables['Instance9'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance9'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance9'].ZOffset = 0
-		Variables['Instance9'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance9'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance9'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance9'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,1.7118662595748901,0.9337460398674011),NumberSequenceKeypoint.new(0.0954580008983612,7.4265289306640625,2.6079697608947754),NumberSequenceKeypoint.new(0.327457994222641,12.235345840454102,2.8563528060913086),NumberSequenceKeypoint.new(1,17.828880310058594,4.998295783996582)}
-		Variables['Instance9'].Texture = 'rbxassetid://12018086505'
-		Variables['Instance9'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.12050739675760269,0.9750000238418579,0),NumberSequenceKeypoint.new(0.21035940945148468,0.9375,0),NumberSequenceKeypoint.new(0.30000001192092896,0.8206662535667419,0),NumberSequenceKeypoint.new(0.4000000059604645,0.829325795173645,0),NumberSequenceKeypoint.new(0.5,0.8400025963783264,0),NumberSequenceKeypoint.new(0.5608531832695007,0.887499988079071,0),NumberSequenceKeypoint.new(0.6624842882156372,0.9375,0),NumberSequenceKeypoint.new(0.7427854537963867,0.9624999761581421,0),NumberSequenceKeypoint.new(0.7954830527305603,0.981249988079071,0),NumberSequenceKeypoint.new(1,1,0)}
-		Variables['Instance9'].Brightness = 10
-		Variables['Instance9'].Enabled = true
-		Variables['Instance10'] = Instance.new('ParticleEmitter');Variables['Instance10'].Name = '5'
-		Variables['Instance10'].FlipbookFramerate = NumberRange.new(4, 4)
-		Variables['Instance10'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance10'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance10'].TimeScale = 1
-		Variables['Instance10'].Drag = 0
-		Variables['Instance10'].VelocityInheritance = 0
-		Variables['Instance10'].Speed = NumberRange.new(0.0007934820023365319, 0.0007934820023365319)
-		Variables['Instance10'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance10'].Rotation = NumberRange.new(35, 110)
-		Variables['Instance10'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance10'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-		Variables['Instance10'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance10'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance10'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance10'].Rate = 21
-		Variables['Instance10'].Lifetime = NumberRange.new(0.30000001192092896, 0.6000000238418579)
-		Variables['Instance10'].LightEmission = 0
-		Variables['Instance10'].LightInfluence = 0
-		Variables['Instance10'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance10'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance10'].ZOffset = 0
-		Variables['Instance10'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance10'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance10'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance10'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,2.030609369277954,1.107606053352356),NumberSequenceKeypoint.new(0.0954580008983612,8.809321403503418,3.093564033508301),NumberSequenceKeypoint.new(0.327457994222641,14.513522148132324,3.388195276260376),NumberSequenceKeypoint.new(1,21.14855194091797,5.92896032333374)}
-		Variables['Instance10'].Texture = 'rbxassetid://12018086505'
-		Variables['Instance10'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.12050739675760269,0.9750000238418579,0),NumberSequenceKeypoint.new(0.21035940945148468,0.9375,0),NumberSequenceKeypoint.new(0.30000001192092896,0.8206662535667419,0),NumberSequenceKeypoint.new(0.5005285143852234,0.637499988079071,0),NumberSequenceKeypoint.new(0.5608531832695007,0.887499988079071,0),NumberSequenceKeypoint.new(0.6624842882156372,0.9375,0),NumberSequenceKeypoint.new(0.7427854537963867,0.9624999761581421,0),NumberSequenceKeypoint.new(0.7954830527305603,0.981249988079071,0),NumberSequenceKeypoint.new(1,1,0)}
-		Variables['Instance10'].Brightness = 0
-		Variables['Instance10'].Enabled = true
-		Variables['Instance11'] = Instance.new('ParticleEmitter');Variables['Instance11'].Name = '5'
-		Variables['Instance11'].FlipbookFramerate = NumberRange.new(4, 4)
-		Variables['Instance11'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance11'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance11'].TimeScale = 1
-		Variables['Instance11'].Drag = 0
-		Variables['Instance11'].VelocityInheritance = 0
-		Variables['Instance11'].Speed = NumberRange.new(0.0006689297733828425, 0.0006689297733828425)
-		Variables['Instance11'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance11'].Rotation = NumberRange.new(35, 110)
-		Variables['Instance11'].FlipbookMode = Enum.ParticleFlipbookMode.Loop
-		Variables['Instance11'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-		Variables['Instance11'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance11'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance11'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance11'].Rate = 21
-		Variables['Instance11'].Lifetime = NumberRange.new(0.30000001192092896, 0.6000000238418579)
-		Variables['Instance11'].LightEmission = 0
-		Variables['Instance11'].LightInfluence = 0
-		Variables['Instance11'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance11'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance11'].ZOffset = 0
-		Variables['Instance11'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance11'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance11'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance11'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,1.7118662595748901,0.9337460398674011),NumberSequenceKeypoint.new(0.0954580008983612,7.4265289306640625,2.6079697608947754),NumberSequenceKeypoint.new(0.327457994222641,12.235345840454102,2.8563528060913086),NumberSequenceKeypoint.new(1,17.828880310058594,4.998295783996582)}
-		Variables['Instance11'].Texture = 'rbxassetid://12018086505'
-		Variables['Instance11'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.12050739675760269,0.9750000238418579,0),NumberSequenceKeypoint.new(0.21035940945148468,0.9375,0),NumberSequenceKeypoint.new(0.30000001192092896,0.8206662535667419,0),NumberSequenceKeypoint.new(0.4000000059604645,0.829325795173645,0),NumberSequenceKeypoint.new(0.5,0.8400025963783264,0),NumberSequenceKeypoint.new(0.5608531832695007,0.887499988079071,0),NumberSequenceKeypoint.new(0.6624842882156372,0.9375,0),NumberSequenceKeypoint.new(0.7427854537963867,0.9624999761581421,0),NumberSequenceKeypoint.new(0.7954830527305603,0.981249988079071,0),NumberSequenceKeypoint.new(1,1,0)}
-		Variables['Instance11'].Brightness = 0
-		Variables['Instance11'].Enabled = true
-		Variables['Instance12'] = Instance.new('ParticleEmitter');Variables['Instance12'].Name = 'RealLa'
-		Variables['Instance12'].FlipbookFramerate = NumberRange.new(1, 1)
-		Variables['Instance12'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance12'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance12'].TimeScale = 1
-		Variables['Instance12'].Drag = 0
-		Variables['Instance12'].VelocityInheritance = 0
-		Variables['Instance12'].LockedToPart = true
-		Variables['Instance12'].Speed = NumberRange.new(0.016872910782694817, 0.016872910782694817)
-		Variables['Instance12'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance12'].Rotation = NumberRange.new(50, 50)
-		Variables['Instance12'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance12'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Surface
-		Variables['Instance12'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance12'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance12'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance12'].Rate = 20
-		Variables['Instance12'].Lifetime = NumberRange.new(0.23000000417232513, 0.23000000417232513)
-		Variables['Instance12'].LightEmission = 0
-		Variables['Instance12'].LightInfluence = 0
-		Variables['Instance12'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance12'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance12'].ZOffset = 0
-		Variables['Instance12'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance12'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance12'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance12'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,15.185620307922363,0),NumberSequenceKeypoint.new(1,15.185620307922363,0)}
-		Variables['Instance12'].Texture = 'rbxassetid://15028417355'
-		Variables['Instance12'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(0.5015856027603149,0.768750011920929,0),NumberSequenceKeypoint.new(1,1,0)}
-		Variables['Instance12'].Brightness = 0
-		Variables['Instance12'].Enabled = true
-		Variables['Instance13'] = Instance.new('ParticleEmitter');Variables['Instance13'].Name = 'RealLa'
-		Variables['Instance13'].FlipbookFramerate = NumberRange.new(1, 1)
-		Variables['Instance13'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance13'].FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-		Variables['Instance13'].TimeScale = 1
-		Variables['Instance13'].Drag = 0
-		Variables['Instance13'].VelocityInheritance = 0
-		Variables['Instance13'].LockedToPart = true
-		Variables['Instance13'].Speed = NumberRange.new(0.016872910782694817, 0.016872910782694817)
-		Variables['Instance13'].RotSpeed = NumberRange.new(0, 0)
-		Variables['Instance13'].Rotation = NumberRange.new(50, 50)
-		Variables['Instance13'].FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-		Variables['Instance13'].ShapeStyle = Enum.ParticleEmitterShapeStyle.Surface
-		Variables['Instance13'].ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-		Variables['Instance13'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance13'].SpreadAngle = Vector2.new(0, 0)
-		Variables['Instance13'].Rate = 20
-		Variables['Instance13'].Lifetime = NumberRange.new(0.20000000298023224, 0.20000000298023224)
-		Variables['Instance13'].LightEmission = 0
-		Variables['Instance13'].LightInfluence = 0
-		Variables['Instance13'].Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-		Variables['Instance13'].Squash = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)}
-		Variables['Instance13'].ZOffset = 0
-		Variables['Instance13'].EmissionDirection = Enum.NormalId.Top
-		Variables['Instance13'].Color = ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579)),ColorSequenceKeypoint.new(1,Color3.new(0.3921568691730499,0.13333334028720856,0.6000000238418579))}
-		Variables['Instance13'].Shape = Enum.ParticleEmitterShape.Box
-		Variables['Instance13'].Size = NumberSequence.new{NumberSequenceKeypoint.new(0,13.49832820892334,0),NumberSequenceKeypoint.new(1,13.49832820892334,0)}
-		Variables['Instance13'].Texture = 'rbxassetid://15187783966'
-		Variables['Instance13'].Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(0.7542282938957214,0,0),NumberSequenceKeypoint.new(1,1,0)}
-		Variables['Instance13'].Brightness = 10
-		Variables['Instance13'].Enabled = true
-		Variables['Instance3'].Parent = rootpart.Parent
-		Variables['Instance4'].Parent = Variables['Instance3']
-		Variables['Instance5'].Parent = Variables['Instance4']
-		Variables['Instance6'].Parent = Variables['Instance4']
-		Variables['Instance7'].Parent = Variables['Instance4']
-		Variables['Instance8'].Parent = Variables['Instance4']
-		Variables['Instance9'].Parent = Variables['Instance4']
-		Variables['Instance10'].Parent = Variables['Instance4']
-		Variables['Instance11'].Parent = Variables['Instance4']
-		Variables['Instance12'].Parent = Variables['Instance4']
-		Variables['Instance13'].Parent = Variables['Instance4']
-		for i,v in pairs(Variables['Instance3']:GetDescendants()) do
-			if v:IsA("ParticleEmitter") then
-				table.insert(RGBtable,v)
-			end
-		end
-		task.delay(2,function()
-			Variables['Instance3']:Destroy()
-		end)
-		task.delay(.17,function()
-			parrycurrently = false
-			task.wait(.08)
-			if SwordWeld1 ~= nil and not parrycurrently then
-				SwordWeld1.C0 = CFrame.new(0.200000003, -0.550000012, -2, 0.99619472, 0.0871556997, 3.80969656e-09, 0, -4.37113883e-08, 1, 0.0871556997, -0.99619472, -4.35450538e-08)
-				SwordWeld1.C1 = CFrame.new(0, 0, 0, 0.939692616, 0, 0.342020154, 0, 1, 0, -0.342020154, 0, 0.939692616)
-			end
-		end)
-		task.delay(.2,function()
-			for i,v in pairs(Variables['Instance3']:GetDescendants()) do
-				if v:IsA("ParticleEmitter") then
-					v.Enabled = false
-				end
-			end
-		end)
-	end)
-end
-function CheckChar(Char)
+function EffectCharacter(Char)
 	local RootPart = Char:FindFirstChild("HumanoidRootPart")
 	local HumanoidChar = Char:FindFirstChild("Humanoid")
 	HumanoidChar.Died:Connect(function()
-		local_player.CharacterAdded:Connect(function(char)
+		Dead = true
+		plrlol.CharacterAdded:Connect(function(char)
 			local Character = nil
 			repeat
-				if local_player.Character and local_player.Character:FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
-					Character = local_player.Character or char
-					CheckChar(Character)
+				if CharacterParented:FindFirstChild(plrlol.Name) and CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
+					Character = plrlol.Character or char
+					EffectCharacter(Character)
+					if Character and ExtraBebounfly then
+						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
+					end
 				end
 				wait()
 			until Character ~= nil
 		end)
 	end)
-	if SwordModel then
-		SwordModel:Destroy()
-	end
-	
-	if TogglSetting.CustomSword then
-		AddSword(Char)
-	end
-end
-
-CheckChar(local_player.Character)
-function SwordCrateManual()
-	game:GetService("ReplicatedStorage").Remote.RemoteFunction:InvokeServer("PromptPurchaseCrate", workspace.Spawn.Crates.NormalSwordCrate)
-end
-function ExplosionCrateManual()
-	game:GetService("ReplicatedStorage").Remote.RemoteFunction:InvokeServer("PromptPurchaseCrate", workspace.Spawn.Crates.NormalExplosionCrate)
-end
-function SwordCrateAuto()
-	while _G.AutoSword do
-		game:GetService("ReplicatedStorage").Remote.RemoteFunction:InvokeServer("PromptPurchaseCrate", workspace.Spawn.Crates.NormalSwordCrate)
-		wait(1)
-	end
-end
-function ExplosionCrateAuto()
-	while _G.AutoBoom do
-		game:GetService("ReplicatedStorage").Remote.RemoteFunction:InvokeServer("PromptPurchaseCrate", workspace.Spawn.Crates.NormalExplosionCrate)
-		wait(1)
-	end
-end
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/main/hubwithnoClose"))()
-local Window = Library.CreateLib("DarkDeath", "BloodTheme")
-local Combat = Window:NewTab("Combat"):NewSection("Combat")
-local Shop = Window:NewTab("Shop"):NewSection("Shop")
-local Visual = Window:NewTab("Visual"):NewSection("Visual")
-local Tab4 = Window:NewTab("Home")
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = randomstring()
-ScreenGui.Parent = game.CoreGui
-ScreenGui.ResetOnSpawn = false
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Name = "Toggle"
-ToggleButton.Parent = ScreenGui
-ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ToggleButton.Position = UDim2.new(0, 0, 0.454706937, 0)
-ToggleButton.Size = UDim2.new(0, 90, 0, 38)
-ToggleButton.Font = Enum.Font.SourceSans
-ToggleButton.Text = "Toggle"
-ToggleButton.TextColor3 = Color3.fromRGB(248, 248, 248)
-ToggleButton.TextSize = 28.000
-ToggleButton.Draggable = true
-local Corner = Instance.new("UICorner")
-Corner.Name = "Corner"
-Corner.Parent = ToggleButton
-
-local SpamButton = Instance.new("TextButton")
-SpamButton.Name = "Toggle"
-SpamButton.Parent = ScreenGui
-SpamButton.BackgroundColor3 = Color3.new(1, 0, 0)
-SpamButton.Position = UDim2.new(0, 0, 0.35, 0)
-SpamButton.Size = UDim2.new(0, 90, 0, 38)
-SpamButton.Font = Enum.Font.SourceSans
-SpamButton.Text = "Spam Parry: disabled"
-SpamButton.Visible = false
-SpamButton.TextColor3 = Color3.fromRGB(248, 248, 248)
-SpamButton.TextScaled = true
-SpamButton.Draggable = true
-local Corner1 = Instance.new("UICorner")
-Corner1.Name = "Corner"
-Corner1.Parent = SpamButton
-
-
-ToggleButton.MouseButton1Click:connect(function()
-	Library:ToggleUI()
-end)
-SpamButton.MouseButton1Click:connect(function()
-	if not TogglSetting.AutoSpam then
-		TogglSetting.AutoSpam = true
-		SpamButton.Text = "Spam Parry: enabled"
-		SpamButton.BackgroundColor3 = Color3.new(0, 1, 0)
-	else
-		TogglSetting.AutoSpam = false
-		SpamButton.Text = "Spam Parry: disabled"
-		SpamButton.BackgroundColor3 = Color3.new(1, 0, 0)
-	end
-end)
-Combat:NewToggle("Auto Parry", "Enabled Auto Parry", function(toggled)
-	resolve_parry_Remote()
-	TogglSetting.aura_Enabled = toggled
-end)
-Combat:NewToggle("Death Parry (Beta Test)", "Enabled Test Auto Parry", function(toggled)
-	resolve_parry_Remote()
-	TogglSetting.TestParry = toggled
-end)
-Combat:NewToggle("Auto Spam button", "Enabled Test Spam button", function(toggled)
-	SpamButton.Visible = toggled
-end)
-Shop:NewButton("SwordCrate", "ButtonInfo", function()
-	SwordCrateManual()
-end)
-Shop:NewButton("ExplosionCrate", "ButtonInfo", function()
-	ExplosionCrateManual()
-end)
-Visual:NewToggle("Kill mon Hit Sound", "ToggleInfo", function(toggled)
-	TogglSetting.hit_sound_Enabled = toggled
-end)
-Visual:NewToggle("Hit Effect", "ToggleInfo", function(toggled)
-	TogglSetting.hit_effect_Enabled = toggled
-end)
-Visual:NewToggle("Custom Sword (Dark Blade required)", "Running Custom Sword", function(toggled)
-	TogglSetting.CustomSword = toggled
-	if TogglSetting.CustomSword then
-		AddSword(local_player.Character)
-	else
-		if SwordModel then
-			SwordModel:Destroy()
-		end
-		SwordModel = nil
-		for i,Model in pairs(local_player.Character:GetChildren()) do
-			if Model:IsA("Model") and Model.Name == "Dark Blade" then
-				local SwordDetect = Model:FindFirstChildWhichIsA("MeshPart")
-				if SwordDetect and SwordDetect.Name == "KatanaMesh" then
-					SwordDetect.Transparency = 0
-					SwordDetect:FindFirstChildWhichIsA("Model"):Destroy()
-				end
-			end
-		end
-	end
-end)
-Visual:NewToggle("Night/Day", "Enabled Sky Cycle", function(toggled)
-	TogglSetting.night_mode_Enabled = toggled
-end)
-Visual:NewToggle("Trail", "ToggleInfo", function(toggled)
-	TogglSetting.trail_Enabled = toggled
-end)
-Visual:NewToggle("Trail", "ToggleInfo", function(toggled)
-	TogglSetting.trail_Enabled = toggled
-end)
-Visual:NewToggle("Aiming Mechanism", "ToggleInfo", function(toggled)   
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Hosvile/Refinement/main/M%3ABlade%20Ball%20Mechanism",true))()
-end)
-Visual:NewToggle("find Low Ping Server", "Teleporting To Low Ping Server", function(toggled)
-	local function fetchServersData(placeId)
-		local url = "https://games.roblox.com/v1/games/"..placeId.."/servers/Public?sortOrder=Asc&limit=100"
-		local success, response = pcall(function()
-			return game:GetService("HttpService"):JSONDecode(game:HttpGet(url))
-		end)
-
-		if success and response and response.data then
-			return response.data
-		end
-
-		return nil
-	end
-	local servers = fetchServersData(game.PlaceId)
-	if not servers then
-		return
-	end
-	local lowestPingServer = servers[1]
-	for _, server in pairs(servers) do
-		if server["ping"] < lowestPingServer["ping"] and server.maxPlayers > server.playing then
-			lowestPingServer = server
-		end
-	end
-	task.wait(3)
-	local dataPing = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-	if tonumber(dataPing:match("(%d+)")) >= 100 then
-		game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, lowestPingServer.id)
-	end
-end)
-Tab4:NewSection("Made By NeverLose Hub")
-Tab4:NewSection("auto parry By Aries")
-Tab4:NewSection("Visual effect By nurysium")
-Tab4:NewSection("Delete Clash By Hosvile")
-local function get_closest_entity(Object: Part)
-	task.spawn(function()
-		local closest
-		local max_distance = math.huge
-		for index, entity in workspace.Alive:GetChildren() do
-			if entity.Name ~= Players.LocalPlayer.Name then
-				local distance = (Object.Position - entity.HumanoidRootPart.Position).Magnitude
-				if distance < max_distance then
-					closest_Entity = entity
-				end
-			end
-		end
-		if closest_Entity == nil then
-			return local_player.Character 
-		else
-			return closest_Entity
-		end
-	end)
-end
-
-function resolve_parry_Remote()
-	local Services = {game:GetService('AdService'),game:GetService('SocialService')}
-	for _, value in Services do
-		local temp_remote = value:FindFirstChildOfClass('RemoteEvent')
-		if not temp_remote then
-			continue
-		end
-		if not temp_remote.Name:find('\n') then
-			continue
-		end
-		parry_remote = temp_remote
-	end
-end
-local aura_table = {
-	canParry = true,
-	is_Spamming = false,
-	parry_Range = 0,
-	spam_Range = 0, 
-	hit_Count = 0,
-	hit_Time = tick(),
-	ball_Warping = tick(),
-	is_ball_Warping = false
-}
-local SPS = 0
-function Parry()
-	task.spawn(function()
-		if not parry_remote or parry_remote == nil then
-			resolve_parry_Remote()
-			return
-		end
-		task.defer(function()
-			get_closest_entity(local_player.Character.PrimaryPart)
-		end)
-		local target_Position = closest_Entity.HumanoidRootPart.Position
-		parry_remote:FireServer(
-			0.5,
-			CFrame.new(camera.CFrame.Position, Vector3.new(math.random(0, 100), math.random(0, 1000), math.random(100, 1000))),
-			{[closest_Entity.Name] = target_Position},
-			{target_Position.X, target_Position.Y},
-			false
-		)
-	end)
-end
-
-ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
-	task.defer(function()
-		SPS += 1
-		task.delay(1,function()
-			if SPS >= 0 then
-				SPS -= 1  
-			end
-		end)
-	end)
-	local Playbackspeed = {2,1.5,0.6,1.8}
-	if TogglSetting.hit_sound_Enabled and TogglSetting.CustomSword ~= true then
-		if local_player.Character:WaitForChild("HumanoidRootPart") then
-			local hit_Sound = Instance.new('Sound',local_player.Character:WaitForChild("HumanoidRootPart"))
-			hit_Sound.SoundId = 'rbxassetid://8632670510'
-			hit_Sound.Volume = 3
-			hit_Sound.PlaybackSpeed = 1
-			hit_Sound:Play()
-			task.delay(2,function()
-				hit_Sound:Destroy()
-			end)
-		end
-	end
-	if TogglSetting.CustomSword and SwordSlashEffect then
-		parryeffect(local_player.Character:WaitForChild("HumanoidRootPart"))
-		SwordSlashEffect.Enabled = true
-		task.delay(3.5, function() 
-			SwordSlashEffect.Enabled = false
-		end)
-	end
-	if TogglSetting.hit_effect_Enabled and TogglSetting.CustomSword ~= true then
-		local hit_effect = game:GetObjects("rbxassetid://17407244385")[1]
-		hit_effect.Parent = getBall()
-		hit_effect:Emit(3)
-		task.delay(5, function() 
-			hit_effect:Destroy()
-		end)
-	end
-end)
-
-ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function()
-	aura_table.hit_Count += 1
-	task.delay(0.15, function()
-		aura_table.hit_Count -= 1
-	end)
-end)
-
-function VerifyBall(Ball)
-	if typeof(Ball) == "Instance" and Ball:IsA("BasePart") and Ball.Size == Vector3.new(3,3,3) and Ball.Shape == Enum.PartType.Ball then
-		local Hilight = Ball:FindFirstChildWhichIsA("Highlight") 
-		if Hilight and Hilight.OutlineColor == Color3.fromRGB(255,255,255) and Ball:FindFirstChildWhichIsA("VectorForce") then
-			return true
-		end
-	end
-end
-function getBall()
-	if workspace:WaitForChild("Alive"):FindFirstChild(local_player.Name) then
-		for index, ball in workspace:WaitForChild("Balls"):GetChildren() do
-			if VerifyBall(ball) then
-				return ball
-			end
-		end
-	else
-		for index, ball in workspace:WaitForChild("TrainingBalls"):GetChildren() do
-			if VerifyBall(ball) then
-				return ball
-			end
-		end
-	end
-end
-workspace:WaitForChild("Balls").ChildRemoved:Connect(function(child)
-	aura_table.hit_Count = 0
-	aura_table.is_ball_Warping = false
-	aura_table.is_Spamming = false
-end)
-task.defer(function()
-	game:GetService("RunService").Heartbeat:Connect(function()
-		if not local_player.Character then
-			return
-		end
-		if TogglSetting.trail_Enabled then
-			local trail = game:GetObjects("rbxassetid://17483658369")[1]
-			trail.Name = 'nurysium_fx'
-			if local_player.Character.PrimaryPart:FindFirstChild('nurysium_fx') then
-				return
-			end
-			local Attachment0 = Instance.new("Attachment", local_player.Character.PrimaryPart)
-			local Attachment1 = Instance.new("Attachment", local_player.Character.PrimaryPart)
-			Attachment0.Position = Vector3.new(0, -2.411, 0)
-			Attachment1.Position = Vector3.new(0, 2.504, 0)
-			trail.Parent = local_player.Character.PrimaryPart
-			trail.Attachment0 = Attachment0
-			trail.Attachment1 = Attachment1
-		else
-			if local_player.Character.PrimaryPart:FindFirstChild('nurysium_fx') then
-				local_player.Character.PrimaryPart['nurysium_fx']:Destroy()
-			end
-		end
-	end)
-end)
-local Deouble = false
-task.defer(function()
-	while task.wait(120) do
-		if TogglSetting.night_mode_Enabled then
-			if Deouble then
-				Deouble = false
-				game:GetService("TweenService"):Create(game:GetService("Lighting"), TweenInfo.new(10), {ClockTime = 3.9}):Play()
-			else
-				Deouble = true
-				game:GetService("TweenService"):Create(game:GetService("Lighting"), TweenInfo.new(10), {ClockTime = 13.5}):Play()
-			end
-		else
-			game:GetService("TweenService"):Create(game:GetService("Lighting"), TweenInfo.new(10), {ClockTime = 13.5}):Play()
-		end
-	end
-end)
-local function MultiTimes(Num,Times)
-	local Numb = 0 
-	for i=1,Times or 2 do Numb += Num*Num end
-	return Numb
-end
-local function Repeatfunc()
-	local function SpamParry(Text)
-		coroutine.resume(coroutine.create(function()
-			if TogglSetting.AutoSpam then
-				SpamButton.Text = "Spam Parry: enabled. BPS("..SPS..")"
-			end
-			if TogglSetting.AutoSpam and SPS >= 1 then
-				get_closest_entity(local_player.Character.PrimaryPart)
-				if closest_Entity then
-					if workspace.Alive:FindFirstChild(closest_Entity.Name) and workspace.Alive:FindFirstChild(closest_Entity.Name).Humanoid.Health > 0 then
-						if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= (aura_table.spam_Range or 1) then   
-							Parry()
-							wait()
-							task.spawn(function()
-								for i=1,5+SPS do
-									SpamParry()
-								end
-							end)
-						end
-					end
-				end
-			end
-		end))
-	end
-	task.spawn(function()
-		for i=1,6+SPS do
-			SpamParry()
-			SpamParry()
-		end
-	end)
-	if ThemeSong then
-		ThemePos = ThemeSong.TimePosition+0.001
-	end
-	if TogglSetting.aura_Enabled then
-		local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10
-		local MainBall = getBall()
-		if not MainBall then
-			return
-		end
-		MainBall:GetAttributeChangedSignal('target'):Once(function()
-			aura_table.canParry = true
-		end)
-		if MainBall:GetAttribute('target') ~= local_player.Name or not aura_table.canParry then
-			return
-		end
-		get_closest_entity(local_player.Character.PrimaryPart)
-		local player_Position = local_player.Character.PrimaryPart.Position
-		local ball_Position = MainBall.Position
-		local ball_Velocity = MainBall.AssemblyLinearVelocity
-		if MainBall:FindFirstChild('zoomies') then
-			ball_Velocity = MainBall.zoomies.VectorVelocity
-		end
-		local ball_Direction = (local_player.Character.PrimaryPart.Position - ball_Position).Unit
-		local ball_Distance = local_player:DistanceFromCharacter(ball_Position)
-		local ball_Dot = ball_Direction:Dot(ball_Velocity.Unit)
-		local ball_Speed = ball_Velocity.Magnitude
-		local ball_speed_Limited = math.min(ball_Speed / 1000, 0.1)
-		local ball_predicted_Distance = (ball_Distance - ping / 15.5) - (ball_Speed / 3.5)
-		local target_Position = closest_Entity.HumanoidRootPart.Position
-		local target_Distance = local_player:DistanceFromCharacter(target_Position)
-		local target_distance_Limited = math.min(target_Distance / 10000, 0.1)
-		local target_Direction = (local_player.Character.PrimaryPart.Position - closest_Entity.HumanoidRootPart.Position).Unit
-		local target_Velocity = closest_Entity.HumanoidRootPart.AssemblyLinearVelocity
-		local target_isMoving = target_Velocity.Magnitude > 0
-		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
-		aura_table.spam_Range = math.max(ping / 10, 15) + ball_Speed / 7
-		aura_table.parry_Range = math.max(math.max(ping, 4) + ball_Speed / 3.5, 9.5)
-		aura_table.is_Spamming = aura_table.hit_Count > 1 or ball_Distance < 13.5
-		if ball_Dot < -0.2 then
-			aura_table.ball_Warping = tick()
-		end
-		task.spawn(function()
-			if (tick() - aura_table.ball_Warping) >= 0.15 + target_distance_Limited - ball_speed_Limited or ball_Distance <= 10 then
-				aura_table.is_ball_Warping = false
-				return
-			end
-			aura_table.is_ball_Warping = true
-		end)
-		if ball_Distance <= aura_table.parry_Range and not aura_table.is_ball_Warping then
-			Parry()
-			task.spawn(function()
-				for i=1,5*SPS+MultiTimes(SPS,3+MultiTimes(SPS,3)) do
-					if MainBall:GetAttribute('target') == local_player.Name then
-						SpamParry()
-					end
-				end
-			end)
-			aura_table.canParry = false
-			aura_table.hit_Time = tick()
-			aura_table.hit_Count += 1
-			task.delay(0.15, function()
-				aura_table.hit_Count -= 1
-			end)
-		end
-		task.spawn(function()
+	CharacterParented.ChildRemoved:Connect(function(model)
+		if not Dead and model == Char then
+			Dead = true
+			local Character = nil
 			repeat
-				RunService.RenderStepped:Wait()
-			until (tick() - aura_table.hit_Time) >= 1
-			aura_table.canParry = true
+				if CharacterParented:FindFirstChild(plrlol.Name) then
+					Character = plrlol.Character
+					EffectCharacter(Character)
+					if Character and ExtraBebounfly then
+						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
+					end
+				end
+				wait()
+			until Character ~= nil
+		end
+	end)
+	Dead = false
+	Clip = true
+	if Noclipping then
+		Noclipping:Disconnect()
+	end
+	if Flyye then
+		task.delay(.005,function()
+			Flyye = true
+			loopcheck()
 		end)
+		Flyye = false
+		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
+			if VELO and BODY then
+				VELO:Destroy()
+				BODY:Destroy()
+				VELO = nil
+				BODY = nil
+				plrlol.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
+			end
+		end
+		
+		if NoclipEnabled then
+			Clip = false
+			Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
+		end
 	end
 end
-game:GetService("RunService").Heartbeat:Connect(Repeatfunc)
-game:GetService("RunService").PreRender:Connect(Repeatfunc)
-game:GetService("RunService").RenderStepped:Connect(Repeatfunc) 
-game:GetService("RunService").Heartbeat:Connect(Repeatfunc)
-game:GetService("RunService").PreRender:Connect(Repeatfunc)
+wait(3)
+CharacterParented = workspace
+OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
+loopcheck()
+EffectCharacter(plrlol.Character)
