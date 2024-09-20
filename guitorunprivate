@@ -1,0 +1,80 @@
+local urls = {
+	--blade ball
+	["bladeball"] = "https://raw.githubusercontent.com/NotJacobNicko/PrivateScript/refs/heads/main/Bladeballshit?token=GHSAT0AAAAAACVTKR245NFKHLE6JIY6GHDAZXNG24Q",
+	--copy map
+	["copymap"] = "https://raw.githubusercontent.com/NotJacobNicko/PrivateScript/main/CopyPlayer?token=GHSAT0AAAAAACVTKR255SURROTCLPDQJ2EEZXAA65A",
+	--slap death
+	["slapdeath"] = "https://raw.githubusercontent.com/NotJacobNicko/PrivateScript/main/Slap%20Death?token=GHSAT0AAAAAACVTKR24RK7XSTQR6C34CUXWZXCSPAA"
+}
+function randomstring()
+	local e = {}
+	for i = 1,math.random(5,50) do
+		table.insert(e,utf8.char(math.random(10,100)))
+	end
+	return table.concat(e)
+end
+local UI = nil
+local Frame = script.Parent.Frame
+if not game:GetService("RunService"):IsStudio() then
+	UI = Instance.new("ScreenGui")
+	UI.Parent = game.CoreGui
+	UI.Name = randomstring()
+	Frame = game:GetObjects("rbxassetid://76711214238719")[1]
+	Frame.Name = randomstring()
+	Frame.Parent = UI
+else
+	UI = script.Parent
+	Frame = script.Parent.Frame
+end
+local TextBar = Frame:WaitForChild("code")
+local Button = Frame:WaitForChild("button")
+local Text = ""
+local Info = "waiting"
+local stopmore = false
+
+if game.PlaceId == 6403373529 or game.PlaceId == 9015014224 or game.PlaceId == 11520107397 then
+	Text = "slapdeath"
+	TextBar.PlaceholderText = "slap death?"
+else
+	Text = "copymap"
+	TextBar.PlaceholderText = "copymap?"
+end
+task.wait()
+TextBar.Name = randomstring()
+Button.Name = randomstring()
+function SearchSource(text)
+	local function RunUntilllLoad(code)
+		stopmore = true
+		Button.Text = "waiting..."
+		repeat 
+			local sucess = pcall(function()
+				loadstring(game:HttpGet(code))() 
+			end)
+			if sucess then
+				Info = "loaded"
+			end
+			wait()
+		until Info == "loaded"
+		Button.Text = "script loaded"
+		wait(1)
+		UI:Destroy()
+	end
+	
+	if urls[text:lower()] then
+		RunUntilllLoad(urls[text:lower()])
+	else
+		Button.Text = "not found"
+	end
+end
+TextBar.FocusLost:Connect(function()
+	if TextBar.Text ~= nil then
+		Text = TextBar.Text
+	else
+		Text = ""
+	end
+end)
+Button.MouseButton1Click:Connect(function()
+	if not stopmore and Text ~= "" then
+		SearchSource(Text)
+	end
+end)
