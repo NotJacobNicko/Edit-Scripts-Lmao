@@ -1,6 +1,6 @@
 local urls = {
 	--blade ball
-	["bladeball"] = "https://raw.githubusercontent.com/NotJacobNicko/PrivateScript/refs/heads/main/Bladeballshit?token=GHSAT0AAAAAACVTKR245NFKHLE6JIY6GHDAZXNG24Q",
+	["bladeball"] = "https://raw.githubusercontent.com/NotJacobNicko/PrivateScript/refs/heads/main/Bladeballshit?token=GHSAT0AAAAAACVTKR25FBKWYNUMLZXE6L4IZXNKZJA",
 	--copy map
 	["copymap"] = "https://raw.githubusercontent.com/NotJacobNicko/PrivateScript/main/CopyPlayer?token=GHSAT0AAAAAACVTKR255SURROTCLPDQJ2EEZXAA65A",
 	--slap death
