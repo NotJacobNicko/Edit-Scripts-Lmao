@@ -14,7 +14,7 @@ function randomstring()
 	return table.concat(e)
 end
 local UI = nil
-local Frame = script.Parent.Frame
+local Frame = nil
 if not game:GetService("RunService"):IsStudio() then
 	UI = Instance.new("ScreenGui")
 	UI.Parent = game.CoreGui
