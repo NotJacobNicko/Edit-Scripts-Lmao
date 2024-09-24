@@ -97,7 +97,7 @@ function loopcheck()
 				LastPos:Destroy()
 			end
 		end
-		Debug()
+		--Debug()
 		local function FastSpam()
 			if Flyye and plrlol.PlayerGui:FindFirstChild("TouchGui") then
 				-- enable player controlls when game restricts it >:(
@@ -204,7 +204,8 @@ function EffectCharacter(Char)
 		plrlol.CharacterAdded:Connect(function(char)
 			local Character = nil
 			repeat
-				if CharacterParented:FindFirstChild(plrlol.Name) and CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
+				local Human = CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid")
+				if CharacterParented:FindFirstChild(plrlol.Name) and Human and Human.Health ~= 0 then
 					Character = plrlol.Character or char
 					EffectCharacter(Character)
 				end
@@ -217,7 +218,8 @@ function EffectCharacter(Char)
 			Dead = true
 			local Character = nil
 			repeat
-				if CharacterParented:FindFirstChild(plrlol.Name) then
+				local Human = CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid")
+				if CharacterParented:FindFirstChild(plrlol.Name) and Human and Human.Health ~= 0 then
 					Character = plrlol.Character
 					EffectCharacter(Character)
 				end
