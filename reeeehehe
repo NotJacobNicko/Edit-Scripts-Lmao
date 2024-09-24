@@ -240,7 +240,7 @@ function EffectCharacter(Char)
 					Char:MoveTo(LastPos.Position)
 				end
 				wait()
-			until RootPart.Position == LastPos.Position or not LastPos 
+			until (RootPart.Position - LastPos.Position).Magnitude <= 5 or not LastPos 
 		end)
 		Flyye = false
 		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
