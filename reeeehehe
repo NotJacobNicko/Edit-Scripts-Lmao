@@ -7,6 +7,7 @@ local NoclipEnabled = true
 local CharacterParented = nil
 local Clip = true
 local Noclipping
+local ISStudio = game:GetService("RunService"):IsStudio()
 function randomstring()
 	local e = {}
 	for i = 1,math.random(5,50) do
@@ -14,7 +15,13 @@ function randomstring()
 	end
 	return table.concat(e)
 end
-local GUI = Instance.new("ScreenGui",plrlol.PlayerGui)
+local LastPos = nil
+local GUI = Instance.new("ScreenGui")
+if not ISStudio then
+	GUI.Parent = game.CoreGui
+else
+	GUI.Parent = plrlol.PlayerGui
+end
 GUI.Name = randomstring()
 GUI.ResetOnSpawn = false
 GUI.IgnoreGuiInset = true
@@ -31,7 +38,6 @@ button1.MouseButton1Click:Connect(function()
 		Flyye = true
 		ExtraBebounfly = true
 		NoclipEnabled = true
-		
 		Clip = false
 		Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
 	else
@@ -57,8 +63,54 @@ end)
 local PlrCamera = workspace.CurrentCamera
 function loopcheck()
 	local function uh()
+		
 		local Humanoid = plrlol.Character:WaitForChild("Humanoid")
 		local RootPart = plrlol.Character:FindFirstChild("HumanoidRootPart")
+		if ExtraBebounfly then
+			if not LastPos or LastPos.Parent ~= workspace then
+				LastPos = Instance.new("Part",workspace)
+				LastPos.Name = randomstring()
+				LastPos.CFrame = OriginPos
+				LastPos.Color = Color3.new(1, 0, 0)
+				LastPos.CanCollide = false
+				LastPos.Material = Enum.Material.SmoothPlastic
+				LastPos.Size = Vector3.new(2, 2, 1)
+				LastPos.Transparency = .5
+				LastPos.Anchored = true
+			else
+				OriginPos = LastPos.CFrame
+			end
+		else
+			if LastPos then
+				LastPos:Destroy()
+			end
+		end
+		local function FastSpam()
+			if Flyye and plrlol.PlayerGui:FindFirstChild("TouchGui") then
+				-- enable player controlls when game restricts it >:(
+				game:GetService("UserInputService").ModalEnabled = false
+				local PlayerModule = require(plrlol:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
+				local PlayerControls = PlayerModule:GetControls()
+				local MobileGui = plrlol.PlayerGui:FindFirstChild("TouchGui")
+				local MobileFrame = MobileGui:FindFirstChild("TouchControlFrame")
+				if MobileGui and not MobileGui.Enabled or not MobileGui:FindFirstChild("TouchControlFrame").Visible or not MobileGui:FindFirstChild("TouchControlFrame"):FindFirstChild("JumpButton").Visible or not MobileGui:FindFirstChild("TouchControlFrame"):FindFirstChild("DynamicThumbstickFrame").Visible then
+					MobileGui.Enabled = true
+					MobileFrame.Visible = true
+					MobileFrame:FindFirstChild("JumpButton").Visible = true
+					MobileFrame:FindFirstChild("DynamicThumbstickFrame").Visible = true
+					MobileFrame.ZIndex = math.huge
+				end
+				PlayerControls:Enable(true)
+			end
+		end
+		task.spawn(function()
+			FastSpam()
+			for i=1,50 do
+				FastSpam()
+			end
+			FastSpam()
+		end)
+		
 		if Flyye and plrlol.Character and Humanoid and RootPart then
 			local PlayerModuleMoment = plrlol.PlayerScripts:WaitForChild("PlayerModule")
 			if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO and BODY then
@@ -75,20 +127,26 @@ function loopcheck()
 					Humanoid = plrlol.Character:FindFirstChildWhichIsA("Humanoid")
 					RootPart = plrlol.Character:WaitForChild("HumanoidRootPart")
 				end
-				BODY.CFrame = CFrame.new(OriginPos.X,OriginPos.Y,OriginPos.Z)*CFrame.lookAt(RootPart.Position, RootPart.Position + PlrCamera.CFrame.LookVector)
+				
+				BODY.CFrame = PlrCamera.CFrame  --CFrame.new(OriginPos.X,OriginPos.Y,OriginPos.Z)*CFrame.lookAt(RootPart.Position, RootPart.Position + PlrCamera.CFrame.LookVector)
 				VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
 				BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
 				VELO.Velocity = Vector3.new()
+				
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
 					VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * 100)
 					if not Dead and plrlol.Character then
-						OriginPos = RootPart.CFrame
+						if LastPos and RootPart then
+							LastPos.CFrame = RootPart.CFrame
+						end
 					end
 				end
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
 					VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * 100)
 					if not Dead and plrlol.Character then
-						OriginPos = RootPart.CFrame
+						if LastPos and RootPart then
+							LastPos.CFrame = RootPart.CFrame
+						end
 					end
 				end
 			else
@@ -108,6 +166,8 @@ function loopcheck()
 				end
 			end
 		end
+		
+		
 	end
 	uh()
 	coroutine.resume(coroutine.create(function()
@@ -140,9 +200,6 @@ function EffectCharacter(Char)
 				if CharacterParented:FindFirstChild(plrlol.Name) and CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
 					Character = plrlol.Character or char
 					EffectCharacter(Character)
-					if Character and ExtraBebounfly then
-						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
-					end
 				end
 				wait()
 			until Character ~= nil
@@ -156,9 +213,6 @@ function EffectCharacter(Char)
 				if CharacterParented:FindFirstChild(plrlol.Name) then
 					Character = plrlol.Character
 					EffectCharacter(Character)
-					if Character and ExtraBebounfly then
-						plrlol.Character:MoveTo(Vector3.new(OriginPos.X,OriginPos.Y,OriginPos.Z))
-					end
 				end
 				wait()
 			until Character ~= nil
@@ -189,6 +243,19 @@ function EffectCharacter(Char)
 			Clip = false
 			Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoope)
 		end
+		task.spawn(function()
+			repeat
+				if ExtraBebounfly then
+					if not ISStudio then
+						RootPart.Position = LastPos.Position
+					else
+						Char:MoveTo(LastPos.Position)
+					end
+				end
+				wait()
+			until RootPart.Position == LastPos.Position or not LastPos 
+			
+		end)
 	end
 end
 wait(3)
