@@ -1,3 +1,4 @@
+repeat wait() until game:IsLoaded()
 local Flyye,VELO,BODY = false,nil,nil
 local OriginPos = CFrame.new()
 local plrlol = game:GetService("Players").LocalPlayer
@@ -138,6 +139,7 @@ function loopcheck()
 					if not Dead and plrlol.Character then
 						if LastPos and RootPart then
 							LastPos.CFrame = RootPart.CFrame
+							print("Moving")
 						end
 					end
 				end
@@ -146,6 +148,7 @@ function loopcheck()
 					if not Dead and plrlol.Character then
 						if LastPos and RootPart then
 							LastPos.CFrame = RootPart.CFrame
+							print("Moving")
 						end
 					end
 				end
@@ -258,7 +261,6 @@ function EffectCharacter(Char)
 		end)
 	end
 end
-wait(3)
 CharacterParented = workspace
 OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
 loopcheck()
