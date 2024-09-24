@@ -234,14 +234,10 @@ function EffectCharacter(Char)
 	end
 	if Flyye then
 		task.spawn(function()
-			print("reviving")
 			repeat
 				if ExtraBebounfly then
-					if not ISStudio then
-						RootPart.Position = LastPos.Position
-					else
-						Char:MoveTo(LastPos.Position)
-					end
+					print("Forcing To Move Wait")
+					Char:MoveTo(LastPos.Position)
 				end
 				wait()
 			until RootPart.Position == LastPos.Position or not LastPos 
