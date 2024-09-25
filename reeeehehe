@@ -145,16 +145,21 @@ function loopcheck()
 				VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
 				BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
 				VELO.Velocity = Vector3.new()
-				if not Dead and plrlol.Character then
-					if LastPos and RootPart then
-						LastPos.CFrame = RootPart.CFrame
-					end
-				end
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
 					VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * 100)
+					if not Dead and plrlol.Character then
+						if LastPos and RootPart then
+							LastPos.CFrame = RootPart.CFrame
+						end
+					end
 				end
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
 					VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * 100)
+					if not Dead and plrlol.Character then
+						if LastPos and RootPart then
+							LastPos.CFrame = RootPart.CFrame
+						end
+					end
 				end
 			else
 				if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO == nil and BODY == nil then
@@ -261,7 +266,11 @@ function EffectCharacter(Char)
 		Flyye = true
 	end
 end
-CharacterParented = workspace
+if plrlol.Character then
+	CharacterParented = plrlol.Character.Parent
+else
+	CharacterParented = workspace
+end
 OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
 loopcheck()
 EffectCharacter(plrlol.Character)
