@@ -76,7 +76,7 @@ local function teleportToItem(itemName)
 	end
 end
 
-Home:NewButton("Unlock Third Person", function()
+Home:NewButton("Unlock Third Person",nil, function()
 	game.Players.LocalPlayer.CameraMaxZoomDistance = 50
 	game.Players.LocalPlayer.CameraMode = Enum.CameraMode.Classic
 end)
@@ -107,18 +107,18 @@ end)
 
 local Teleports = MainUI:NewTab("Teleports"):NewSection("Teleport")
 
-Teleports:NewButton("Teleport to Hotdog", function()
+Teleports:NewButton("Teleport to Hotdog",nil, function()
 	teleportToItem("Hotdog")
 end)
 
-Teleports:NewButton("Teleport to Pizza", function()
+Teleports:NewButton("Teleport to Pizza",nil, function()
 	teleportToItem("Pizza")
 end)
 
-Teleports:NewButton("Teleport to Burger", function()
+Teleports:NewButton("Teleport to Burger",nil, function()
 	teleportToItem("Burger")
 end)
 
-Teleports:NewButton("Teleport to Medkit", function()
+Teleports:NewButton("Teleport to Medkit",nil, function()
 	teleportToItem("Medkit")
 end)
