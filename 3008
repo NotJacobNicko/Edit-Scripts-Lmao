@@ -88,13 +88,13 @@ task.spawn(function()
 	while wait() do
 		if Lmao then
 			local Lighting = game:GetService("Lighting")
-			Lighting.Ambient = Color3.new(0,0,0)
-			Lighting.Brightness = 1
+			Lighting.Ambient = Color3.new(255,255,255)
+			Lighting.Brightness = 3
 			Lighting.ClockTime = 12
 			Lighting.FogColor = Color3.fromRGB(133,133,133)
 			Lighting.OutdoorAmbient = Color3.fromRGB(133,133,133)
 			Lighting.FogStart = 0
-			Lighting.FogEnd = 0
+			Lighting.FogEnd = math.huge
 			Lighting.GeographicLatitude = 23.5
 		end
 	end
