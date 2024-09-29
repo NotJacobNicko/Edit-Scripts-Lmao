@@ -38,7 +38,7 @@ textbox.BackgroundColor3 = Color3.new(0.133333, 1, 0)
 textbox.Position = UDim2.new(0.46, 0,0.77, 0)
 textbox.Visible = true
 textbox.Text = ""
-textbox.PlaceholderText = "range"
+textbox.PlaceholderText = "speed"
 textbox.PlaceholderColor3 = Color3.new(0, 0, 0)
 textbox:GetPropertyChangedSignal("Text"):Connect(function()
 	local num = tonumber(textbox.Text)
@@ -87,55 +87,64 @@ function loopcheck()
 		local Humanoid = plrlol.Character:WaitForChild("Humanoid")
 		local RootPart = plrlol.Character:FindFirstChild("HumanoidRootPart")
 		if ExtraBebounfly then
-			if not LastPos or LastPos.Parent ~= workspace then
-				pcall(game.Destroy,LastPos)
-				LastPos = Instance.new("Part",workspace)
-				LastPos.Name = randomstring()
-				LastPos.CFrame = OriginPos
-				LastPos.Color = Color3.new(1, 0, 0)
-				LastPos.CanCollide = false
-				LastPos.Material = Enum.Material.SmoothPlastic
-				LastPos.Size = Vector3.new(2, 2, 1)
-				LastPos.Transparency = .9
-			else
-				OriginPos = LastPos.CFrame
-			end
-			
-			if not Dead then
-				if LastPos and not VELO or VELO.Parent ~= LastPos then
-					VELO = Instance.new("BodyVelocity",LastPos)
-					VELO.Name = randomstring()
-					VELO.Parent = LastPos
-					VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
-					VELO.Velocity = Vector3.new()
+			pcall(function()
+				if not LastPos or LastPos.Parent ~= workspace then
+					pcall(game.Destroy,LastPos)
+					LastPos = Instance.new("Part",workspace)
+					LastPos.Name = randomstring()
+					LastPos.CFrame = OriginPos
+					LastPos.Color = Color3.new(1, 0, 0)
+					LastPos.CanCollide = false
+					LastPos.Material = Enum.Material.SmoothPlastic
+					LastPos.Size = Vector3.new(2, 2, 1)
+					LastPos.Transparency = .9
+				else
+					LastPos.Name = randomstring()
+					OriginPos = LastPos.CFrame
 				end
 
-				if LastPos and not BODY or BODY.Parent ~= LastPos then
-					BODY = Instance.new("BodyGyro",LastPos)
-					BODY.Name = randomstring()
-					BODY.Parent = LastPos
-					BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-					BODY.P = 1000
-					BODY.D = 200
-				end
-				
-				if LastPos and RootPart then
-					if not weldlol or weldlol.Parent ~= LastPos then
-						pcall(game.Destroy,weldlol)
-						weldlol = Instance.new("Weld",LastPos)
-						weldlol.Name = randomstring()
-						weldlol.Part0 = RootPart
-						weldlol.Part1 = LastPos
+				if not Dead then
+					if LastPos and not VELO or VELO.Parent ~= LastPos then
+						VELO = Instance.new("BodyVelocity",LastPos)
+						VELO.Name = randomstring()
+						VELO.Parent = LastPos
+						VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+						VELO.Velocity = Vector3.new()
+					else
+						VELO.Name = randomstring()
+					end
+
+					if LastPos and not BODY or BODY.Parent ~= LastPos then
+						BODY = Instance.new("BodyGyro",LastPos)
+						BODY.Name = randomstring()
+						BODY.Parent = LastPos
+						BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+						BODY.P = 1000
+						BODY.D = 200
+					else
+						BODY.Name = randomstring()
+					end
+
+					if LastPos and RootPart then
+						if not weldlol or weldlol.Part0 ~= RootPart or weldlol.Part1 ~= LastPos or weldlol.Parent ~= LastPos then
+							pcall(game.Destroy,weldlol)
+							weldlol = Instance.new("Weld",LastPos)
+							weldlol.Name = randomstring()
+							weldlol.Part0 = RootPart
+							weldlol.Part1 = LastPos
+						else
+							weldlol.Name = randomstring()
+						end
 					end
 				end
-			end
+			end)
 		else
 			if LastPos then
 				LastPos:Destroy()
 			end
 		end
 		local function FastSpam()
-			
+
 			if Clip and not Dead then
 				for _, child in pairs(plrlol.Character:GetDescendants()) do
 					if child:IsA("BasePart") and child.CanCollide == true then
@@ -143,7 +152,7 @@ function loopcheck()
 					end
 				end
 			end
-			
+
 			if Flyye and plrlol.PlayerGui:FindFirstChild("TouchGui") then
 				game:GetService("UserInputService").ModalEnabled = false
 				local PlayerModule = require(plrlol:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
@@ -197,7 +206,7 @@ function loopcheck()
 				end
 			end
 		end
-		
+
 	end
 	uh()
 	coroutine.resume(coroutine.create(function()
@@ -213,6 +222,9 @@ function EffectCharacter(Char)
 	local HumanoidChar = Char:FindFirstChild("Humanoid")
 	HumanoidChar.Died:Connect(function()
 		Dead = true
+		if LastPos then
+			LastPos.Anchored = true
+		end
 		plrlol.CharacterAdded:Connect(function(char)
 			local Character = nil
 			repeat
@@ -242,12 +254,23 @@ function EffectCharacter(Char)
 	Dead = false
 	if Flyye then
 		task.spawn(function()
-			repeat
-				if ExtraBebounfly then
-					Char:MoveTo(LastPos.Position)
+			local sucee = pcall(function()
+				repeat
+					if ExtraBebounfly then
+						Char:MoveTo(LastPos.Position)
+					end
+					wait()
+				until (LastPos and (RootPart.Position - LastPos.Position).Magnitude <= 5) or not LastPos 
+				task.wait(.2)
+				if LastPos then
+					LastPos.Anchored = false
 				end
-				wait()
-			until (RootPart.Position - LastPos.Position).Magnitude <= 5 or not LastPos 
+			end)
+			if not sucee then
+				if LastPos then
+					LastPos.Anchored = false
+				end
+			end
 		end)
 		Flyye = false
 		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
