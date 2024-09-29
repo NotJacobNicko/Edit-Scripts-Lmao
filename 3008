@@ -70,6 +70,7 @@ Home:NewButton("Unlock Third Person","", function()
 end)
 local Lmao = false
 local Lmao1 = false
+local Lmao2 = false
 Home:NewToggle("Reset Lighting","", function(Value)
 	Lmao = Value
 end)
@@ -155,6 +156,14 @@ Teleports:NewToggle("Auto Find Chocolate(Reach 804 Stud Near Pillar Anywhere)","
 		notify("Auto Finding Chocolate Disabled")
 	end
 end)
+Teleports:NewToggle("Find Lost Survivor(rick roll)","", function(toggle)
+	Lmao2 = toggle
+	if Lmao2 then
+		notify("finding Lost Survivor wander around untill it loaded")
+	else
+		notify("Finding survivor Disabled")
+	end
+end)
 task.spawn(function()
 	while wait(.5) do
 		if Lmao1 then
@@ -167,5 +176,23 @@ task.spawn(function()
 				end
 			end
 		end
+		
+		if Lmao2 then
+			for i,v in pairs(workspace:GetDescendants()) do
+				if v:IsA("Model") and v:FindFirstChildWhichIsA("Humanoid") then
+					local Head = v:FindFirstChild("Head")
+					local Humanoid = v:FindFirstChildWhichIsA("Humanoid")
+					if not v:FindFirstChildWhichIsA("CharacterMesh") then
+						if Head and Head:FindFirstChild("face").Texture == "rbxassetid://2222767231" and Humanoid.RigType ~= Enum.RigType.R6 or v.Name == "Wounded Survivor" then
+							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Head.CFrame
+							notify("Survivor Found")
+							Lmao2 = false
+							break
+						end
+					end
+				end
+			end
+		end
+		
 	end
 end)
