@@ -7,6 +7,7 @@ local ExtraBebounfly = false
 local CharacterParented = nil
 local ISStudio = game:GetService("RunService"):IsStudio()
 local Speed = 100
+local ActiveDeath = false
 function randomstring()
 	local e = {}
 	for i = 1,math.random(5,50) do
@@ -50,6 +51,9 @@ button1.MouseButton1Click:Connect(function()
 		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
 		Flyye = true
 		ExtraBebounfly = true
+		if not ActiveDeath then
+			EffectCharacter(plrlol.Character)
+		end
 	else
 		button1.BackgroundColor3 = Color3.new(1, 0, 0)
 		Flyye = false
@@ -223,8 +227,10 @@ end
 function EffectCharacter(Char)
 	local RootPart = Char:FindFirstChild("HumanoidRootPart")
 	local HumanoidChar = Char:FindFirstChild("Humanoid")
+	ActiveDeath = false
 	pcall(function()
 		HumanoidChar.Died:Connect(function()
+			ActiveDeath = false
 			Dead = true
 			IsAlive = false
 			if LastPos then
@@ -245,6 +251,7 @@ function EffectCharacter(Char)
 	end)
 	CharacterParented.ChildRemoved:Connect(function(model)
 		if model:IsA("Model") and model == Char then
+			ActiveDeath = false
 			Dead = true
 			IsAlive = false
 			if LastPos then
@@ -264,7 +271,6 @@ function EffectCharacter(Char)
 	Dead = false
 	if Flyye then
 		task.spawn(function()
-			PlrCamera.CameraType = Enum.CameraType.Scriptable
 			local sucee = pcall(function()
 				repeat
 					if ExtraBebounfly then
@@ -301,8 +307,10 @@ function EffectCharacter(Char)
 end
 if plrlol.Character then
 	CharacterParented = plrlol.Character.Parent
+	print(CharacterParented.Name)
 else
 	CharacterParented = workspace
+	print("workspace bru")
 end
 OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
 loopcheck()
