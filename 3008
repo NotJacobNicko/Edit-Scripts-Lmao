@@ -4,6 +4,7 @@ local MainUI = UILibrary.CreateLib("3008", "Ocean")
 local Home = MainUI:NewTab("Home"):NewSection("Info")
 
 -- ESP
+
 local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
 ESP:Toggle(true)
 ESP.Players = false
@@ -30,7 +31,6 @@ local bruhwronggameidiot = pcall(function()
 
 	ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Employees, {
 		Type = "Model",
-		CustomName = "Employee",
 		Color = Color3.fromRGB(255, 0, 4),
 		IsEnabled = "employeeToggle"
 	})
@@ -45,7 +45,6 @@ if not bruhwronggameidiot then
 
 	ESP:AddObjectListener(workspace.Employees, {
 		Type = "Model",
-		CustomName = "Employee",
 		Color = Color3.fromRGB(255, 0, 4),
 		IsEnabled = "employeeToggle"
 	})
@@ -79,6 +78,26 @@ end
 Home:NewButton("Unlock Third Person","", function()
 	game.Players.LocalPlayer.CameraMaxZoomDistance = 50
 	game.Players.LocalPlayer.CameraMode = Enum.CameraMode.Classic
+end)
+local Lmao = false
+Home:NewToggle("Daytime","", function(Value)
+	Lmao = Value
+end)
+
+task.spawn(function()
+	while wait() do
+		if Lmao then
+			local Lighting = game:GetService("Lighting")
+			Lighting.Ambient = Color3.new(0,0,0)
+			Lighting.Brightness = 1
+			Lighting.ClockTime = 12
+			Lighting.FogColor = Color3.fromRGB(133,133,133)
+			Lighting.OutdoorAmbient = Color3.fromRGB(133,133,133)
+			Lighting.FogStart = 0
+			Lighting.FogEnd = 0
+			Lighting.GeographicLatitude = 23.5
+		end
+	end
 end)
 
 Home:NewToggle("ESP","", function(Value)
