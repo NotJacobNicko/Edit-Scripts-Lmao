@@ -242,7 +242,7 @@ function EffectCharacter(Char)
 			Dead = true
 			local Character = nil
 			repeat
-				local Human = CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid")
+				local Human = model:FindFirstChildWhichIsA("Humanoid")
 				if CharacterParented:FindFirstChild(plrlol.Name) and Human and Human.Health ~= 0 then
 					Character = plrlol.Character
 					EffectCharacter(Character)
