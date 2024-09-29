@@ -21,32 +21,60 @@ local function notify(message)
 	})
 end
 
+local bruhwronggameidiot = pcall(function()
+	ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Items, {
+		Type = "Model",
+		Color = Color3.fromRGB(34, 255, 0),
+		IsEnabled = "itemESP"
+	})
+
+	ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Employees, {
+		Type = "Model",
+		CustomName = "Employee",
+		Color = Color3.fromRGB(255, 0, 4),
+		IsEnabled = "employeeToggle"
+	})
+end)
+
+if not bruhwronggameidiot then
+	ESP:AddObjectListener(workspace.Items, {
+		Type = "Model",
+		Color = Color3.fromRGB(34, 255, 0),
+		IsEnabled = "itemESP"
+	})
+
+	ESP:AddObjectListener(workspace.Employees, {
+		Type = "Model",
+		CustomName = "Employee",
+		Color = Color3.fromRGB(255, 0, 4),
+		IsEnabled = "employeeToggle"
+	})
+end
+
 local function teleportToItem(itemName)
 	local donesearch = false
-	for i,v in pairs(game:GetService("Workspace").GameObjects.Physical.Items:GetDescendants()) do
-		if v.Name == "Root" and v.Parent.Name == itemName then
-			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
-			donesearch = true
-			break
+	local errorbecauseyournotinagame = pcall(function()
+		for i,v in pairs(game:GetService("Workspace").GameObjects.Physical.Items:GetDescendants()) do
+			if v.Name == "Root" and v.Parent.Name == itemName then
+				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+				donesearch = true
+				break
+			end
+		end
+	end)
+	if not errorbecauseyournotinagame then
+		for i,v in pairs(workspace.Items:GetDescendants()) do
+			if v.Name == "Root" and v.Parent.Name == itemName then
+				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+				donesearch = true
+				break
+			end
 		end
 	end
 	if donesearch == false then
 		notify("Item position not defined")
 	end
 end
-
-ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Items, {
-	Type = "Model",
-	Color = Color3.fromRGB(34, 255, 0),
-	IsEnabled = "itemESP"
-})
-
-ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Employees, {
-	Type = "Model",
-	CustomName = "Employee",
-	Color = Color3.fromRGB(255, 0, 4),
-	IsEnabled = "employeeToggle"
-})
 
 Home:NewButton("Unlock Third Person", function()
 	game.Players.LocalPlayer.CameraMaxZoomDistance = 50
