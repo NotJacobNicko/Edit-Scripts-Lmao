@@ -1,0 +1,96 @@
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/refs/heads/main/hubwithnoClose"))()
+
+local MainUI = UILibrary:CreateLib("Idunno - 3008")
+local Home = MainUI:NewTab("Home"):NewSection("Info")
+
+-- ESP
+local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
+ESP:Toggle(true)
+ESP.Players = false
+ESP.Tracers = false
+ESP.Boxes = false
+ESP.Names = false
+
+-- notify function
+local function notify(message)
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "Notify";
+		Text = message;
+		Icon = "";
+		Duration = 5;
+	})
+end
+
+local function teleportToItem(itemName)
+	local donesearch = false
+	for i,v in pairs(game:GetService("Workspace").GameObjects.Physical.Items:GetDescendants()) do
+		if v.Name == "Root" and v.Parent.Name == itemName then
+			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+			donesearch = true
+			break
+		end
+	end
+	if donesearch == false then
+		notify("Item position not defined")
+	end
+end
+
+ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Items, {
+	Type = "Model",
+	Color = Color3.fromRGB(34, 255, 0),
+	IsEnabled = "itemESP"
+})
+
+ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Employees, {
+	Type = "Model",
+	CustomName = "Employee",
+	Color = Color3.fromRGB(255, 0, 4),
+	IsEnabled = "employeeToggle"
+})
+
+Home:NewButton("Unlock Third Person", function()
+	game.Players.LocalPlayer.CameraMaxZoomDistance = 50
+	game.Players.LocalPlayer.CameraMode = Enum.CameraMode.Classic
+end)
+
+Home:NewToggle("ESP","", function(Value)
+	ESP.Boxes = Value
+end)
+
+Home:NewToggle("ESP Tracers","", function(Value)
+	ESP.Tracers = Value
+end)
+
+Home:NewToggle("ESP Nametags","", function(Value)
+	ESP.Names = Value
+end)
+
+Home:NewToggle("Show Players","", function(Value)
+	ESP.Players = Value
+end)
+
+Home:NewToggle("Show Employees","", function(Value)
+	ESP.employeeToggle = Value
+end)
+
+Home:NewToggle("Show Items","", function(Value)
+	ESP.itemESP = Value
+end)
+
+local Teleports = MainUI:NewTab("Teleports"):NewSection("Teleport")
+
+Teleports:NewButton("Teleport to Hotdog", function()
+	teleportToItem("Hotdog")
+end)
+
+Teleports:NewButton("Teleport to Pizza", function()
+	teleportToItem("Pizza")
+end)
+
+Teleports:NewButton("Teleport to Burger", function()
+	teleportToItem("Burger")
+end)
+
+Teleports:NewButton("Teleport to Medkit", function()
+	teleportToItem("Medkit")
+end)
