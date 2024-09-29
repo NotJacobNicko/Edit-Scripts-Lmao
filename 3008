@@ -83,7 +83,6 @@ local Lmao = false
 Home:NewToggle("Daytime","", function(Value)
 	Lmao = Value
 end)
-
 task.spawn(function()
 	while wait() do
 		if Lmao then
@@ -102,6 +101,14 @@ task.spawn(function()
 			Lighting.FogColor = Color3.fromRGB(255, 255, 255)
 			Lighting.FogStart = math.huge
 			Lighting.FogEnd = math.huge
+			
+			for i,v in pairs(Lighting:GetDescendants()) do
+				if v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
+					v.Enabled = false
+				else
+					v.Parent = game:GetService("ReplicatedStorage")
+				end
+			end
 			
 		end
 	end
