@@ -52,30 +52,15 @@ end
 
 local function teleportToItem(itemName)
 	local donesearch = false
-	local errorbecauseyournotinagame = pcall(function()
-		for i,v in pairs(workspace.GameObjects.Physical.Items:GetDescendants()) do
-			if v.Name == "Root" and v.Parent.Name == itemName then
-				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
-				donesearch = true
-				break
-			end
-		end
-	end)
-	if not errorbecauseyournotinagame then
-		for i,v in pairs(workspace.Items:GetDescendants()) do
-			if v.Name == "Root" and v.Parent.Name == itemName then
-				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
-				donesearch = true
-				break
-			end
+	for i,v in pairs(workspace:GetDescendants()) do
+		if v.Name == "Root" and v.Parent.Name == itemName then
+			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+			donesearch = true
+			break
 		end
 	end
 	if donesearch == false then
-		if itemName == "Chocolate" then
-			notify("Chocolate Is Not Near Or you Did Not Go At 804 Studs")
-		else
-			notify("Item Not Found Or Its Not Loaded In")
-		end
+		notify("Item Not Found Or Its Not Loaded Nearby")
 	end
 end
 
@@ -84,6 +69,7 @@ Home:NewButton("Unlock Third Person","", function()
 	game.Players.LocalPlayer.CameraMode = Enum.CameraMode.Classic
 end)
 local Lmao = false
+local Lmao1 = false
 Home:NewToggle("Reset Lighting","", function(Value)
 	Lmao = Value
 end)
@@ -161,6 +147,25 @@ Teleports:NewButton("Teleport to Medkit","", function()
 	teleportToItem("Medkit")
 end)
 
-Teleports:NewButton("Teleport to Chocolate(Reach 804 Stud Near Pillar Anywhere)","", function()
-	teleportToItem("Chocolate")
+Teleports:NewToggle("Auto Find Chocolate(Reach 804 Stud Near Pillar Anywhere)","", function(toggle)
+	Lmao1 = toggle
+	if Lmao1 then
+		notify("Auto Finding Chocolate Nearby Please Go 804 Studs!")
+	else
+		notify("Auto Finding Chocolate Disabled")
+	end
+end)
+task.spawn(function()
+	while wait(.5) do
+		if Lmao1 then
+			for i,v in pairs(workspace:GetDescendants()) do
+				if v.Name == "Root" and v.Parent.Name == "Chocolate" then
+					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+					notify("Chocolate found")
+					Lmao1 = false
+					break
+				end
+			end
+		end
+	end
 end)
