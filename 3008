@@ -1,6 +1,6 @@
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/refs/heads/main/hubwithnoClose"))()
 
-local MainUI = UILibrary:CreateLib("Idunno - 3008")
+local MainUI = UILibrary:CreateLib("Idunno - 3008","Ocean")
 local Home = MainUI:NewTab("Home"):NewSection("Info")
 
 -- ESP
