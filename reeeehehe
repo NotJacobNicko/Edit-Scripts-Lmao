@@ -147,7 +147,6 @@ function loopcheck()
 			end
 		end
 		local function FastSpam()
-
 			if Flyye and not Dead then
 				for _, child in pairs(plrlol.Character:GetDescendants()) do
 					if child:IsA("BasePart") and child.CanCollide == true then
@@ -251,6 +250,7 @@ function EffectCharacter(Char)
 	end)
 	CharacterParented.ChildRemoved:Connect(function(model)
 		if model:IsA("Model") and model == Char then
+			print("really you gotta delete my character?")
 			ActiveDeath = false
 			Dead = true
 			IsAlive = false
@@ -278,13 +278,14 @@ function EffectCharacter(Char)
 					end
 					wait()
 				until (LastPos and (RootPart.Position - LastPos.Position).Magnitude <= 5) or not LastPos 
-				task.wait(.4)
+				task.wait(.5)
 				if LastPos then
 					LastPos.Anchored = false
 				end
 				IsAlive = true
 			end)
 			if not sucee then
+				print("Error To Move Position")
 				if LastPos then
 					LastPos.Anchored = false
 				end
