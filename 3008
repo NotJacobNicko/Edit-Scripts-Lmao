@@ -23,13 +23,13 @@ local function notify(message)
 end
 
 local bruhwronggameidiot = pcall(function()
-	ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Items, {
+	ESP:AddObjectListener(workspace.GameObjects.Physical.Items, {
 		Type = "Model",
 		Color = Color3.fromRGB(34, 255, 0),
 		IsEnabled = "itemESP"
 	})
 
-	ESP:AddObjectListener(game:GetService("Workspace").GameObjects.Physical.Employees, {
+	ESP:AddObjectListener(workspace.GameObjects.Physical.Employees, {
 		Type = "Model",
 		Color = Color3.fromRGB(255, 0, 4),
 		IsEnabled = "employeeToggle"
@@ -53,7 +53,7 @@ end
 local function teleportToItem(itemName)
 	local donesearch = false
 	local errorbecauseyournotinagame = pcall(function()
-		for i,v in pairs(game:GetService("Workspace").GameObjects.Physical.Items:GetDescendants()) do
+		for i,v in pairs(workspace.GameObjects.Physical.Items:GetDescendants()) do
 			if v.Name == "Root" and v.Parent.Name == itemName then
 				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
 				donesearch = true
@@ -71,7 +71,11 @@ local function teleportToItem(itemName)
 		end
 	end
 	if donesearch == false then
-		notify("Item position not defined")
+		if itemName == "Chocolate" then
+			notify("Chocolate Is Not Near Or you Did Not Go At 804 Studs")
+		else
+			notify("Item Not Found Or Its Not Loaded In")
+		end
 	end
 end
 
@@ -80,7 +84,7 @@ Home:NewButton("Unlock Third Person","", function()
 	game.Players.LocalPlayer.CameraMode = Enum.CameraMode.Classic
 end)
 local Lmao = false
-Home:NewToggle("Daytime","", function(Value)
+Home:NewToggle("Reset Lighting","", function(Value)
 	Lmao = Value
 end)
 task.spawn(function()
@@ -97,6 +101,7 @@ task.spawn(function()
 			Lighting.GlobalShadows = true
 			Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
 			Lighting.ShadowSoftness = .2
+			Lighting.ClockTime = 12
 			Lighting.GeographicLatitude = 0
 			Lighting.FogColor = Color3.fromRGB(255, 255, 255)
 			Lighting.FogStart = math.huge
@@ -154,4 +159,8 @@ end)
 
 Teleports:NewButton("Teleport to Medkit","", function()
 	teleportToItem("Medkit")
+end)
+
+Teleports:NewButton("Teleport to Chocolate(Reach 804 Stud Near Pillar Anywhere)","", function()
+	teleportToItem("Chocolate")
 end)
