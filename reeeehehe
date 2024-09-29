@@ -52,6 +52,7 @@ button1.MouseButton1Click:Connect(function()
 		Flyye = true
 		ExtraBebounfly = true
 		if not ActiveDeath then
+			print("Injected Character Flight Due To Error")
 			EffectCharacter(plrlol.Character)
 		end
 	else
@@ -70,18 +71,6 @@ button1.MouseButton1Click:Connect(function()
 	end
 end)
 local PlrCamera = workspace.CurrentCamera
-function Debug()
-	local function CheckPart(part)
-		if part then
-			return true
-		else
-			return false
-		end
-	end
-	print("Is Dead:",Dead)
-	print("OriginPos:", OriginPos)
-	print("Part:", CheckPart(LastPos))
-end
 local weldlol = nil
 local IsAlive = true
 function loopcheck()
@@ -127,7 +116,7 @@ function loopcheck()
 					else
 						BODY.Name = randomstring()
 					end
-
+					
 					if LastPos and RootPart then
 						if not weldlol or weldlol.Part0 ~= RootPart or weldlol.Part1 ~= LastPos or weldlol.Parent ~= RootPart then
 							pcall(game.Destroy,weldlol)
@@ -139,6 +128,7 @@ function loopcheck()
 							weldlol.Name = randomstring()
 						end
 					end
+					
 				end
 			end)
 		else
@@ -178,6 +168,10 @@ function loopcheck()
 			end
 			FastSpam()
 		end)
+		if not Flyye then
+			OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
+			workspace:FindFirstChildWhichIsA("CFrameValue").Value = OriginPos
+		end
 		if Flyye and plrlol.Character and Humanoid and RootPart then
 			local PlayerModuleMoment = plrlol.PlayerScripts:WaitForChild("PlayerModule")
 			if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO and BODY then
@@ -200,13 +194,13 @@ function loopcheck()
 				VELO.Velocity = Vector3.new()
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
 					VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * Speed)
-					if not Dead then
+					if not Dead and ExtraBebounfly then
 						OriginPos = LastPos.CFrame
 					end
 				end
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
 					VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * Speed)
-					if not Dead then
+					if not Dead and ExtraBebounfly then
 						OriginPos = LastPos.CFrame
 					end
 				end
@@ -226,7 +220,7 @@ end
 function EffectCharacter(Char)
 	local RootPart = Char:FindFirstChild("HumanoidRootPart")
 	local HumanoidChar = Char:FindFirstChild("Humanoid")
-	ActiveDeath = false
+	ActiveDeath = true
 	pcall(function()
 		HumanoidChar.Died:Connect(function()
 			ActiveDeath = false
@@ -284,7 +278,6 @@ function EffectCharacter(Char)
 				IsAlive = true
 			end)
 			if not sucee then
-				print("Error")
 				task.wait(.5)
 				if LastPos then
 					LastPos.Anchored = false
@@ -311,7 +304,7 @@ if plrlol.Character then
 	print(CharacterParented.Name)
 else
 	CharacterParented = workspace
-	print("workspace bru")
+	print("error auto set to workspace")
 end
 OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
 loopcheck()
