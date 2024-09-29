@@ -170,7 +170,6 @@ function loopcheck()
 		end)
 		if not Flyye then
 			OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
-			workspace:FindFirstChildWhichIsA("CFrameValue").Value = OriginPos
 		end
 		if Flyye and plrlol.Character and Humanoid and RootPart then
 			local PlayerModuleMoment = plrlol.PlayerScripts:WaitForChild("PlayerModule")
