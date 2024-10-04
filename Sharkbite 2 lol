@@ -1,0 +1,1153 @@
+-- sharkbite2
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "Sharkbite2", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+local Tab = Window:MakeTab({
+	Name = "player setting",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local Section = Tab:AddSection({
+	Name = "player"
+})
+Tab:AddSlider({
+	Name = "Speed",
+	Min = 1,
+	Max = 100,
+	Default = 16,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 4,
+	ValueName = "speed change",
+	Callback = function(Value)
+		print(Value)
+		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+	end    
+})
+Tab:AddButton({
+	Name = "noclip",
+	Callback = function()
+		local Workspace = game:GetService("Workspace")
+		local CoreGui = game:GetService("CoreGui")
+		local Players = game:GetService("Players")
+		local Noclip = Instance.new("ScreenGui")
+		local BG = Instance.new("Frame")
+		local Title = Instance.new("TextLabel")
+		local Toggle = Instance.new("TextButton")
+		local StatusPF = Instance.new("TextLabel")
+		local Status = Instance.new("TextLabel")
+		local Credit = Instance.new("TextLabel")
+		local Plr = Players.LocalPlayer
+		local Clipon = false
+
+		Noclip.Name = "Noclip"
+		Noclip.Parent = game.CoreGui
+
+		BG.Name = "BG"
+		BG.Parent = Noclip
+		BG.BackgroundColor3 = Color3.new(0.0980392, 0.0980392, 0.0980392)
+		BG.BorderColor3 = Color3.new(0.0588235, 0.0588235, 0.0588235)
+		BG.BorderSizePixel = 2
+		BG.Position = UDim2.new(0.149479166, 0, 0.82087779, 0)
+		BG.Size = UDim2.new(0, 210, 0, 127)
+		BG.Active = true
+		BG.Draggable = true
+
+		Title.Name = "Title"
+		Title.Parent = BG
+		Title.BackgroundColor3 = Color3.new(0.266667, 0.00392157, 0.627451)
+		Title.BorderColor3 = Color3.new(0.180392, 0, 0.431373)
+		Title.BorderSizePixel = 2
+		Title.Size = UDim2.new(0, 210, 0, 33)
+		Title.Font = Enum.Font.Highway
+		Title.Text = "Noclip"
+		Title.TextColor3 = Color3.new(1, 1, 1)
+		Title.FontSize = Enum.FontSize.Size32
+		Title.TextSize = 30
+		Title.TextStrokeColor3 = Color3.new(0.180392, 0, 0.431373)
+		Title.TextStrokeTransparency = 0
+
+		Toggle.Parent = BG
+		Toggle.BackgroundColor3 = Color3.new(0.266667, 0.00392157, 0.627451)
+		Toggle.BorderColor3 = Color3.new(0.180392, 0, 0.431373)
+		Toggle.BorderSizePixel = 2
+		Toggle.Position = UDim2.new(0.152380958, 0, 0.374192119, 0)
+		Toggle.Size = UDim2.new(0, 146, 0, 36)
+		Toggle.Font = Enum.Font.Highway
+		Toggle.FontSize = Enum.FontSize.Size28
+		Toggle.Text = "Toggle"
+		Toggle.TextColor3 = Color3.new(1, 1, 1)
+		Toggle.TextSize = 25
+		Toggle.TextStrokeColor3 = Color3.new(0.180392, 0, 0.431373)
+		Toggle.TextStrokeTransparency = 0
+
+		StatusPF.Name = "StatusPF"
+		StatusPF.Parent = BG
+		StatusPF.BackgroundColor3 = Color3.new(1, 1, 1)
+		StatusPF.BackgroundTransparency = 1
+		StatusPF.Position = UDim2.new(0.314285725, 0, 0.708661377, 0)
+		StatusPF.Size = UDim2.new(0, 56, 0, 20)
+		StatusPF.Font = Enum.Font.Highway
+		StatusPF.FontSize = Enum.FontSize.Size24
+		StatusPF.Text = "Status:"
+		StatusPF.TextColor3 = Color3.new(1, 1, 1)
+		StatusPF.TextSize = 20
+		StatusPF.TextStrokeColor3 = Color3.new(0.333333, 0.333333, 0.333333)
+		StatusPF.TextStrokeTransparency = 0
+		StatusPF.TextWrapped = true
+
+		Status.Name = "Status"
+		Status.Parent = BG
+		Status.BackgroundColor3 = Color3.new(1, 1, 1)
+		Status.BackgroundTransparency = 1
+		Status.Position = UDim2.new(0.580952346, 0, 0.708661377, 0)
+		Status.Size = UDim2.new(0, 56, 0, 20)
+		Status.Font = Enum.Font.Highway
+		Status.FontSize = Enum.FontSize.Size14
+		Status.Text = "off"
+		Status.TextColor3 = Color3.new(0.666667, 0, 0)
+		Status.TextScaled = true
+		Status.TextSize = 14
+		Status.TextStrokeColor3 = Color3.new(0.180392, 0, 0.431373)
+		Status.TextWrapped = true
+		Status.TextXAlignment = Enum.TextXAlignment.Left
+
+		Credit.Name = "Credit"
+		Credit.Parent = BG
+		Credit.BackgroundColor3 = Color3.new(1, 1, 1)
+		Credit.BackgroundTransparency = 1
+		Credit.Position = UDim2.new(0.195238099, 0, 0.866141737, 0)
+		Credit.Size = UDim2.new(0, 128, 0, 17)
+		Credit.Font = Enum.Font.SourceSans
+		Credit.FontSize = Enum.FontSize.Size18
+		Credit.Text = "Created by MIQUELVERFAILLIE"
+		Credit.TextColor3 = Color3.new(1, 1, 1)
+		Credit.TextSize = 16
+		Credit.TextStrokeColor3 = Color3.new(0.196078, 0.196078, 0.196078)
+		Credit.TextStrokeTransparency = 0
+		Credit.TextWrapped = true
+		local Stepped
+		Toggle.MouseButton1Click:connect(function()
+			if Status.Text == "off" then
+				Clipon = true
+				Status.Text = "on"
+				Status.TextColor3 = Color3.new(0,185,0)
+				Stepped = game:GetService("RunService").Stepped:Connect(function()
+					if Clipon then
+						for a, b in pairs(Workspace:GetChildren()) do
+							if b.Name == Plr.Name then
+								for i, v in pairs(Workspace[Plr.Name]:GetChildren()) do
+									if v:IsA("BasePart") then
+										v.CanCollide = false
+									end end end end
+					else
+						Stepped:Disconnect()
+					end
+				end)
+			elseif Status.Text == "on" then
+				Clipon = false
+				Status.Text = "off"
+				Status.TextColor3 = Color3.new(170,0,0)
+			end
+		end)
+	end    
+})
+Tab:AddButton({
+	Name = "infinitejump GUI",
+	Callback = function()
+		-- Gui to Lua
+		-- Version: 3.2
+
+		-- Instances:
+
+		local InfJumpGui = Instance.new("ScreenGui")
+		local Main = Instance.new("Frame")
+		local Top = Instance.new("Frame")
+		local TextLabel = Instance.new("TextLabel")
+		local close = Instance.new("TextButton")
+		local InfiniteJump = Instance.new("TextButton")
+		local infjumpenabled = false
+		--Properties:
+
+		InfJumpGui.Name = "InfJumpGui"
+		InfJumpGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+		InfJumpGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+		Main.Name = "Main"
+		Main.Parent = InfJumpGui
+		Main.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+		Main.Position = UDim2.new(0.414008319, 0, 0.424691409, 0)
+		Main.Size = UDim2.new(0.171983361, 0, 0.0987654254, 0)
+
+		Top.Name = "Top"
+		Top.Parent = Main
+		Top.BackgroundColor3 = Color3.fromRGB(54, 54, 54)
+		Top.BorderSizePixel = 0
+		Top.Size = UDim2.new(1, 0, 0.231244698, 0)
+
+		TextLabel.Parent = Top
+		TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		TextLabel.BackgroundTransparency = 1.000
+		TextLabel.Size = UDim2.new(0.92806381, 0, 1, 0)
+		TextLabel.Font = Enum.Font.Code
+		TextLabel.Text = "Infinite Jump by mug#1941"
+		TextLabel.TextColor3 = Color3.fromRGB(74, 74, 74)
+		TextLabel.TextScaled = true
+		TextLabel.TextSize = 14.000
+		TextLabel.TextWrapped = true
+
+		close.Name = "close"
+		close.Parent = Top
+		close.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		close.BackgroundTransparency = 1.000
+		close.Position = UDim2.new(0.946004272, 0, 0, 0)
+		close.Size = UDim2.new(0.0539956801, 0, 1, 0)
+		close.Font = Enum.Font.Code
+		close.Text = "X"
+		close.TextColor3 = Color3.fromRGB(74, 74, 74)
+		close.TextScaled = true
+		close.TextSize = 14.000
+		close.TextWrapped = true
+
+		InfiniteJump.Name = "InfiniteJump"
+		InfiniteJump.Parent = Main
+		InfiniteJump.BackgroundColor3 = Color3.fromRGB(58, 58, 58)
+		InfiniteJump.BorderColor3 = Color3.fromRGB(74, 74, 74)
+		InfiniteJump.Position = UDim2.new(0.112903222, 0, 0.325633258, 1)
+		InfiniteJump.Size = UDim2.new(0.774193406, 0, 0.535669923, 0)
+		InfiniteJump.Font = Enum.Font.Code
+		InfiniteJump.Text = "Disabled"
+		InfiniteJump.TextColor3 = Color3.fromRGB(74, 74, 74)
+		InfiniteJump.TextSize = 24.000
+		InfiniteJump.TextWrapped = true
+
+		-- Scripts:
+
+		local function CFFF_fake_script() -- close.LocalScript 
+			local script = Instance.new('LocalScript', close)
+
+			script.Parent.MouseButton1Click:Connect(function()
+				local frame = script.Parent.Parent.Parent
+				frame:TweenPosition(UDim2.new(0.4, 0,1.5, 0))
+				infjumpenabled = false
+				wait(1)
+				frame.Parent:Destroy()
+			end)
+		end
+		coroutine.wrap(CFFF_fake_script)()
+		local function VESU_fake_script() -- InfiniteJump.EnableDisableInfJump 
+			local script = Instance.new('LocalScript', InfiniteJump)
+
+
+			script.Parent.MouseButton1Click:Connect(function()
+				if infjumpenabled == false then
+					infjumpenabled = true
+					script.Parent.Text = "Enabled"
+				elseif infjumpenabled == true then
+					infjumpenabled = false
+					script.Parent.Text = "Disabled"
+				end
+			end)
+		end
+		coroutine.wrap(VESU_fake_script)()
+		local function GSJXM_fake_script() -- Main.Draggable 
+			local script = Instance.new('LocalScript', Main)
+
+			local Frame = script.Parent
+			Frame.Selectable = true
+			Frame.Active = true
+			Frame.Draggable = true
+		end
+		coroutine.wrap(GSJXM_fake_script)()
+		local function MZUWYOR_fake_script() -- Main.Opening 
+			local script = Instance.new('LocalScript', Main)
+
+			script.Parent.Position = UDim2.new(0.33, 0,2, 0)
+			script.Parent:TweenPosition(UDim2.new(0.33, 0,0.3, 0))
+		end
+		coroutine.wrap(MZUWYOR_fake_script)()
+		local function HLKTLMK_fake_script() -- Main.infjumpscript 
+			local script = Instance.new('LocalScript', Main)
+
+			game:GetService("UserInputService").JumpRequest:Connect(function()
+				if infjumpenabled == true then
+					game.Players.LocalPlayer.Character:FindFirstChild("Humanoid"):ChangeState("Jumping")
+				end
+			end)
+		end
+		coroutine.wrap(HLKTLMK_fake_script)()
+	end    
+})
+
+
+local Tab = Window:MakeTab({
+	Name = "Boats",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local Section = Tab:AddSection({
+	Name = "Select boat"
+})
+
+--other tab
+Tab:AddButton({
+	Name = "UFO",
+	Callback = function()
+		local args = {
+			[1] = "UFO"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Partyboat",
+	Callback = function()
+		local args = {
+			[1] = "PartyBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "FishingBoat",
+	Callback = function()
+		local args = {
+			[1] = "FishingBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "DuckyBoat",
+	Callback = function()
+		local args = {
+			[1] = "DuckyBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "SmallWoodenSailboat",
+	Callback = function()
+		local args = {
+			[1] = "SmallWoodenSailboat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "UnicornBoat",
+	Callback = function()
+		local args = {
+			[1] = "UnicornBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "BlueWoodenMotorboat",
+	Callback = function()
+		local args = {
+			[1] = "BlueWoodenMotorboat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "DoubleDougnutTubeBoat",
+	Callback = function()
+		local args = {
+			[1] = "DoubleDougnutTubeBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "VikingLongship",
+	Callback = function()
+		local args = {
+			[1] = "VikingLongship"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "BabyDuckTrail",
+	Callback = function()
+		local args = {
+			[1] = "BabyDuckTrail"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "SmallDinghyMotorboat",
+	Callback = function()
+		local args = {
+			[1] = "SmallDinghyMotorboat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "HoverBike",
+	Callback = function()
+		local args = {
+			[1] = "HoverBike"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Sloop",
+	Callback = function()
+		local args = {
+			[1] = "Sloop"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "TourBoat",
+	Callback = function()
+		local args = {
+			[1] = "TourBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "TugBoat",
+	Callback = function()
+		local args = {
+			[1] = "TugBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})--other tab
+Tab:AddButton({
+	Name = "CanopyMotorboat",
+	Callback = function()
+		local args = {
+			[1] = "CanopyMotorboat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "SHarkCageBoat",
+	Callback = function()
+		local args = {
+			[1] = "SHarkCageBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Catamaran",
+	Callback = function()
+		local args = {
+			[1] = "Catamaran"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Duckmarine",
+	Callback = function()
+		local args = {
+			[1] = "Duckmarine"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Lifeboat",
+	Callback = function()
+		local args = {
+			[1] = "Lifeboat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "ViperSpeedBoat",
+	Callback = function()
+		local args = {
+			[1] = "ViperSpeedBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "JetSki",
+	Callback = function()
+		local args = {
+			[1] = "JetSki"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Marlin",
+	Callback = function()
+		local args = {
+			[1] = "Marlin"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "PyroTank",
+	Callback = function()
+		local args = {
+			[1] = "PyroTank"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "CombatBoat",
+	Callback = function()
+		local args = {
+			[1] = "CombatBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "MilitarySubmarine",
+	Callback = function()
+		local args = {
+			[1] = "MilitarySubmarine"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "SeaBreacher",
+	Callback = function()
+		local args = {
+			[1] = "SeaBreacher"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Wildfire",
+	Callback = function()
+		local args = {
+			[1] = "Wildfire"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "CruiseShip",
+	Callback = function()
+		local args = {
+			[1] = "CruiseShip"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Titanic",
+	Callback = function()
+		local args = {
+			[1] = "Titanic"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "HydroTank",
+	Callback = function()
+		local args = {
+			[1] = "HydroTank"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "MarlinGT",
+	Callback = function()
+		local args = {
+			[1] = "MarlinGT"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Sleigh2023",
+	Callback = function()
+		local args = {
+			[1] = "Sleigh2023"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Sleigh2022",
+	Callback = function()
+		local args = {
+			[1] = "Sleigh2022"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "DucklingBoat",
+	Callback = function()
+		local args = {
+			[1] = "DucklingBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "GingerBoatMan",
+	Callback = function()
+		local args = {
+			[1] = "GingerBoatMan"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "GingerbreadSteamBoat",
+	Callback = function()
+		local args = {
+			[1] = "GingerbreadSteamBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "CoffinBoat",
+	Callback = function()
+		local args = {
+			[1] = "CoffinBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "FestiveGalleon",
+	Callback = function()
+		local args = {
+			[1] = "FestiveGalleon"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "RedSnowmobile",
+	Callback = function()
+		local args = {
+			[1] = "RedSnowmobile"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "TheGoldenDucky",
+	Callback = function()
+		local args = {
+			[1] = "TheGoldenDucky"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "BlueSnowmobile",
+	Callback = function()
+		local args = {
+			[1] = "BlueSnowmobile"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "RGBTurretSleigh",
+	Callback = function()
+		local args = {
+			[1] = "RGBTurretSleigh"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "MagicWandBoat",
+	Callback = function()
+		local args = {
+			[1] = "MagicWandBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "HMHSBritannic",
+	Callback = function()
+		local args = {
+			[1] = "HMHSBritannic"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "OdysseySubmarine",
+	Callback = function()
+		local args = {
+			[1] = "OdysseySubmarine"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "HoverHeart",
+	Callback = function()
+		local args = {
+			[1] = "HoverHeart"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "Eggcelerator",
+	Callback = function()
+		local args = {
+			[1] = "Eggcelerator"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+--other tab
+Tab:AddButton({
+	Name = "StealthBoat",
+	Callback = function()
+		local args = {
+			[1] = "StealthBoat"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("EventsFolder"):WaitForChild("BoatSelection"):WaitForChild("UpdateHostBoat"):FireServer(unpack(args))
+	end    
+})
+local Tab = Window:MakeTab({
+	Name = "others",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local Section = Tab:AddSection({
+	Name = "scripts"
+})
+Tab:AddButton({
+	Name = "infinite yield",
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()	
+	end    
+})
+Tab:AddButton({
+	Name = "Shader RTX ",
+	Callback = function()
+		loadstring(game:HttpGet(('https://pastefy.app/xXkUxA0P/raw'),true))()
+	end    
+})
+Tab:AddButton({
+	Name = "FPS booster ",
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/FPSBooster.lua"))()
+	end    
+})
+local Tab = Window:MakeTab({
+	Name = "scripts FE",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local Section = Tab:AddSection({
+	Name = "scripts"
+})
+Tab:AddButton({
+	Name = "fe Hamster Ball",
+	Callback = function()
+		local UserInputService = game:GetService("UserInputService")
+		local RunService = game:GetService("RunService")
+		local Camera = workspace.CurrentCamera
+
+		local SPEED_MULTIPLIER = 30
+		local JUMP_POWER = 60
+		local JUMP_GAP = 0.3
+
+		local character = game.Players.LocalPlayer.Character
+
+		for i,v in ipairs(character:GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = false
+			end
+		end
+
+		local ball = character.HumanoidRootPart
+		ball.Shape = Enum.PartType.Ball
+		ball.Size = Vector3.new(5,5,5)
+		local humanoid = character:WaitForChild("Humanoid")
+		local params = RaycastParams.new()
+		params.FilterType = Enum.RaycastFilterType.Exclude
+		params.FilterDescendantsInstances = {character}
+
+		local tc = RunService.RenderStepped:Connect(function(delta)
+			ball.CanCollide = true
+			humanoid.PlatformStand = true
+			if UserInputService:GetFocusedTextBox() then return end
+			if UserInputService:IsKeyDown("W") then
+				ball.RotVelocity -= Camera.CFrame.RightVector * delta * SPEED_MULTIPLIER
+			end
+			if UserInputService:IsKeyDown("A") then
+				ball.RotVelocity -= Camera.CFrame.LookVector * delta * SPEED_MULTIPLIER
+			end
+			if UserInputService:IsKeyDown("S") then
+				ball.RotVelocity += Camera.CFrame.RightVector * delta * SPEED_MULTIPLIER
+			end
+			if UserInputService:IsKeyDown("D") then
+				ball.RotVelocity += Camera.CFrame.LookVector * delta * SPEED_MULTIPLIER
+			end
+			--ball.RotVelocity = ball.RotVelocity - Vector3.new(0,ball.RotVelocity.Y/50,0)
+		end)
+
+		UserInputService.JumpRequest:Connect(function()
+			local result = workspace:Raycast(
+				ball.Position,
+				Vector3.new(
+					0,
+					-((ball.Size.Y/2)+JUMP_GAP),
+					0
+				),
+				params
+			)
+			if result then
+				ball.Velocity = ball.Velocity + Vector3.new(0,JUMP_POWER,0)
+			end
+		end)
+
+		Camera.CameraSubject = ball
+		humanoid.Died:Connect(function() tc:Disconnect() end)
+
+	end    
+})
+Tab:AddButton({
+	Name = "click fling",
+	Callback = function()
+		loadstring(game:HttpGet(('https://raw.githubusercontent.com/0Ben1/fe/main/obf_5wpM7bBcOPspmX7lQ3m75SrYNWqxZ858ai3tJdEAId6jSI05IOUB224FQ0VSAswH.lua.txt'),true))()		
+	end    
+})
+Tab:AddButton({
+	Name = "troll gui",
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Tropxzz/Scripts/main/Googol", true))()
+	end       
+})
+Tab:AddButton({
+	Name = "fe Crawl gui",
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/0Ben1/fe/main/obf_vZDX8j5ggfAf58QhdJ59BVEmF6nmZgq4Mcjt2l8wn16CiStIW2P6EkNc605qv9K4.lua.txt'))()
+	end       
+})
+Tab:AddButton({
+	Name = "chat bypass",
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/Anonymous12131/MenaceV2.1.-Best-bypasser/main/obf_i7iAAH834YFQno0FLyuLPcNR5ouJrmvEFdtmXtF1C6u935ghB9DAFK5L3zgsPs6X.lua.txt'))() 
+	end       
+})
+Tab:AddButton({
+	Name = "chat bypass",
+	Callback = function()
+		local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+		-- check if the ScreenGui already exists, if it does, destroy it and remove BillboardGuis
+		if playerGui:FindFirstChild("TadachiisESP") then
+			playerGui:FindFirstChild("TadachiisESP"):Destroy()
+
+			for _, player in ipairs(game.Players:GetPlayers()) do
+				local billboardGui = player.Character and player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("PlayerBillboardGui")
+				if billboardGui then
+					billboardGui:Destroy()
+				end
+			end
+		end
+
+		-- create ScreenGui
+		local screenGui = Instance.new("ScreenGui")
+		screenGui.Name = "TadachiisESP"
+		screenGui.Parent = playerGui
+		screenGui.DisplayOrder = 1
+
+		-- create Frame
+		local holder = Instance.new("Frame")
+		holder.Name = "Holder"
+		holder.Parent = screenGui
+		holder.Size = UDim2.new(0, 200, 0, 100) -- size of the frame
+		holder.Position = UDim2.new(0.5, -100, 0.5, -50) -- position of the frame at the center of the screen
+		holder.BackgroundColor3 = Color3.new(1, 1, 1) -- white background
+		holder.BackgroundTransparency = 0.5 -- semi-transparent
+		holder.Draggable = true -- makes the frame draggable
+		holder.Active = true
+
+		-- create TextLabel
+		local titleLabel = Instance.new("TextLabel")
+		titleLabel.Name = "TitleLabel"
+		titleLabel.Text = "Tadachii's ESP GUI"
+		titleLabel.TextScaled = true
+		titleLabel.Parent = holder
+		titleLabel.Size = UDim2.new(1, 0, 0.5, 0) -- fills half of the frame
+		titleLabel.BackgroundColor3 = Color3.new(1, 1, 1) -- white background
+		titleLabel.TextColor3 = Color3.new(0, 0, 0) -- black text
+		titleLabel.BackgroundTransparency = 0.5 -- semi-transparent
+
+		-- create TextLabel for Status
+		local statusLabel = Instance.new("TextLabel")
+		statusLabel.Name = "StatusLabel"
+		statusLabel.Text = ""
+		statusLabel.Parent = holder
+		statusLabel.Size = UDim2.new(1, 0, 0.25, 0) -- fills one-fourth of the frame below the TitleLabel
+		statusLabel.Position = UDim2.new(0, 0, 0.5, 0) -- aligns the text label to the bottom of the frame
+		statusLabel.BackgroundColor3 = Color3.new(1, 1, 1) -- white background
+		statusLabel.TextColor3 = Color3.new(0, 0, 0) -- black text
+		statusLabel.BackgroundTransparency = 0.5 -- semi-transparent
+		statusLabel.TextScaled = true -- enable text scaling for the status label
+
+		-- create TextButton for Status
+		local statusButton = Instance.new("TextButton")
+		statusButton.Name = "StatusButton"
+		statusButton.Text = "Off"
+		statusButton.Parent = holder
+		statusButton.Size = UDim2.new(1, 0, 0.25, 0) -- fills one-fourth of the frame below the StatusLabel
+		statusButton.Position = UDim2.new(0, 0, 0.75, 0) -- aligns the button to the bottom of the frame
+		statusButton.BackgroundColor3 = Color3.new(1, 1, 1) -- white background
+		statusButton.TextColor3 = Color3.new(0, 0, 0) -- black text
+		statusButton.BackgroundTransparency = 0.5 -- semi-transparent
+		statusButton.TextScaled = true -- enable text scaling for the button
+
+		-- Function to create BillboardGui for a player with name and distance
+		local function createBillboardGuiForPlayer(player, distance)
+			local billboardGui = Instance.new("BillboardGui")
+			billboardGui.Name = "PlayerBillboardGui"
+			billboardGui.Adornee = player.Character.Head
+			billboardGui.Size = UDim2.new(0, 100, 0, 50) -- fixed size for the BillboardGui
+			billboardGui.StudsOffset = Vector3.new(0, 2, 0) -- adjust the vertical offset as needed
+			billboardGui.AlwaysOnTop = true
+			billboardGui.LightInfluence = 1
+			billboardGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			billboardGui.Parent = player.Character.Head
+
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Name = "PlayerNameLabel"
+			textLabel.Text = player.Name .. "\nDistance: " .. math.floor(distance)
+			textLabel.Size = UDim2.new(1, 0, 1, 0)
+			textLabel.BackgroundTransparency = 1 -- transparent background
+			textLabel.TextColor3 = Color3.new(1, 0, 0) -- red text for the player's name
+			textLabel.TextScaled = true
+			textLabel.TextStrokeColor3 = Color3.new(0, 0, 0) -- black text stroke
+			textLabel.TextStrokeTransparency = 0 -- fully opaque text stroke (visible through walls)
+			textLabel.Visible = statusButton.Text == "On" -- Hide the text if StatusButton is "Off"
+			textLabel.Parent = billboardGui
+		end
+
+		-- Function to update player ESP distance
+		local function updatePlayerESP()
+			local localCharacter = game.Players.LocalPlayer.Character
+			if not localCharacter then
+				return
+			end
+
+			for _, player in ipairs(game.Players:GetPlayers()) do
+				if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+					local distance = (localCharacter.Head.Position - player.Character.Head.Position).Magnitude
+					local billboardGui = player.Character.Head:FindFirstChild("PlayerBillboardGui")
+					if billboardGui then
+						billboardGui.PlayerNameLabel.Text = player.Name .. "\nDistance: " .. math.floor(distance)
+						billboardGui.PlayerNameLabel.TextColor3 = Color3.new(1, 0, 0) -- Set the text color to red
+						billboardGui.PlayerNameLabel.Visible = statusButton.Text == "On" -- Update visibility based on StatusButton
+					else
+						createBillboardGuiForPlayer(player, distance)
+					end
+				end
+			end
+		end
+
+		-- Call updatePlayerESP() initially and then schedule it to be called every 0.01 seconds
+		updatePlayerESP()
+		game:GetService("RunService").Heartbeat:Connect(function()
+			updatePlayerESP()
+		end)
+
+		-- Now, you can add functionality to the button, for example:
+		local function onButtonClicked()
+			if statusButton.Text == "Off" then
+				statusButton.Text = "On"
+				-- Add code to enable the player ESP here
+			else
+				statusButton.Text = "Off"
+				-- Add code to disable the player ESP here
+
+				-- Remove BillboardGui for each player's head when disabling the ESP
+				for _, player in ipairs(game.Players:GetPlayers()) do
+					local billboardGui = player.Character and player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("PlayerBillboardGui")
+					if billboardGui then
+						billboardGui:Destroy()
+					end
+				end
+			end
+			-- Update the visibility of BillboardGui elements after clicking the button
+			for _, player in ipairs(game.Players:GetPlayers()) do
+				local billboardGui = player.Character and player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("PlayerBillboardGui")
+				if billboardGui then
+					billboardGui.PlayerNameLabel.Visible = statusButton.Text == "On"
+				end
+			end
+		end
+
+		statusButton.MouseButton1Click:Connect(onButtonClicked)
+	end       
+})
+local Tab = Window:MakeTab({
+	Name = "hubs",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local Section = Tab:AddSection({
+	Name = "scripts"
+})
+Tab:AddButton({
+	Name = "HubUpdater",
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/raimbowo1/test/main/naval'))()
+	end
+})
+Tab:AddButton({
+	Name = "zyle hub shark bite 2",
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/Lolboxo/SharkBiteV3/main/SharkBiteV3.1'))()
+	end    
+})
+Tab:AddButton({
+	Name = "VTper HUB shark bite 2",
+	Callback = function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/SleeksScripts/Sharkbite-2-script/main/Script'))()
+	end    
+})
+Tab:AddButton({
+	Name = "gameshub Credit by: Modzz",
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/TakeModzz/Games-Hub-V5-Selector-Fixed/main/Games"))()
+	end    
+})
+Tab:AddButton({
+	Name = "GameHub V6 Credit by: gamerscripter",
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/GamerScripter/Game-Hub/main/loader"))()
+	end    
+})
+Tab:AddButton({
+	Name = "Darksius X Credit by: DarrenQr",
+	Callback = function()
+		local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+		local Window = Library.CreateLib("Darksius X Hub", "DarkTheme")
+
+		--Main
+		local Main = Window:NewTab("Main")
+		local MainSection = Main:NewSection("Main")
+	end    
+})
+OrionLib:Init()
