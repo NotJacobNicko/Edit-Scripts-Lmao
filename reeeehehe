@@ -4,9 +4,9 @@ local OriginPos = CFrame.new()
 local plrlol = game:GetService("Players").LocalPlayer
 local Dead = false
 local ExtraBebounfly = false
-local CharacterParented = nil
+local CharacterParented = workspace
 local ISStudio = game:GetService("RunService"):IsStudio()
-local Speed = 100
+local Speed = 60
 local ActiveDeath = false
 function randomstring()
 	local e = {}
@@ -18,7 +18,7 @@ end
 local LastPos = nil
 local GUI = Instance.new("ScreenGui")
 if not ISStudio then
-	GUI.Parent = game.CoreGui
+	GUI.Parent = game:GetService("CoreGui")
 else
 	GUI.Parent = plrlol.PlayerGui
 end
@@ -38,11 +38,12 @@ textbox.BackgroundColor3 = Color3.new(0.133333, 1, 0)
 textbox.Position = UDim2.new(0.46, 0,0.77, 0)
 textbox.Visible = true
 textbox.Text = ""
-textbox.PlaceholderText = "speed"
+textbox.PlaceholderText = "Speed:"..Speed
 textbox.PlaceholderColor3 = Color3.new(0, 0, 0)
 textbox:GetPropertyChangedSignal("Text"):Connect(function()
 	local num = tonumber(textbox.Text)
 	if num ~= nil and 10 <= num then
+		textbox.PlaceholderText = "Speed:"..num
 		Speed = num
 	end
 end)
@@ -59,6 +60,9 @@ button1.MouseButton1Click:Connect(function()
 		button1.BackgroundColor3 = Color3.new(1, 0, 0)
 		Flyye = false
 		ExtraBebounfly = false
+		if LastPos then
+			LastPos:Destroy()
+		end
 		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
 			if VELO and BODY then
 				VELO:Destroy()
@@ -168,9 +172,11 @@ function loopcheck()
 			end
 			FastSpam()
 		end)
-		if not Flyye then
-			OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
+		
+		if not Flyye and RootPart then
+			OriginPos = plrlol.Character:FindFirstChild("HumanoidRootPart").CFrame
 		end
+		
 		if Flyye and plrlol.Character and Humanoid and RootPart then
 			local PlayerModuleMoment = plrlol.PlayerScripts:WaitForChild("PlayerModule")
 			if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO and BODY then
@@ -185,24 +191,29 @@ function loopcheck()
 					end
 				else
 					Humanoid = plrlol.Character:FindFirstChildWhichIsA("Humanoid")
-					RootPart = plrlol.Character:WaitForChild("HumanoidRootPart")
+					RootPart = plrlol.Character:FindFirstChild("HumanoidRootPart")
 				end
 				BODY.CFrame = PlrCamera.CFrame
 				VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
 				BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
 				VELO.Velocity = Vector3.new()
-				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
-					VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * Speed)
-					if not Dead and ExtraBebounfly then
-						OriginPos = LastPos.CFrame
+				
+
+				if not Dead then
+					if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
+						VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * Speed)
+						if not Dead and ExtraBebounfly then
+							OriginPos = LastPos.CFrame
+						end
+					end
+					if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
+						VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * Speed)
+						if not Dead and ExtraBebounfly then
+							OriginPos = LastPos.CFrame
+						end
 					end
 				end
-				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
-					VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * Speed)
-					if not Dead and ExtraBebounfly then
-						OriginPos = LastPos.CFrame
-					end
-				end
+				
 			end
 		end
 
@@ -210,8 +221,10 @@ function loopcheck()
 	uh()
 	coroutine.resume(coroutine.create(function()
 		while wait() do
-			uh()
-			uh()
+			task.defer(function()
+				uh()
+				uh()
+			end)
 		end
 	end))
 	uh()
@@ -225,9 +238,6 @@ function EffectCharacter(Char)
 			ActiveDeath = false
 			Dead = true
 			IsAlive = false
-			if LastPos then
-				LastPos.Anchored = true
-			end
 			plrlol.CharacterAdded:Connect(function(char)
 				local Character = nil
 				repeat
@@ -243,12 +253,9 @@ function EffectCharacter(Char)
 	end)
 	CharacterParented.ChildRemoved:Connect(function(model)
 		if model:IsA("Model") and model == Char then
-			ActiveDeath = false
 			Dead = true
+			ActiveDeath = false
 			IsAlive = false
-			if LastPos then
-				LastPos.Anchored = true
-			end
 			local Character = nil
 			repeat
 				local Human = model:FindFirstChildWhichIsA("Humanoid")
@@ -261,15 +268,19 @@ function EffectCharacter(Char)
 		end
 	end)
 	Dead = false
+	
 	if Flyye then
 		task.spawn(function()
+			if LastPos then
+				LastPos.Anchored = true
+			end
 			local sucee = pcall(function()
 				repeat
 					if ExtraBebounfly then
 						Char:MoveTo(LastPos.Position)
 					end
 					wait()
-				until (LastPos and (RootPart.Position - LastPos.Position).Magnitude <= 5) or not LastPos 
+				until (LastPos and (RootPart.Position - OriginPos.Position).Magnitude <= 5) or not LastPos 
 				task.wait(.5)
 				if LastPos then
 					LastPos.Anchored = false
@@ -294,7 +305,7 @@ function EffectCharacter(Char)
 				plrlol.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
 			end
 		end
-		wait(0.005)
+		wait()
 		Flyye = true
 	end
 end
@@ -305,6 +316,6 @@ else
 	CharacterParented = workspace
 	print("error auto set to workspace")
 end
-OriginPos = plrlol.Character:WaitForChild("HumanoidRootPart").CFrame
+OriginPos = plrlol.Character:FindFirstChild("HumanoidRootPart").CFrame or CFrame.new()
 loopcheck()
 EffectCharacter(plrlol.Character)
