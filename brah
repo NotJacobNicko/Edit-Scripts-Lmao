@@ -105,14 +105,15 @@ function HollowPurple()
 					if CaughtChar:IsA("Model") and CaughtChar ~= Plr.Character and CaughtChar:FindFirstChildWhichIsA("Humanoid") then
 						local HumanoidA = CaughtChar:FindFirstChildWhichIsA("Humanoid")
 						local ROOTHAHA = CaughtChar:FindFirstChild("HumanoidRootPart")
-						if (ROOTHAHA.Position - HollowPurple.Position).Magnitude <= HollowPurple.Size.Z then
-							--HumanoidA.Health = 0
-							pcall(function()
-								game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
-							end)
-							
-							
-							
+						if ROOTHAHA then
+							if (ROOTHAHA.Position - HollowPurple.Position).Magnitude <= HollowPurple.Size.Z then
+								--HumanoidA.Health = 0
+
+								pcall(function()
+									game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
+								end)
+
+							end 
 						end
 					end
 				end
