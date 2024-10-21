@@ -1,0 +1,179 @@
+local FUNCTION = {}
+FUNCTION.Rocks = function(Origin,rockNumber,Direction,CanCollide,Min,Max,MinVel,MaxVel,MinSize,MaxSize,LifeTime)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {workspace.Terrain} or {}
+	local raycastResult = workspace:Raycast(Origin,Direction,params)
+	local random = Random.new()
+	for i = 1, rockNumber do 
+		if raycastResult then
+			local Part = Instance.new("Part")
+			Part.Anchored = false
+			Part.Name = "Debris"
+			Part.Shape = "Block"
+			Part.Size = Vector3.new(random:NextNumber(MinSize,MaxSize),random:NextNumber(MinSize,MaxSize),random:NextNumber(MinSize,MaxSize))
+			Part.Material = raycastResult.Instance.Material
+			Part.CanCollide = false
+			Part.CFrame = CFrame.new(raycastResult.Position+Vector3.new(0,1,0))
+			Part.Transparency = raycastResult.Instance.Transparency
+			Part.Color = raycastResult.Instance.Color
+			Part.Velocity = Vector3.new(0,math.random(Min, MaxVel),0)
+			Part.CFrame = Part.CFrame * CFrame.Angles(math.rad(math.random(Min, Max)), math.rad(math.random(Min, Max)), math.rad(math.random(Min, Max)))
+			Part.Parent = workspace.Terrain or workspace
+			spawn(function()
+				task.wait(0.5)
+				if Part then
+					Part.CanCollide = CanCollide
+				end
+			end)
+			task.spawn(function()
+				wait(LifeTime-2.5)
+				if Part then
+					game:GetService("TweenService"):Create(Part,TweenInfo.new(2.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),{Size = Vector3.new(0,0,0)}):Play()
+				end
+			end)
+			game:GetService("Debris"):AddItem(Part,LifeTime)
+		end
+	end  
+end
+
+local TS = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Plr = Players.LocalPlayer
+
+local NilFolder = Instance.new("Folder",nil)
+NilFolder.Name = "HOLLOWPURPLEASSET_NIL"
+local EffectPart = Instance.new("Part",NilFolder)
+EffectPart.Name = "Effects"
+EffectPart.Color = Color3.fromRGB(99,95,98)
+EffectPart.Size = Vector3.new(0.001, 0.001, 0.001)
+EffectPart.Anchored = true
+EffectPart.EnableFluidForces = true
+
+
+local TrashInstances = {}
+local params = RaycastParams.new()
+params.FilterType = Enum.RaycastFilterType.Exclude
+params.FilterDescendantsInstances = {workspace.Terrain} or {}
+
+local GUI = Instance.new("ScreenGui")
+GUI.Name = "HollowPurple"
+GUI.IgnoreGuiInset = true
+GUI.ResetOnSpawn = false
+if not game:GetService("RunService"):IsStudio() then
+	GUI.Parent = game:GetService("CoreGui")
+else
+	GUI.Parent = Plr.PlayerGui
+end
+local Button = Instance.new("TextButton",GUI)
+Button.Name = "Click"
+Button.Text = "Hollow Purple"
+Button.Position = UDim2.new(0.847,0,0.356,0)
+Button.Size = UDim2.new(0,70,0,64)
+Button.BackgroundColor3 = Color3.fromRGB(0,0,255)
+Button.TextColor3 = Color3.fromRGB(0, 255, 0)
+Button.TextScaled = true
+Button.TextWrapped = true
+local Corner = Instance.new("UICorner",Button)
+Corner.CornerRadius = UDim.new(0,10)
+local Active = false
+function HollowPurple()
+	local CharRoot = Plr.Character.HumanoidRootPart 
+	CharRoot.Anchored = true
+	local HollowPurple = game:GetObjects("rbxassetid://119771021827377")[1]:Clone()
+	HollowPurple.Parent = workspace
+	HollowPurple.Anchored = true
+	HollowPurple.Size = Vector3.new(0,0,0)
+	HollowPurple.CFrame = Plr.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-16)
+	table.insert(TrashInstances,HollowPurple)
+	wait(.1)
+	for i = 1,100 do
+		local ran = 1+i/2
+		local Position = CharRoot.CFrame*CFrame.new(0,0,-i*i/3) 
+		local RayInfo = workspace:Raycast((Position*CFrame.new(math.random(-75,75),0,0)).Position,Vector3.new(0,-100,0),params)
+		if i == 100 then
+			if HollowPurple then
+				HollowPurple:Destroy()
+			end
+		end
+		if HollowPurple then
+			local Extend = i*i/15
+			HollowPurple.Size = Vector3.new(15+Extend,15+Extend,15+Extend)
+			HollowPurple.CFrame = Position
+			task.spawn(function()
+				for i,CaughtChar in pairs(workspace:GetDescendants()) do
+					if CaughtChar:IsA("Model") and CaughtChar ~= Plr.Character and CaughtChar:FindFirstChildWhichIsA("Humanoid") then
+						local HumanoidA = CaughtChar:FindFirstChildWhichIsA("Humanoid")
+						local ROOTHAHA = CaughtChar:FindFirstChild("HumanoidRootPart")
+						if (ROOTHAHA.Position - HollowPurple.Position).Magnitude <= HollowPurple.Size.Z then
+							--HumanoidA.Health = 0
+							pcall(function()
+								game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
+							end)
+							
+							
+							
+						end
+					end
+				end
+			end)
+		end
+		task.spawn(function()
+			if RayInfo and RayInfo.Instance then
+				FUNCTION.Rocks((Position*CFrame.new(math.random(-75,75),0,0)).Position,2,Vector3.new(0,-100,0),true,-180,180,80,350,5,25,6.5)
+				local GroundPart = RayInfo.Instance
+				local SepPos = i*i/15
+
+				local groundeffect = EffectPart:Clone()
+				groundeffect.CFrame = Position * CFrame.new(-(5+SepPos),-4,-5) * CFrame.Angles(math.rad(math.random(-360,360)),math.rad(math.random(-360,360)),math.rad(math.random(-360,360)))
+				groundeffect.Reflectance = GroundPart.Transparency
+				groundeffect.Reflectance = GroundPart.Reflectance
+				groundeffect.Color = GroundPart.Color
+				groundeffect.Material = GroundPart.Material
+				groundeffect.Parent = workspace.Terrain
+				local groundeffect1 = EffectPart:Clone()
+				groundeffect1.CFrame = Position * CFrame.new(5+SepPos,-4,-5) * CFrame.Angles(math.rad(math.random(-360,360)),math.rad(math.random(-360,360)),math.rad(math.random(-360,360)))
+				groundeffect1.Reflectance = GroundPart.Transparency
+				groundeffect1.Reflectance = GroundPart.Reflectance
+				groundeffect1.Color = GroundPart.Color
+				groundeffect1.Material = GroundPart.Material
+				groundeffect1.Parent = workspace.Terrain
+
+
+				table.insert(TrashInstances,groundeffect1)
+				table.insert(TrashInstances,groundeffect)
+
+				local SizeFun = 2+i
+				TS:Create(groundeffect, TweenInfo.new(.5), {Size = Vector3.new(SizeFun,SizeFun,SizeFun)}):Play()
+				TS:Create(groundeffect1, TweenInfo.new(.5), {Size = Vector3.new(SizeFun,SizeFun,SizeFun)}):Play()
+				task.wait(10)
+				task.delay(2,function()
+					if groundeffect then
+						groundeffect:Destroy()
+					end
+					if groundeffect1 then
+						groundeffect1:Destroy()
+					end
+				end)
+				TS:Create(groundeffect, TweenInfo.new(2), {Transparency = 1,Position = Vector3.new(groundeffect.Position.X,-60,groundeffect.Position.Z)}):Play()
+				TS:Create(groundeffect1, TweenInfo.new(2), {Transparency = 1,Position = Vector3.new(groundeffect1.Position.X,-60,groundeffect1.Position.Z)}):Play()
+
+			end
+		end)
+		wait()
+	end
+	CharRoot.Anchored = false
+end
+Button.MouseButton1Click:Connect(function()
+	if not Active then
+		Active = true
+		local SoundAhh = Instance.new("Sound",game:GetService("SoundService"))
+		SoundAhh.SoundId = "rbxassetid://6667923288"
+		SoundAhh.PlayOnRemove = true
+		SoundAhh.Volume = 5
+		SoundAhh:Destroy()
+		wait(1)
+		HollowPurple()
+		Active = false
+	end
+end)
