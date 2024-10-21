@@ -112,7 +112,6 @@ function HollowPurple()
 										--HumanoidA.Health = 0
 										local GameCreator = game.CreatorId
 										
-										if GameCreator == 102068705 then
 											pcall(function()
 												game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
 											end)
@@ -141,8 +140,7 @@ function HollowPurple()
 													Lantern.Network:FireServer(unpack(args))
 												end
 											end)
-										end
-										
+									
 									end)
 									wait()
 								end
