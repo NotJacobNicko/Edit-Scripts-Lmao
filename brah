@@ -77,6 +77,7 @@ Button.TextWrapped = true
 local Corner = Instance.new("UICorner",Button)
 Corner.CornerRadius = UDim.new(0,10)
 local Active = false
+
 function HollowPurple()
 	local CharRoot = Plr.Character.HumanoidRootPart 
 	CharRoot.Anchored = true
@@ -90,40 +91,48 @@ function HollowPurple()
 	for i = 1,100 do
 		local ran = 1+i/2
 		local Position = CharRoot.CFrame*CFrame.new(0,0,-i*i/3) 
-		local RayInfo = workspace:Raycast((Position*CFrame.new(math.random(-75,75),0,0)).Position,Vector3.new(0,-100,0),params)
+		local RayInfo = workspace:Raycast((Position*CFrame.new(math.random(-75,75),0,0)).Position,Vector3.new(0,-15,0),params)
 		if i == 100 then
 			if HollowPurple then
 				HollowPurple:Destroy()
 			end
 		end
 		if HollowPurple then
-			local Extend = i*i/15
-			HollowPurple.Size = Vector3.new(15+Extend,15+Extend,15+Extend)
+			HollowPurple.Size = Vector3.new(15+i*i/15,15+i*i/15,15+i*i/15)
 			HollowPurple.CFrame = Position
-			task.spawn(function()
+			task.defer(function()
 				for i,CaughtChar in pairs(workspace:GetDescendants()) do
 					if CaughtChar:IsA("Model") and CaughtChar ~= Plr.Character and CaughtChar:FindFirstChildWhichIsA("Humanoid") then
 						local HumanoidA = CaughtChar:FindFirstChildWhichIsA("Humanoid")
 						local ROOTHAHA = CaughtChar:FindFirstChild("HumanoidRootPart")
 						if ROOTHAHA then
 							if (ROOTHAHA.Position - HollowPurple.Position).Magnitude <= HollowPurple.Size.Z then
-								--HumanoidA.Health = 0
+								task.spawn(function()
+									for i=1,math.random(5,10) do
+										task.defer(function()
+											--HumanoidA.Health = 0
 
-								pcall(function()
-									game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
+											pcall(function()
+												game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
+											end)
+
+
+										end)
+									end
 								end)
-
 							end 
 						end
 					end
 				end
 			end)
 		end
+		
 		task.spawn(function()
+			local SepPos = i*i/15
+			
 			if RayInfo and RayInfo.Instance then
 				FUNCTION.Rocks((Position*CFrame.new(math.random(-75,75),0,0)).Position,2,Vector3.new(0,-100,0),true,-180,180,80,350,5,25,6.5)
 				local GroundPart = RayInfo.Instance
-				local SepPos = i*i/15
 
 				local groundeffect = EffectPart:Clone()
 				groundeffect.CFrame = Position * CFrame.new(-(5+SepPos),-4,-5) * CFrame.Angles(math.rad(math.random(-360,360)),math.rad(math.random(-360,360)),math.rad(math.random(-360,360)))
@@ -132,6 +141,7 @@ function HollowPurple()
 				groundeffect.Color = GroundPart.Color
 				groundeffect.Material = GroundPart.Material
 				groundeffect.Parent = workspace.Terrain
+				table.insert(TrashInstances,groundeffect)
 				local groundeffect1 = EffectPart:Clone()
 				groundeffect1.CFrame = Position * CFrame.new(5+SepPos,-4,-5) * CFrame.Angles(math.rad(math.random(-360,360)),math.rad(math.random(-360,360)),math.rad(math.random(-360,360)))
 				groundeffect1.Reflectance = GroundPart.Transparency
@@ -139,14 +149,10 @@ function HollowPurple()
 				groundeffect1.Color = GroundPart.Color
 				groundeffect1.Material = GroundPart.Material
 				groundeffect1.Parent = workspace.Terrain
-
-
 				table.insert(TrashInstances,groundeffect1)
-				table.insert(TrashInstances,groundeffect)
 
-				local SizeFun = 2+i
-				TS:Create(groundeffect, TweenInfo.new(.5), {Size = Vector3.new(SizeFun,SizeFun,SizeFun)}):Play()
-				TS:Create(groundeffect1, TweenInfo.new(.5), {Size = Vector3.new(SizeFun,SizeFun,SizeFun)}):Play()
+				TS:Create(groundeffect, TweenInfo.new(.5), {Size = Vector3.new(2+i,2+i,2+i)}):Play()
+				TS:Create(groundeffect1, TweenInfo.new(.5), {Size = Vector3.new(2+i,2+i,2+i)}):Play()
 				task.wait(10)
 				task.delay(2,function()
 					if groundeffect then
@@ -173,7 +179,7 @@ Button.MouseButton1Click:Connect(function()
 		SoundAhh.PlayOnRemove = true
 		SoundAhh.Volume = 5
 		SoundAhh:Destroy()
-		wait(1)
+		wait(2)
 		HollowPurple()
 		Active = false
 	end
