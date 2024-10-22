@@ -79,13 +79,14 @@ Corner.CornerRadius = UDim.new(0,10)
 local Active = false
 
 function HollowPurple()
-	local CharRoot = Plr.Character.HumanoidRootPart 
+	local CharRoot = Plr.Character.HumanoidRootPart:Clone() 
 	CharRoot.Anchored = true
-	local HollowPurple = game:GetObjects("rbxassetid://119771021827377")[1]:Clone()
+	CharRoot.Transparency = 1
+	local HollowPurple = game:GetService("ReplicatedStorage").Purple:Clone() --game:GetObjects("rbxassetid://119771021827377")[1]:Clone()
 	HollowPurple.Parent = workspace
 	HollowPurple.Anchored = true
 	HollowPurple.Size = Vector3.new(0,0,0)
-	HollowPurple.CFrame = Plr.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-16)
+	HollowPurple.CFrame =CharRoot.CFrame * CFrame.new(0,0,-16)
 	table.insert(TrashInstances,HollowPurple)
 	wait(.1)
 	for i = 1,100 do
@@ -111,12 +112,13 @@ function HollowPurple()
 								local GameCreator = game.CreatorId
 
 								if GameCreator == 102068705 or GameCreator == 9950771 then
-									for i=1,math.random(5,10) do
+									for i=1,5 do
 										task.spawn(function()
 											
 											pcall(function()
 												game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
 											end)
+											
 											pcall(function()
 												if Plr.Backpack:FindFirstChild("Lantern") then
 													Plr.Backpack:FindFirstChild("Lantern").Parent = Plr.Character
@@ -139,10 +141,7 @@ function HollowPurple()
 															Plr.Character.Lantern.Network:FireServer("Hit", CaughtChar.Hitbox)
 														end
 													end
-
 												end
-												
-												
 											end)
 										end)
 										wait(.5)
@@ -224,23 +223,30 @@ function HollowPurple()
 				end)
 				TS:Create(groundeffect, TweenInfo.new(2), {Transparency = 1,Position = Vector3.new(groundeffect.Position.X,-60,groundeffect.Position.Z)}):Play()
 				TS:Create(groundeffect1, TweenInfo.new(2), {Transparency = 1,Position = Vector3.new(groundeffect1.Position.X,-60,groundeffect1.Position.Z)}):Play()
-
 			end
 		end)
 		wait()
 	end
-	CharRoot.Anchored = false
+
 end
+local OrginJumpPos = 0
 Button.MouseButton1Click:Connect(function()
 	if not Active then
 		Active = true
+		OrginJumpPos = Plr.Character:FindFirstChildWhichIsA("Humanoid").JumpPower
+		
+		Plr.Character:FindFirstChildWhichIsA("Humanoid").JumpPower = 0
 		local SoundAhh = Instance.new("Sound",game:GetService("SoundService"))
 		SoundAhh.SoundId = "rbxassetid://6667923288"
 		SoundAhh.PlayOnRemove = true
 		SoundAhh.Volume = 5
 		SoundAhh:Destroy()
 		wait(2)
-		HollowPurple()
+		task.spawn(function()
+			HollowPurple()
+		end)
+		wait(4)
+		Plr.Character:FindFirstChildWhichIsA("Humanoid").JumpPower = OrginJumpPos
 		Active = false
 	end
 end)
