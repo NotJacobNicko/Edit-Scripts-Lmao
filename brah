@@ -104,24 +104,78 @@ function HollowPurple()
 				if CaughtChar:IsA("Model") and CaughtChar ~= Plr.Character and CaughtChar:FindFirstChildWhichIsA("Humanoid") then
 					local HumanoidA = CaughtChar:FindFirstChildWhichIsA("Humanoid")
 					local ROOTHAHA = CaughtChar:FindFirstChild("HumanoidRootPart")
-					if ROOTHAHA then
+					if ROOTHAHA and HumanoidA then
 						if (ROOTHAHA.Position - HollowPurple.Position).Magnitude <= HollowPurple.Size.Z then
 							task.spawn(function()
 								--HumanoidA.Health = 0
 								local GameCreator = game.CreatorId
 
-								if GameCreator == 102068705 then
+								if GameCreator == 102068705 or GameCreator == 9950771 then
 									for i=1,math.random(5,10) do
 										task.spawn(function()
 											
 											pcall(function()
 												game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
 											end)
-											
-											
+											pcall(function()
+												if Plr.Backpack:FindFirstChild("Lantern") then
+													Plr.Backpack:FindFirstChild("Lantern").Parent = Plr.Character
+												elseif Plr.Character:FindFirstChild("Lantern") then
+													if workspace:FindFirstChild("DungeonGolem") and Plr.Character:FindFirstChild("Lantern") then
+														Plr.Character:FindFirstChild("Lantern"):Activate()
+														if Plr.Character:FindFirstChild("Lantern") and Plr.Character.Lantern:FindFirstChild("Network") then
+															Plr.Character.Lantern.Network:FireServer("Hit",CaughtChar:FindFirstChild("Cube.001"))
+														end
+													end
+													if (workspace:FindFirstChild("GuideNPC") or workspace:FindFirstChild("ReplicaNPC") or workspace:FindFirstChild("PotatoLord")) and Plr.Character:FindFirstChild("Lantern") then
+														Plr.Character:FindFirstChild("Lantern"):Activate()
+														if Plr.Character:FindFirstChild("Lantern") and Plr.Character.Lantern:FindFirstChild("Network") then
+															game:GetService("Players").LocalPlayer.Character.Lantern.Network:FireServer("Hit", ROOTHAHA)
+														end
+													end
+													if workspace:FindFirstChild("golem") and Plr.Character:FindFirstChild("Lantern") then
+														Plr.Character:FindFirstChild("Lantern"):Activate()
+														if Plr.Character:FindFirstChild("Lantern") and Plr.Character.Lantern:FindFirstChild("Network") then
+															Plr.Character.Lantern.Network:FireServer("Hit", CaughtChar.Hitbox)
+														end
+													end
+
+												end
+												
+												
+											end)
 										end)
 										wait(.5)
 									end
+								else
+									print(GameCreator)
+								end
+
+							end)
+						end 
+					end
+				else
+					if CaughtChar:IsA("BasePart") then
+						if (CaughtChar.Position - HollowPurple.Position).Magnitude <= HollowPurple.Size.Z then
+							task.spawn(function()
+								--HumanoidA.Health = 0
+								local GameCreator = game.CreatorId
+
+								if GameCreator == 102068705 or GameCreator == 9950771 then
+									pcall(function()
+										if CaughtChar.Name == "TrackGloveMissile" then
+											if Plr.Backpack:FindFirstChild("Lantern") then
+												Plr.Backpack:FindFirstChild("Lantern").Parent = Plr.Character
+											elseif Plr.Character:FindFirstChild("Lantern") then
+												if workspace:FindFirstChild("TrackGloveMissile") and Plr.Character:FindFirstChild("Lantern") then
+													Plr.Character:FindFirstChild("Lantern"):Activate()
+													if Plr.Character:FindFirstChild("Lantern") and Plr.Character.Lantern:FindFirstChild("Network") then
+														Plr.Character.Lantern.Network:FireServer("Hit", CaughtChar)
+													end
+												end
+											end
+										end
+									end)
 								else
 									print(GameCreator)
 								end
