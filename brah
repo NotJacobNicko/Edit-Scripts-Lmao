@@ -82,7 +82,12 @@ function HollowPurple()
 	local CharRoot = Plr.Character.HumanoidRootPart:Clone() 
 	CharRoot.Anchored = true
 	CharRoot.Transparency = 1
-	local HollowPurple = game:GetService("ReplicatedStorage").Purple:Clone() --game:GetObjects("rbxassetid://119771021827377")[1]:Clone()
+	local HollowPurple = nil
+	if game:GetService("RunService"):IsStudio() then
+		HollowPurple = game:GetService("ReplicatedStorage").Purple:Clone()
+	else
+		HollowPurple = game:GetObjects("rbxassetid://119771021827377")[1]:Clone()
+	end 
 	HollowPurple.Parent = workspace
 	HollowPurple.Anchored = true
 	HollowPurple.Size = Vector3.new(0,0,0)
