@@ -60,20 +60,19 @@ local function Checkgame(userId,placeId)
 		return s, data and data.data or data
 	end
 
-	local s, Username, UserId = pcall(function() 
+	local pla, Username, UserId = pcall(function() 
 		local username = Players:GetNameFromUserIdAsync(userId)
 
 		return username, userId
 	end)
 
-	if not s then
-		return --Status("Username or UserId does not exist!", 3)
+	if not pla then
+		return
 	end
 
 
-	local s, response = pcall(HttpService.JSONDecode, HttpService, game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. UserId .. "&format=Png&size=150x150&isCircular=false"))
-	--local s, response = HttpGet("https://www.roblox.com/headshot-thumbnail/json?userId=" .. UserId .. "&width=150&height=150")
-	local thumbnail = s and response['data'][1].imageUrl
+	local thu, response = pcall(HttpService.JSONDecode, HttpService, game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. UserId .. "&format=Png&size=150x150&isCircular=false"))
+	local thumbnail = thu and response['data'][1].imageUrl
 
 
 	--Status("Searching...")
@@ -87,9 +86,9 @@ local function Checkgame(userId,placeId)
 			Stop = false
 			break
 		end
-		local s, result = getServers(placeId, cursor)
+		local result = getServers(placeId, cursor)
 
-		if s then
+		if result then
 			local servers = result.data
 			cursor = result.nextPageCursor
 
@@ -98,8 +97,8 @@ local function Checkgame(userId,placeId)
 			-- Search all servers
 			for index, server in ipairs(servers) do
 				local function fetchServer()
-					local s, thumbs = fetchThumbs(server.playerTokens)
-					if s then
+					local fe, thumbs = fetchThumbs(server.playerTokens)
+					if fe then
 						players = players + #thumbs
 						for _, playerThumb in ipairs(thumbs) do
 							if playerThumb.imageUrl then
@@ -116,14 +115,8 @@ local function Checkgame(userId,placeId)
 										end
 									end)
 								end
-							else
-								--Status("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
-								--print("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
 							end
 						end
-					else
-						--Status("token failed", s, thumb)
-						--print("token failed", s, thumbs)
 					end
 				end
 				searched = searched + 1
