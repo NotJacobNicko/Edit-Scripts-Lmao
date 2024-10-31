@@ -137,5 +137,5 @@ local function Checkgame(userId,placeId)
 		warn("Failed to find ".. Username ..", maybe in a vip server")
 	end
 end
-
+warn("finding")
 Checkgame(312160553,game.PlaceId)
