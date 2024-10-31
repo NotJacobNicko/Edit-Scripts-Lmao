@@ -23,12 +23,9 @@ local function teleport(placeId, guid)
 end
 
 local function Checkgame(userId,placeId)
-	local function getServers(id, cursor)
-		local fullurl = "https://games.roblox.com/v1/games/".. id .."/servers/Public?limit=100"
-		if cursor then
-			fullurl = "&cursor=".. cursor
-		end
-		local Raw = game:HttpGet(fullurl)
+	local function getServers(id,cursor)
+		local _servers = "https://games.roblox.com/v1/games/"..id.."/servers/Public?sortOrder=Asc&limit=100"
+		local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
 		return HttpService:JSONDecode(Raw)
 	end
 	
