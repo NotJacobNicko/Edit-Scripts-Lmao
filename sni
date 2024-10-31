@@ -23,18 +23,15 @@ local function teleport(placeId, guid)
 end
 
 local function Checkgame(userId,placeId)
-	
-	local function HttpGet(url)
-		return pcall(HttpService.JSONDecode, HttpService, game:HttpGet(url))
-	end
 	local function getServers(id, cursor)
 		local fullurl = "https://games.roblox.com/v1/games/".. id .."/servers/Public?limit=100"
 		if cursor then
 			fullurl = "&cursor=".. cursor
 		end
-
-		return HttpGet(fullurl)
+		local Raw = game:HttpGet(fullurl)
+		return HttpService:JSONDecode(Raw)
 	end
+	
 	local function fetchThumbs(tokens)
 		local payload = {
 			Url = "https://thumbnails.roblox.com/v1/batch",
@@ -74,7 +71,7 @@ local function Checkgame(userId,placeId)
 	end
 
 
-	local s, response = HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. UserId .. "&format=Png&size=150x150&isCircular=false")
+	local s, response = pcall(HttpService.JSONDecode, HttpService, game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. UserId .. "&format=Png&size=150x150&isCircular=false"))
 	--local s, response = HttpGet("https://www.roblox.com/headshot-thumbnail/json?userId=" .. UserId .. "&width=150&height=150")
 	local thumbnail = s and response['data'][1].imageUrl
 
