@@ -5,6 +5,19 @@ local TeleportService = game:GetService("TeleportService")
 local threads = 30 -- idk what this does
 local Stop = false
 
+local RequestFunction
+if syn and syn.request then
+	RequestFunction = syn.request
+elseif request then
+	RequestFunction = request
+elseif http and http.request then
+	RequestFunction = http.request
+elseif http_request then
+	RequestFunction = http_request
+end
+
+
+
 local function teleport(placeId, guid)
 	TeleportService:TeleportToPlaceInstance(placeId, guid)
 end
@@ -45,7 +58,7 @@ local function Checkgame(userId,placeId)
 		end
 
 		payload.Body = HttpService:JSONEncode(payload.Body)
-		local result = syn.request(payload)
+		local result = RequestFunction(payload)
 		local s, data = pcall(HttpService.JSONDecode, HttpService, result.Body)
 		return s, data and data.data or data
 	end
