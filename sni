@@ -1,0 +1,141 @@
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local threads = 30 -- idk what this does
+local Stop = false
+
+local function teleport(placeId, guid)
+	TeleportService:TeleportToPlaceInstance(placeId, guid)
+end
+
+local function Checkgame(userId,placeId)
+	
+	local function HttpGet(url)
+		return pcall(HttpService.JSONDecode, HttpService, game:HttpGet(url))
+	end
+	local function getServers(id, cursor)
+		local fullurl = "https://games.roblox.com/v1/games/".. id .."/servers/Public?limit=100"
+		if cursor then
+			fullurl = "&cursor=".. cursor
+		end
+
+		return HttpGet(fullurl)
+	end
+	local function fetchThumbs(tokens)
+		local payload = {
+			Url = "https://thumbnails.roblox.com/v1/batch",
+			Headers = {
+				["Content-Type"] = "application/json"
+			},
+			Method = "POST",
+
+			Body = {}
+		}
+
+		for _, token in ipairs(tokens) do
+			table.insert(payload.Body, {
+				requestId = "0:".. token ..":AvatarHeadshot:150x150:png:regular",
+				type = "AvatarHeadShot",
+				targetId = 0,
+				token = token,
+				format = "png",
+				size = "150x150"
+			})
+		end
+
+		payload.Body = HttpService:JSONEncode(payload.Body)
+		local result = syn.request(payload)
+		local s, data = pcall(HttpService.JSONDecode, HttpService, result.Body)
+		return s, data and data.data or data
+	end
+
+	local s, Username, UserId = pcall(function() 
+		local username = Players:GetNameFromUserIdAsync(userId)
+
+		return username, userId
+	end)
+
+	if not s then
+		return --Status("Username or UserId does not exist!", 3)
+	end
+
+
+	local s, response = HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. UserId .. "&format=Png&size=150x150&isCircular=false")
+	--local s, response = HttpGet("https://www.roblox.com/headshot-thumbnail/json?userId=" .. UserId .. "&width=150&height=150")
+	local thumbnail = s and response['data'][1].imageUrl
+
+
+	--Status("Searching...")
+	local cursor = nil
+	local searched = 0
+	local maxSearchs = 0
+	local players = 0
+	-- Server search
+	while true do
+		if Stop then
+			Stop = false
+			break
+		end
+		local s, result = getServers(placeId, cursor)
+
+		if s then
+			local servers = result.data
+			cursor = result.nextPageCursor
+
+			maxSearchs = maxSearchs + #servers
+
+			-- Search all servers
+			for index, server in ipairs(servers) do
+				local function fetchServer()
+					local s, thumbs = fetchThumbs(server.playerTokens)
+					if s then
+						players = players + #thumbs
+						for _, playerThumb in ipairs(thumbs) do
+							if playerThumb.imageUrl then
+								if playerThumb.imageUrl == thumbnail then
+									Stop = true
+									--Status("Found player, teleporting...")
+									teleport(placeId, server.id)
+									local try = 0
+									plr.OnTeleport:Connect(function(teleportState)
+										if teleportState == Enum.TeleportState.Failed then
+											try = try + 1
+											--Status("Teleport failed, try #".. try)
+											teleport(placeId, server.id)
+										end
+									end)
+								end
+							else
+								--Status("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
+								--print("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
+							end
+						end
+					else
+						--Status("token failed", s, thumb)
+						--print("token failed", s, thumbs)
+					end
+				end
+				searched = searched + 1
+				if index % threads ~= 0 then
+					task.spawn(fetchServer)
+					task.wait()
+				else
+					fetchServer()
+				end
+			end
+			if not cursor then
+				break
+			end
+		else
+			return --Status("Failed to find servers", 3)
+		end
+		task.wait()
+	end
+
+	if not Stop then
+		--Status("Failed to find ".. Username ..", maybe in a vip server", 3)
+	end
+end
+
+Checkgame(312160553,game.PlaceId)
