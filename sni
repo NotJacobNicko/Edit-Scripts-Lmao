@@ -134,7 +134,7 @@ local function Checkgame(userId,placeId)
 	end
 
 	if not Stop then
-		--Status("Failed to find ".. Username ..", maybe in a vip server", 3)
+		warn("Failed to find ".. Username ..", maybe in a vip server")
 	end
 end
 
