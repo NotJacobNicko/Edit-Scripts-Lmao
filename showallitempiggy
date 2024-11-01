@@ -78,7 +78,7 @@ function Check()
 	end)
 end
 workspace.DescendantAdded:Connect(function(isn)
-	if CarvenderFol == nil then
+	if not CarvenderFol or CarvenderFol == nil then
 		if isn:IsA("Folder") and isn.Name == "CarverQuest" then
 			CarvenderFol = isn
 			Check()
