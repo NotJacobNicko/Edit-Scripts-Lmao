@@ -44,6 +44,7 @@ function Check(part)
 		end
 	end)
 end
+warn("Loaded Hightlight")
 task.spawn(function()
 	while wait() do
 		for i,v in pairs(workspace:GetDescendants()) do
