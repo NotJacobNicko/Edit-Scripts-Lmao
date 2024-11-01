@@ -45,6 +45,7 @@ function Check()
 			end)
 		until knife
 		Effect(knife)
+		warn("Knife has been found its now hightligted")
 	end)
 end
 workspace.DescendantAdded:Connect(function(isn)
@@ -52,6 +53,7 @@ workspace.DescendantAdded:Connect(function(isn)
 		if isn:IsA("Folder") and isn.Name == "CarverQuest" then
 			CarvenderFol = isn
 			warn("Found Folder Due To Map Spawn")
+			Check()
 		end
 	end
 end)
@@ -60,6 +62,7 @@ task.spawn(function()
 		if v:IsA("Folder") and v.Name == "CarverQuest" then
 			CarvenderFol = v
 			warn("Found Folder")
+			Check()
 			break
 		end
 	end
