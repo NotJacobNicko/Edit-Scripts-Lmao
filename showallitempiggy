@@ -23,12 +23,30 @@ local Highlight = Instance.new("Highlight")
 Highlight.Enabled = false
 Highlight.FillTransparency = 3
 Highlight.OutlineColor = Color3.new(0, 0, 0)
-local function Effect(part)
+local function Waypoint(part)
 	if part:IsA("BasePart") then
 		local New = Highlight:Clone()
 		New.Parent = part
 		New.Enabled = true
 		table.insert(RgbIns,New)
+		local BillboardGui = Instance.new("BillboardGui",New)
+		local TextLabel = Instance.new("TextLabel",BillboardGui)
+		BillboardGui.Adornee = part
+		BillboardGui.Name = "waypoint"
+		BillboardGui.Parent = New
+		BillboardGui.Size = UDim2.new(0, 100, 0, 100)
+		BillboardGui.StudsOffset = Vector3.new(0, 0, 0)
+		BillboardGui.AlwaysOnTop = true
+		TextLabel.BackgroundTransparency = 1
+		TextLabel.Position = UDim2.new(0, 0, 0, -50)
+		TextLabel.Size = UDim2.new(0, 100, 0, 100)
+		TextLabel.Font = Enum.Font.SourceSansSemibold
+		TextLabel.TextSize = 20
+		TextLabel.TextColor3 = Color3.new(1, 1, 1)
+		TextLabel.TextStrokeTransparency = 0
+		TextLabel.TextYAlignment = Enum.TextYAlignment.Bottom
+		TextLabel.Text = '!!!'
+		TextLabel.ZIndex = 10
 	end
 end
 warn("Knife Finder")
@@ -48,7 +66,7 @@ function Check()
 						if v.Name == "Knife" and v:IsA("BasePart") then
 							warn("Knife has been found its now hightligted")
 							knife = v
-							Effect(knife)
+							Waypoint(knife)
 							break
 						end
 					end
