@@ -38,22 +38,33 @@ local CarvenderFol = nil
 function Check()
 	pcall(function()
 		local knife = nil
+		warn("Looking folder...")
 		repeat 
 			wait()
-			pcall(function()
-				knife = CarvenderFol:FindFirstChild("Knife")
-			end)
+			warn("Attempting To Get Knife")
+			if CarvenderFol then
+				pcall(function()
+					for i,v in pairs(CarvenderFol:GetDescendants()) do
+						if v.Name == "Knife" and v:IsA("BasePart") then
+							warn("Knife has been found its now hightligted")
+							knife = v
+							Effect(knife)
+							break
+						end
+					end
+				end)
+			else
+				break
+			end
 		until knife
-		Effect(knife)
-		warn("Knife has been found its now hightligted")
 	end)
 end
 workspace.DescendantAdded:Connect(function(isn)
 	if CarvenderFol == nil then
 		if isn:IsA("Folder") and isn.Name == "CarverQuest" then
 			CarvenderFol = isn
-			warn("Found Folder Due To Map Spawn")
 			Check()
+			warn("Found Folder Due To Map Spawn")
 		end
 	end
 end)
@@ -61,8 +72,8 @@ task.spawn(function()
 	for i,v in pairs(workspace:GetDescendants()) do
 		if v:IsA("Folder") and v.Name == "CarverQuest" then
 			CarvenderFol = v
-			warn("Found Folder")
 			Check()
+			warn("Found Folder")
 			break
 		end
 	end
