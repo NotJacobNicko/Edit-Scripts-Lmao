@@ -1,0 +1,55 @@
+local PartSelected = {}
+local RgbIns = {}
+task.defer(function()
+	while true do
+		for i = 0,1,0.001*6 do
+			local Color = Color3.fromHSV(i,1,1)
+			for i,v in pairs(RgbIns) do
+				if not v then
+					return
+				end
+				if v:IsA("Highlight") then
+					v.FillColor = Color
+				end
+				if v:IsA("BasePart") then
+					v.Color = Color
+				end
+			end
+			wait()
+		end
+	end
+end)
+local Highlight = Instance.new("Highlight")
+Highlight.Enabled = false
+Highlight.FillTransparency = 3
+Highlight.OutlineColor = Color3.new(0, 0, 0)
+
+local function Effect(part)
+	if part:IsA("BasePart") then
+		local New = Highlight:Clone()
+		New.Parent = part
+		New.Enabled = true
+		table.insert(RgbIns,New)
+	end
+end
+function Check(part)
+	task.spawn(function()
+		if part and not table.find(PartSelected,part) then
+			if part.Size.X <= 6 or part.Size.Y <= 6 or part.Size.Z <= 6 then
+				if part:FindFirstChildWhichIsA("ClickDetector") then
+					table.insert(PartSelected,part)
+					Effect(part)
+				end
+			end
+		end
+	end)
+end
+task.spawn(function()
+	while wait() do
+		for i,v in pairs(workspace:GetDescendants()) do
+			if v:IsA("BasePart") then
+				Check(v)
+			end
+		end
+	end
+end)
