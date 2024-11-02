@@ -1,0 +1,41 @@
+DefaultSettings = {
+	Damping = 0.1,
+	Stiffness = 0.2,
+	Inertia = 0,
+	Elasticity = 0.5,
+	BlendWeight = 1,
+	Radius = 0.2,
+	AnchorDepth = 0,
+	Force = Vector3.yAxis * 0.2,
+	Gravity = -Vector3.yAxis,
+	WindDirection = -Vector3.xAxis,
+	WindSpeed = 8,
+	WindStrength = .5,
+	WindInfluence = .2,
+	AnchorsRotate = false,
+	UpdateRate = 60,
+	ActivationDistance = 45,
+	ThrottleDistance = 15,
+}
+
+local model = nil
+
+repeat 
+	for Num,isn in pairs(workspace:GetDescendants()) do
+		if isn:IsA("Model") and isn.Name == 'Worn Cape' then
+			model = isn
+		end
+	end
+	wait() 
+until model
+
+
+for i,v in pairs(model:GetChildren()) do
+	if v:IsA("BasePart") then
+		if v:FindFirstChildWhichIsA("Bone") then
+			for name, value in DefaultSettings do
+				warn(name.." "..tostring(v:GetAttribute(name) or "Null"))
+			end
+		end
+	end
+end
