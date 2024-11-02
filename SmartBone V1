@@ -1,0 +1,838 @@
+type func = () -> ()
+type dictionary = { [string]: any }
+type array = { [number]: any }
+type rootList = {
+	[number]: Bone
+}
+type particle = {
+	Bone: Bone,
+	RestLength: number,
+	Weight: number,
+	ParentIndex: number,
+	Transform: CFrame,
+	LocalTransform: CFrame,
+	RootTransform: CFrame,
+	Radius: number,
+	IsColliding: boolean,
+	BoneLength: number,
+	HeirarchyLength: number,
+	DebugPart: BasePart,
+
+	TransformOffset: CFrame,
+	LastTransformOffset: CFrame,
+	LocalTransformOffset: CFrame,
+	RestPosition: Vector3,
+	BoneTransform: CFrame,
+	CalculatedWorldCFrame: CFrame,
+	CalculatedWorldPosition: Vector3,
+
+	Position: Vector3,
+	LastPosition: Vector3,
+	Anchored: boolean,
+	RecyclingBin: any,
+}
+type particleArray = {
+	[number]: particle
+}
+type particleTree = {
+	WindOffset: number,
+	Root: Bone,
+	RootPart: BasePart,
+	RootWorldToLocal: Vector3,
+	BoneTotalLength: number,
+	Particles: particleArray,
+	LocalCFrame: CFrame,
+	LocalGravity: Vector3,
+	Force: Vector3,
+	RestGravity: Vector3,
+	ObjectMove: Vector3,
+	ObjectPreviousPosition: Vector3,
+}
+
+-- // Services \\ --
+
+Lighting = game:GetService("Lighting")
+CollectionService = game:GetService("CollectionService")
+RunService = game:GetService("RunService")
+
+Utilities = {}
+SmartBoneTags = {}
+CurrentControllers = {}
+module = {}
+module.__index = module
+
+ZERO = Vector3.zero
+MetricUnit = 0.2800336040324839
+ImperialUnit = 0.9187454494539344
+
+Unit = {
+	Conversions = {
+		--Metric
+		Kilometer = MetricUnit * 1000,
+		Hektometer = MetricUnit * 100,
+		Decameter = MetricUnit * 10,
+		Meter = MetricUnit,
+		Decimeter = MetricUnit / 10,
+		Centimeter = MetricUnit / 100,
+		Millimeter = MetricUnit / 1000,
+		--Imperial
+		Miles = ImperialUnit * 5280,
+		Yards = ImperialUnit * 3,
+		Feet = ImperialUnit,
+		Inches = ImperialUnit / 12,
+	},
+}
+
+function Unit.Convert(Value: number, Method: string)
+	return Unit.Conversions[Method] ~= nil and Value * Unit.Conversions[Method]
+end
+
+function Unit.ConvertInverse(Value: number, Method: string)
+	return Unit.Conversions[Method] ~= nil and Unit.Conversions[Method] / Value
+end
+
+function Unit.ConvertRounded(Value: number, Method: string)
+	return Unit.Conversions[Method] ~= nil and math.floor(Value * Unit.Conversions[Method])
+end
+Particle = {}
+Particle.__index = Particle
+ParticleTree = {}
+ParticleTree.__index = ParticleTree
+DefaultSettings = {
+	Damping = 0.1,
+	Stiffness = 0.2,
+	Inertia = 0,
+	Elasticity = 0.5,
+	BlendWeight = 1,
+	Radius = 0.2,
+	AnchorDepth = 0,
+	Force = Vector3.yAxis * 0.2,
+	Gravity = -Vector3.yAxis,
+	WindDirection = -Vector3.xAxis,
+	WindSpeed = 8,
+	WindStrength = .5,
+	WindInfluence = .2,
+	AnchorsRotate = false,
+	UpdateRate = 60,
+	ActivationDistance = 45,
+	ThrottleDistance = 15,
+}
+
+function ParticleTree.new(Root: Bone, RootPart: Instance, Gravity: Vector3)
+	return setmetatable({
+		WindOffset = Random.new(1029410295159813):NextNumber(0, 1000000),
+		Root = Root:IsA("Bone") and Root or nil,
+		RootPart = RootPart,
+		RootWorldToLocal = Root.WorldCFrame:ToObjectSpace(Root.CFrame),
+		BoneTotalLength = 0,
+		DistanceFromCamera = 100,
+		Particles = {},
+
+		LocalCFrame = Root.WorldCFrame,
+		LocalGravity = Root.CFrame:PointToWorldSpace(Gravity).Unit * Gravity.Magnitude,
+		Force = Vector3.zero,
+		RestGravity = Vector3.zero,
+		ObjectMove = Vector3.zero,
+		ObjectPreviousPosition = Vector3.zero,
+	}, module)
+end
+
+function Particle.new(Bone: Bone, RootBone: Bone, RootPart: BasePart, Settings: any)
+	return setmetatable({
+		Bone = Bone,
+		RestLength = 0,
+		Weight = 1 * 0.7,
+		ParentIndex = 0,
+		Transform = Bone.WorldCFrame:ToObjectSpace(RootBone.WorldCFrame):Inverse(),
+		LocalTransform = Bone.CFrame:ToObjectSpace(RootBone.CFrame):Inverse(),
+		RootTransform = RootBone.WorldCFrame:ToObjectSpace(RootPart.CFrame):Inverse(),
+		Radius = Settings.Radius,
+		IsColliding = false,
+
+		TransformOffset = CFrame.identity,
+		LastTransformOffset = CFrame.identity,
+		LocalTransformOffset = CFrame.identity,
+		RestPosition = Vector3.zero,
+		BoneTransform = CFrame.identity,
+		CalculatedWorldCFrame = Bone.WorldCFrame,
+		CalculatedWorldPosition = Bone.WorldPosition,
+
+		Position = Bone.WorldPosition,
+		LastPosition = Bone.WorldPosition,
+		Anchored = false,
+		RecyclingBin = {},
+	}, Particle)
+end
+
+function Clamp(min, max)
+	return function(value)
+		return math.clamp(value, min, max)
+	end
+end
+
+function Floor(value)
+	return math.floor(value)
+end
+
+function Offset(offset)
+	return function(value)
+		return value + offset
+	end
+end
+SettingsMath = {
+	Damping = Clamp(0, 1),
+	AnchorDepth = Floor,
+	Stiffness = Clamp(0, 1),
+	Inertia = Clamp(0, 1),
+	Elasticity = Clamp(0, 1),
+	BlendWeight = Clamp(0, 1),
+	UpdateRate = Clamp(0, 165),
+	WindStrength = Clamp(0, 10),
+
+	Gravity = Offset(Vector3.new(0, -0.01, 0)),
+}
+function Utilities.ShallowCopy(original)
+	local copy = {}
+	for key, value in pairs(original) do
+		copy[key] = value
+	end
+	return copy
+end
+
+function Utilities.Lerp(A: any, B: any, C: any)
+	return A + (B - A) * C
+end
+
+function Utilities.GetRotationBetween(U: Vector3, V: Vector3, Axis: Vector3)
+	local Dot, UXV = U:Dot(V), U:Cross(V)
+	if Dot < -0.99999 then
+		return CFrame.fromAxisAngle(Axis, math.pi)
+	end
+	return CFrame.new(0, 0, 0, UXV.X, UXV.Y, UXV.Z, 1 + Dot)
+end
+
+function Utilities.GetHierarchyLength(Child: Instance, Root: Instance)
+	if Child == Root then
+		warn("Child and Root are the same Instance!")
+		return
+	elseif Child == nil then
+		warn("Child is nil!")
+		return
+	end
+	local Up = Child
+	local Count = 0
+	repeat
+		Count += 1
+		Up = Up.Parent
+	until Up == Root
+	return Count
+end
+
+function Utilities.WaitForChildOfClass(parent: Instance, className: string, timeOut: number)
+	local start = os.clock()
+	timeOut = timeOut or 10
+	repeat 
+		task.wait()
+	until parent:FindFirstChildOfClass(className) or os.clock - start > timeOut
+	return parent:FindFirstChildOfClass(className)
+end
+
+function module.new(rootPart: BasePart, rootList: array)
+	local self = setmetatable({
+		ID = Random.new(12098135901304):NextInteger(1, 10000000),
+		RootPart = rootPart,
+		Time = 0,
+		ParticleTrees = {},
+		Connections = {},
+		RootList = rootList,
+		ObjectScale = Unit.Convert(math.abs(rootPart.Size.X), "Millimeter"),
+		WindPreviousPosition = Vector3.zero,
+		Removed = false,
+		RemovedEvent = Instance.new("BindableEvent"),
+		InRange = false,
+
+		Settings = {},
+	}, module)
+
+	for name, value in DefaultSettings do
+		self.Settings[name] = rootPart:GetAttribute(name) or value
+	end
+
+	self.Settings.BlendWeight = 1
+	self.Settings.UpdateRate = math.floor(self.Settings.UpdateRate + 0.1)
+
+	self:Init()
+
+	self:UpdateParameters(self.Settings)
+
+	return self
+end
+
+function module:Init()
+	local RootPart = self.RootPart
+
+	local tailBone, start
+
+	CurrentControllers[self.ID] = self
+
+	self.Connections["AttributeChanged"] = RootPart.AttributeChanged:Connect(function(Attribute: string)
+		if not self.Settings[Attribute] then return end
+		self:UpdateParameters(Attribute, RootPart:GetAttribute(Attribute))
+	end)
+
+	self.Connections["LightingAttributeChanged"] = Lighting.AttributeChanged:Connect(function(Attribute: string)
+		if not self.Settings[Attribute] then return end
+		self:UpdateParameters(Attribute, Lighting:GetAttribute(Attribute))
+	end)
+
+	for _, Bone in RootPart:GetDescendants() do
+		if Bone:IsA("Bone") and Bone.Parent:IsA("Bone") and #Bone:GetChildren() == 0 then
+			start = Bone.WorldCFrame
+				+ (Bone.WorldCFrame.UpVector.Unit * (Bone.WorldPosition - Bone.Parent.WorldPosition).Magnitude)
+			tailBone = Instance.new("Bone")
+			tailBone.Parent = Bone
+			tailBone.Name = Bone.Name .. "_Tail"
+			tailBone.WorldCFrame = start
+		end
+	end
+
+	for _, Root in self.RootList do
+		self:AppendParticleTree(Root)
+	end
+
+	for _, particleTree in self.ParticleTrees do
+		self:AppendParticles(particleTree, particleTree.Root, 0, 0)
+	end
+end
+
+function module:AppendParticleTree(Root: Bone)
+	table.insert(self.ParticleTrees, ParticleTree.new(Root, self.RootPart, self.Settings.Gravity))
+end
+
+function module:AppendParticles(particleTree: dictionary, Bone: Bone, ParentIndex: number, BoneLength: number)
+	local Settings = self.Settings
+
+	local particle: particle = Particle.new(Bone, particleTree.Root, self.RootPart, Settings)
+	particle.Position, particle.LastPosition = Bone.WorldPosition, Bone.WorldPosition
+	particle.ParentIndex = ParentIndex
+	particle.BoneLength = BoneLength
+	particle.HeirarchyLength = 0
+	if ParentIndex >= 1 then
+		BoneLength = (particleTree.Particles[ParentIndex].Bone.WorldPosition - particle.Position).Magnitude
+		particle.BoneLength = BoneLength
+		particle.Weight = (BoneLength * 0.7)
+		particle.HeirarchyLength = Utilities.GetHierarchyLength(Bone, particleTree.Root)
+	end
+
+	if particle.HeirarchyLength <= Settings.AnchorDepth then
+		particle.Anchored = true
+	end
+
+	table.insert(particleTree.Particles, particle)
+
+	local index = #particleTree.Particles
+	local boneChildren = Bone:GetChildren()
+
+	local child
+
+	for i = 1, #boneChildren do
+		child = boneChildren[i]
+		if child:IsA("Bone") then
+			self:AppendParticles(particleTree, child, index, BoneLength)
+		end
+	end
+end
+
+function module:UpdateParameters(setting, value)
+	if not self.Settings[setting] then return end
+	self.Settings[setting] = if SettingsMath[setting] then SettingsMath[setting](value) else value
+end
+
+function module:PreUpdate(particleTree: particleTree)
+
+	local rootPart = particleTree.RootPart
+	local root = particleTree.Root
+
+	particleTree.ObjectMove = (rootPart.Position - particleTree.ObjectPreviousPosition)
+	particleTree.ObjectPreviousPosition = rootPart.Position
+
+	particleTree.RestGravity = root.CFrame:PointToWorldSpace(particleTree.LocalGravity)
+
+	for _, particle in particleTree.Particles do
+		particle.LastTransformOffset = particle.TransformOffset
+		if particle.Bone == particle.Root then
+			particle.TransformOffset = rootPart.CFrame * particle.RootTransform
+		else
+			particle.TransformOffset = root.WorldCFrame * particle.Transform
+		end
+		particle.LocalTransformOffset = root.CFrame * particle.LocalTransform
+	end
+end
+
+function module:UpdateParticles(particleTree: particleTree, Delta: number, LoopIndex: number)
+	local Settings = self.Settings
+
+	local Damping = Settings.Damping
+	local Force = Settings.Gravity
+	local ForceDirection = Settings.Gravity.Unit
+
+	local ProjectedForce = ForceDirection * math.max(particleTree.RestGravity:Dot(ForceDirection), 0)
+
+	Force -= ProjectedForce
+	Force = (Force + Settings.Force) * (self.ObjectScale * Delta)
+
+	local ObjectMove = LoopIndex == 0 and particleTree.ObjectMove or ZERO
+
+	local windMove, velocity, move
+	local timeModifier
+
+	for _, particle in particleTree.Particles do
+		if particle.ParentIndex >= 1 and particle.Anchored == false then
+			windMove = ZERO
+
+			if Settings.WindInfluence > 0 then
+				timeModifier = particleTree.WindOffset
+					+ (os.clock() - (particle.HeirarchyLength / 5))
+					+ (
+						((particle.TransformOffset.Position - particleTree.Root.WorldPosition).Magnitude / 5)
+						* Settings.WindInfluence
+					)
+				windMove = Vector3.new(
+					Settings.WindDirection.X
+						+ (Settings.WindDirection.X * (math.sin(timeModifier * Settings.WindSpeed))),
+					Settings.WindDirection.Y + (0.05 * (math.sin(timeModifier * Settings.WindSpeed))),
+					Settings.WindDirection.Z
+						+ (Settings.WindDirection.X * (math.sin(timeModifier * Settings.WindSpeed)))
+				)
+
+				windMove /= particle.BoneLength
+				windMove *= Settings.WindInfluence
+				windMove *= (Settings.WindStrength / 100) * (math.clamp(particle.HeirarchyLength, 1, 10) / 10)
+				windMove *= particle.Weight
+				self.WindPreviousPosition = windMove
+			end
+
+			velocity = (particle.Position - particle.LastPosition)
+			move = (ObjectMove * Settings.Inertia)
+
+			-- // WIP \\ --
+
+			if particle.IsColliding then
+				Damping += 2
+				if Damping > 1 then
+					Damping = 1
+				end
+			end
+
+
+			particle.LastPosition = particle.Position + move
+			particle.Position += velocity * (1 - Damping) + Force + move + windMove
+		else
+			particle.LastPosition = particle.TransformOffset.Position--particle.Bone.WorldPosition
+			particle.Position = particle.TransformOffset.Position
+		end
+	end
+end
+
+function module:CorrectParticles(particleTree: particleTree, Delta: number)
+	local Settings = self.Settings
+	local stiffness = Settings.Stiffness
+
+	local parentPoint
+	local restLength, difference, length
+	local mat, restPosition, maxLength
+
+	for _, point in particleTree.Particles do
+		parentPoint = particleTree.Particles[point.ParentIndex]
+
+		if parentPoint and point.ParentIndex >= 1 and point.Anchored == false then
+			restLength = (parentPoint.TransformOffset.Position - point.TransformOffset.Position).Magnitude
+
+			if stiffness > 0 or Settings.Elasticity > 0 then
+				mat = CFrame.new(parentPoint.Position) * parentPoint.TransformOffset.Rotation
+				restPosition = (mat * CFrame.new(point.LocalTransformOffset.Position)).Position
+
+				difference = restPosition - point.Position
+				point.Position += difference * (Settings.Elasticity * Delta)
+
+				if stiffness > 0 then
+					difference = restPosition - point.Position
+					length = difference.Magnitude
+					maxLength = restLength * (1 - stiffness) * 2
+					if length > maxLength then
+						point.Position += difference * ((length - maxLength) / length)
+					end
+				end
+			end
+
+			difference = parentPoint.Position - point.Position
+			length = difference.Magnitude
+			if length > 0 then
+				point.Position += difference * ((length - restLength) / length)
+			end
+		end
+	end
+end
+
+function module:SkipUpdateParticles(particleTree: particleTree)
+	local parentPoint, restLength, stiffness
+	local restPosition, difference, length, maxLength
+
+	for _, point in particleTree.Particles do
+		if point.ParentIndex >= 1 and not point.Anchored then
+			point.LastPosition += particleTree.ObjectMove
+			point.Position += particleTree.ObjectMove
+
+			parentPoint = particleTree.Particles[point.ParentIndex]
+			restLength = (parentPoint.TransformOffset.Position - point.TransformOffset.Position).Magnitude
+			stiffness = self.Settings.Stiffness
+
+			if stiffness > 0 then
+				restPosition = parentPoint.Position
+					+ CFrame.lookAt(parentPoint.Position, point.Position).LookVector.Unit
+					* (parentPoint.Position - point.Position).Magnitude
+
+				difference = restPosition - point.Position
+				length = difference.Magnitude
+				maxLength = restLength * (1 - stiffness) * 2
+				if length > maxLength then
+					point.Position += difference * ((length - maxLength) / length)
+				end
+			end
+
+			difference = parentPoint.Position - point.Position
+			length = difference.Magnitude
+			if length > restLength then
+				point.Position += difference * ((length - restLength) / length)
+			end
+		else
+			point.LastPosition = point.TransformOffset.Position--point.Bone.WorldPosition
+			point.Position = point.TransformOffset.Position
+		end
+	end
+end
+
+function module:CalculateTransforms(particleTree: particleTree, Delta: number)
+	if self.InRange then
+		local parentPoint, boneParent
+		local localPosition, referenceCFrame, v0, v1, rotation, factor, alpha
+
+		for _, point in particleTree.Particles do
+			if point.ParentIndex >= 1 and point.Anchored == false then
+				parentPoint = particleTree.Particles[point.ParentIndex]
+				boneParent = parentPoint.Bone
+
+				if parentPoint and boneParent and boneParent:IsA("Bone") and boneParent ~= particleTree.Root then
+					localPosition = parentPoint.LocalTransformOffset.Position
+					referenceCFrame = parentPoint.TransformOffset
+					v0 = referenceCFrame:PointToObjectSpace(localPosition)
+					v1 = point.Position - parentPoint.Position
+					rotation = Utilities.GetRotationBetween(referenceCFrame.UpVector, v1, v0).Rotation
+						* referenceCFrame.Rotation
+
+					factor = 0.00001
+					alpha = (1 - factor ^ Delta)
+
+					parentPoint.CalculatedWorldCFrame = boneParent.WorldCFrame:Lerp(CFrame.new(parentPoint.Position) * rotation, alpha)
+				end
+			end
+		end
+	end
+end
+
+function module:TransformBones(particleTree: particleTree)
+	local parentPoint, boneParent
+
+	if self.InRange then
+		for _, point in particleTree.Particles do
+			if point.ParentIndex >= 1 and point.Anchored == false then
+				parentPoint = particleTree.Particles[point.ParentIndex]
+				boneParent = parentPoint.Bone
+
+				if parentPoint and boneParent and boneParent:IsA("Bone") and boneParent ~= particleTree.Root then
+					if parentPoint.Anchored and self.Settings.AnchorsRotate == false then
+						boneParent.WorldCFrame = parentPoint.TransformOffset
+					else
+						boneParent.WorldCFrame = parentPoint.CalculatedWorldCFrame
+					end
+				end
+			end
+		end
+	end
+end
+
+function module:DEBUG(particleTree: particleTree)
+	for _, point in particleTree.Particles do
+		if point then
+			point.DebugPart.CFrame = CFrame.new(point.Position)
+		end
+	end
+end
+
+function module:RunLoop(particleTree: particleTree, Delta: number, UpdateRate: number)
+	local ready = true
+	local timeVar = Delta * 10
+
+	if UpdateRate > 0 then
+		local frameTime = 1 / UpdateRate
+		self.Time += Delta
+		ready = false
+
+		if self.Time >= frameTime then
+			ready = true
+			self.Time = 0
+		end
+	end
+
+	if ready then
+		self:UpdateParticles(particleTree, timeVar, 0)
+		self:CorrectParticles(particleTree, timeVar)
+	else
+		self:SkipUpdateParticles(particleTree)
+	end
+end
+
+function module:ResetParticles(particleTree: particleTree)
+	for _, point in particleTree.Particles do
+		point.LastPosition = point.TransformOffset.Position
+		point.Position = point.TransformOffset.Position
+	end
+end
+
+function module:ResetTransforms(particleTree: particleTree)
+	local transformOffset
+
+	for _, point in particleTree.Particles do
+		if point.Bone == point.Root then
+			transformOffset = particleTree.RootPart.CFrame * point.RootTransform
+		else
+			transformOffset = particleTree.Root.WorldCFrame * point.Transform
+		end
+
+		point.Bone.WorldCFrame = transformOffset
+	end
+end
+
+function module:UpdateBones(Delta: number, UpdateRate: number)
+	for _, particleTree: particleTree in self.ParticleTrees do
+		self:PreUpdate(particleTree, Delta)
+		self:RunLoop(particleTree, Delta, UpdateRate)
+		self:CalculateTransforms(particleTree, Delta)
+	end
+end
+local dones = false
+function module.addPhysicsBones(Mesh, Attributes)
+	for i, v in next, Attributes do
+		Mesh:SetAttribute(i, v)
+	end
+	table.insert(SmartBoneTags,Mesh)
+	if not dones then
+		dones = true
+		module.Start()
+	end
+end
+local CONN = nil
+function module.Start()
+	local Player = game:GetService("Players").LocalPlayer
+
+	local ActorsFolder = Instance.new("Folder")
+	ActorsFolder.Name = "Actors"
+	ActorsFolder.Parent = Player:WaitForChild("PlayerScripts")
+
+	local function DebugPrint(String: string)
+		warn(String)
+	end
+
+	local SmartBones = {}
+	local IgnoreList = {}
+
+	local function registerSmartBoneObject(Object: BasePart)
+		if Object:IsA("BasePart") and Utilities.WaitForChildOfClass(Object, "Bone", 3) and workspace:IsAncestorOf(Object)then
+			local RootList = {}
+
+			if Object:GetAttribute("Roots") and Object:GetAttribute("Roots") ~= nil and typeof(Object:GetAttribute("Roots")) == "string" then
+				local list = string.split(Object:GetAttribute("Roots"), ",")
+				for _, value in ipairs(list) do
+					local Bone = Object:FindFirstChild(value)
+					if Bone and Bone:IsA("Bone") then
+						table.insert(RootList, Bone)
+					end
+				end
+			else
+				if Object then
+					for i,v in pairs(Object:GetChildren()) do
+						if v and v:IsA("Bone") then
+							table.insert(RootList, v)
+						end
+					end
+				end
+			end
+
+			if #RootList > 0 then
+				local function WithinViewport(Object: Model | BasePart)
+					local CameraObject = workspace.CurrentCamera
+					local CF, Size
+					if CameraObject:IsA("Camera") then
+						if Object:IsA("Model") then
+							CF, Size = Object:GetBoundingBox()
+						elseif Object:IsA("BasePart") then
+							CF, Size = Object.CFrame, Object.Size
+						else
+							warn("Object is neither a Model nor a BasePart! Disregarding Camera check!")
+							return false
+						end
+						local function getCorners(CF: CFrame, Size: Vector3)
+							local corners = {}
+
+							local frontFaceCenter = (CF + CF.LookVector * Size.Z / 2)
+							local backFaceCenter = (CF - CF.LookVector * Size.Z / 2)
+
+							local topFrontEdgeCenter = frontFaceCenter + frontFaceCenter.UpVector * Size.Y / 2
+							local bottomFrontEdgeCenter = frontFaceCenter - frontFaceCenter.UpVector * Size.Y / 2
+							local topBackEdgeCenter = backFaceCenter + backFaceCenter.UpVector * Size.Y / 2
+							local bottomBackEdgeCenter = backFaceCenter - backFaceCenter.UpVector * Size.Y / 2
+
+							corners.topFrontRight = (topFrontEdgeCenter + topFrontEdgeCenter.RightVector * Size.X / 2).Position
+							corners.topFrontLeft = (topFrontEdgeCenter - topFrontEdgeCenter.RightVector * Size.X / 2).Position
+
+							corners.bottomFrontRight = (bottomFrontEdgeCenter + bottomFrontEdgeCenter.RightVector * Size.X / 2).Position
+							corners.bottomFrontLeft = (bottomFrontEdgeCenter - bottomFrontEdgeCenter.RightVector * Size.X / 2).Position
+
+							corners.topBackRight = (topBackEdgeCenter + topBackEdgeCenter.RightVector * Size.X / 2).Position
+							corners.topBackLeft = (topBackEdgeCenter - topBackEdgeCenter.RightVector * Size.X / 2).Position
+
+							corners.bottomBackRight = (bottomBackEdgeCenter + bottomBackEdgeCenter.RightVector * Size.X / 2).Position
+							corners.bottomBackLeft = (bottomBackEdgeCenter - bottomBackEdgeCenter.RightVector * Size.X / 2).Position
+
+							return corners
+						end
+
+						local corners = getCorners(CF, Size)
+						for _, corner in corners do
+							local _, OnScreen = CameraObject:WorldToScreenPoint(corner)
+							if OnScreen then
+								return true
+							end
+						end
+						return false
+					end
+				end
+
+				local timeFunc = os.clock
+				local oldTime = timeFunc()
+				local frameRate = 60
+				local frameRateTable = {}
+				local round = 1000
+
+				local function roundNumber(num)
+					return  math.floor((num * round) + 0.5) / round
+				end
+
+				local function smoothDelta()
+					local currentTime = timeFunc()
+
+					for index = #frameRateTable,1,-1 do
+						frameRateTable[index + 1] = (frameRateTable[index] >= currentTime - 1) and frameRateTable[index] or nil
+					end
+
+					frameRateTable[1] = currentTime
+					frameRate =  math.floor((timeFunc() - oldTime >= 1 and #frameRateTable) or (#frameRateTable / (timeFunc() - oldTime)))
+
+					return roundNumber(frameRate * ((1/frameRate)^2) + .001)
+				end
+
+				local function Initialize(Object: BasePart, RootList: array)
+					local SBone = module.new(Object, RootList)
+
+					local frameTime = 0
+
+					SBone.SimulationConnection = RunService.Heartbeat:Connect(function(Delta: number)
+						Delta = smoothDelta()
+						frameTime += Delta
+
+						local camPosition = workspace.CurrentCamera.CFrame.Position
+						local rootPosition = SBone.RootPart.Position
+						local throttleDistance = SBone.Settings.ThrottleDistance
+						local distance = (camPosition - rootPosition).Magnitude
+						local activationDistance = SBone.Settings.ActivationDistance
+
+						local updateDistance = math.clamp(distance - throttleDistance, 0, activationDistance)
+						local updateThrottle = 1 - math.clamp(updateDistance / activationDistance, 0, 1)
+
+						local UpdateRate = math.floor(math.clamp(updateThrottle * SBone.Settings.UpdateRate, 1, SBone.Settings.UpdateRate))
+
+						local WithinViewport = WithinViewport(SBone.RootPart)
+						if frameTime >= (1/UpdateRate) then
+							if distance < activationDistance and WithinViewport then
+								Delta = frameTime
+								frameTime = 0
+
+								debug.profilebegin("SoftBone")
+
+								if SBone.InRange == false then
+									SBone.InRange = true
+								end
+
+								SBone:UpdateBones(Delta, UpdateRate)
+
+								debug.profileend()
+
+								debug.profilebegin("SoftBoneTransform")
+
+								for _, _ParticleTree in SBone.ParticleTrees do
+									SBone:TransformBones(_ParticleTree, Delta)
+								end
+
+								debug.profileend()
+
+							else
+								if SBone.InRange == true then
+									SBone.InRange = false
+
+									for _, _ParticleTree in SBone.ParticleTrees do
+										SBone:ResetParticles(_ParticleTree)
+									end
+
+
+									for _, _ParticleTree in SBone.ParticleTrees do
+										SBone:ResetTransforms(_ParticleTree, Delta)
+									end
+
+								end
+							end
+						end
+					end)
+
+					return SBone
+				end
+
+				--[[ Event Handler ]]--
+
+				Initialize(Object, RootList)
+				table.insert(IgnoreList, Object)
+			else
+				table.insert(IgnoreList, Object)
+				DebugPrint(
+					"Failed to create SmartBone Object for "
+						.. Object:GetFullName()
+						.. "! Make sure you have defined the Root Bone(s) for this object!"
+				)
+			end
+		end
+	end
+
+	if CONN then
+		CONN:Disconnect()
+	end
+	CONN = game:GetService("RunService").Heartbeat:Connect(function()
+		for _, Object in pairs(SmartBoneTags) do
+			if not SmartBones[Object] and not table.find(IgnoreList, Object) then
+				task.spawn(function()
+					registerSmartBoneObject(Object)
+				end)
+			end
+		end
+	end)
+end
+
+return module
