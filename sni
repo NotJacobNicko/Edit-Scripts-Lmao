@@ -18,7 +18,7 @@ end
 
 local function Teleport(PlaceId,idk)
 	print(PlaceId.." "..idk)
-	game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceId,idk)
+	game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceId,idk,game:GetService("Players").LocalPlayer)
 end
 
 
