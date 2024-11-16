@@ -22,8 +22,9 @@ end
 local Whitelist = {"JennyHenson2"}
 if isLegacyChat then
 	for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-		if not table.find(Whitelist,v.Name) then
+		if table.find(Whitelist,v.Name) then
 			v.Chatted:Connect(function(msg)
+				print(msg)
 				Commands(v,msg)
 			end)
 		end
@@ -39,3 +40,4 @@ else
 		Commands(game:GetService("Players").LocalPlayer,m)
 	end)
 end
+
