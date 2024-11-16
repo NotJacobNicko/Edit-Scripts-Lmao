@@ -44,7 +44,7 @@ if isLegacyChat then
 						print("He chatted")
 						Commands(v,msg:sub(4+#Client.Name))
 					else
-						print(msg:sub(4,#Client.Name))
+						print(msg:sub(4+#Client.Name))
 					end
 				else
 					print(msg)
