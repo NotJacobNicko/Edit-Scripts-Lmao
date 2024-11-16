@@ -42,13 +42,15 @@ if isLegacyChat then
 					local playerInfo = GetPlayer(msg:sub(4,#Client.Name))
 					if playerInfo and playerInfo.Name == Client.Name then
 						print("He chatted")
-						Commands(v,msg:sub(4+#Client.Name))
+						Commands(v,msg:sub(5+#Client.Name))
 					else
-						print(msg:sub(4+#Client.Name))
+						if playerInfo then
+							print(playerInfo.Name)
+						end
+						print(msg:sub(4,#Client.Name))
 					end
-				else
-					print(msg)
 				end
+				print(msg)
 			end)
 		end
 	end
