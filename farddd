@@ -1,0 +1,41 @@
+local ChatService = game:GetService("TextChatService")
+local isLegacyChat = ChatService.ChatVersion == Enum.ChatVersion.LegacyChatService
+function NotifyPlayer(plr,str)
+	local String = "/w "..plr.Name.." "..str
+	if not isLegacyChat then
+		ChatService.TextChannels.RBXGeneral:SendAsync(String)
+	else
+		game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(String, "All")
+	end
+end
+function Commands(v,m)
+	local cmds = {
+		["!hi"] = function()
+			NotifyPlayer(v,"hi bro")
+		end,
+	}
+	local msg = tostring(m:gsub("/e",""))
+	if cmds[msg] then
+		cmds[msg]()
+	end
+end
+local Whitelist = {"JennyHenson2"}
+if isLegacyChat then
+	for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+		if not table.find(Whitelist,v.Name) then
+			v.Chatted:Connect(function(msg)
+				Commands(v,msg)
+			end)
+		end
+	end
+	game:GetService("Players").PlayerAdded:Connect(function(plr)
+		plr.Chatted:Connect(function(msg)
+			Commands(plr,msg)
+		end)
+	end)
+else
+	warn("Cannot Load Due to Chat")
+	game:GetService("TextChatService").SendingMessage:Connect(function(m)
+		Commands(game:GetService("Players").LocalPlayer,m)
+	end)
+end
