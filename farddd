@@ -1,23 +1,148 @@
 local ChatService = game:GetService("TextChatService")
 local isLegacyChat = ChatService.ChatVersion == Enum.ChatVersion.LegacyChatService
+local Debugging = game:GetService("RunService"):IsStudio()
 local Client = game:GetService("Players").LocalPlayer
 function NotifyPlayer(plr,str)
-	local String = "/w "..plr.Name.." "..str
-	if not isLegacyChat then
-		ChatService.TextChannels.RBXGeneral:SendAsync(String)
+	if not plr then
+		return
+	end
+	if not Debugging then
+		local String = "/w "..plr.Name.." "..str
+		if not isLegacyChat then
+			ChatService.TextChannels.RBXGeneral:SendAsync(String)
+		else
+			game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(String, "All")
+		end
 	else
-		game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(String, "All")
+		if not isLegacyChat then
+			ChatService.TextChannels.RBXGeneral:SendAsync(str)
+		else
+			game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(str, "All")
+		end
 	end
 end
+local NeedInformation = false
+local ClockTick,Speed = 0,"slow"
+local ClockhandCon,ClockHandle = nil,nil
+local plruh = nil
+local PlayerBase = {}
+function Loop()
+	local Clock = nil
+	
+	if ClockTick < 3 then
+		Speed = "slow"
+	elseif ClockTick >= 3 and ClockTick < 4 then
+		Speed = "normal"
+	elseif ClockTick >= 4 and ClockTick < 6 then
+		Speed = "fast"
+	elseif ClockTick >= 6  then
+		Speed = "faster"
+	end
+	for i,v in pairs(workspace:GetDescendants()) do
+		if v:IsA("Model") and v.Name == "Wall_Clock" and not Clock then
+			if ClockhandCon then
+				ClockhandCon:Disconnect()
+			end
+			Clock = v
+			ClockHandle = workspace.clock.Wall_Clock:FindFirstChild("Minute_Hand")
+			
+			ClockhandCon = ClockHandle:GetPropertyChangedSignal("Orientation"):Connect(function()
+				if NeedInformation then
+					if ClockHandle.Orientation.Z >= 175 and ClockHandle.Orientation.Z < 180 then
+						for i,plresss in pairs(PlayerBase) do
+							NotifyPlayer(plresss,"The Clock Is halfway")
+						end
+					end
+					if -ClockHandle.Orientation.Z >= 55 and -ClockHandle.Orientation.Z < 60 then
+						for i,plresss in pairs(PlayerBase) do
+							NotifyPlayer(plresss,"The Clock is almost done")
+						end
+					end
+				end
+				task.spawn(function()
+					ClockTick += 1
+					task.delay(1,function()
+						if ClockTick >= 0 then
+							ClockTick -= 1  
+						end
+					end)
+				end)
+			end)
+			
+		end
+	end
+	
+end
+task.spawn(function()
+	for i,v in pairs({game:GetService("RunService").PreAnimation,game:GetService("RunService").Heartbeat,game:GetService("RunService").RenderStepped}) do
+		v:Connect(Loop)
+	end
+end)
 function Commands(v,m)
-	local cmds = {
-		["!hi"] = function()
-			NotifyPlayer(v,"hi bro")
-		end,
+	local Commands = {
+		SlapBattle = {
+			["!supbro"] = function()
+				NotifyPlayer(v,"hi bro")
+			end,
+			["!info"] = function()
+				local Hiig = {"hmm its","yeah its","lemme check its","err the info is","the info is","info is"}
+				local selected = Hiig[math.random(1,#Hiig)]
+				NotifyPlayer(v,selected)
+				local TableInfo = {
+					"gravity: "..workspace.Gravity,
+					"clock Speed is "..Speed,
+					"Clock Tick is "..ClockTick,
+					"only "..#game:GetService("Players"):GetChildren().." players"
+				}
+				for i=1,#TableInfo do
+					local text = TableInfo[i]
+					wait(1.5)
+					NotifyPlayer(v,text)
+				end
+			end,
+			["!clock"] = function()
+				NeedInformation = not NeedInformation
+				
+				if not NeedInformation then
+					local Hiig = {"good luck out there","okay your tired?","alright then","no problem","idk what to do"}
+					local selected = Hiig[math.random(1,#Hiig)]
+					PlayerBase = {}
+					NotifyPlayer(v,selected)
+				else
+					table.insert(PlayerBase,v)
+					local Hiig = {"fine brother","fine ill help","ok good luck","alright","ok then","sure i guess","yeah sure ill notify you"}
+					local selected = Hiig[math.random(1,#Hiig)]
+					NotifyPlayer(v,selected)
+				end
+			end,
+			["!speed"] = function()
+				local Hiig = {"it is ","So its ","Uhh Its ","Its "}
+				local selected = Hiig[math.random(1,#Hiig)]
+				NotifyPlayer(v,selected..Speed.." or around"..ClockTick)
+			end,
+		},
+		
+		JustGeneric = {
+			["!time"] = function()
+				NotifyPlayer(v,"the server time is "..workspace.DistributedGameTime)
+			end,
+		}
 	}
+	
+	print(m)
 	local msg = tostring(m:gsub("/e",""))
-	if cmds[msg] then
-		cmds[msg]()
+	local CommandList = nil
+	
+	if not (game.CreatorId == 9950771 or game.CreatorId == 102068705) or Debugging then
+		CommandList = Commands.SlapBattle
+	end
+	
+	if CommandList then
+		if CommandList[msg] then
+			pcall(function()
+				CommandList[msg]()
+			end)
+		end
 	end
 end
 local Whitelist = {"JennyHenson2","BOIwhatshaun"}
@@ -38,19 +163,7 @@ if isLegacyChat then
 	for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 		if table.find(Whitelist,v.Name) then
 			v.Chatted:Connect(function(msg)
-				if msg:sub(1,3) == "/w " then
-					local playerInfo = GetPlayer(msg:sub(4,#Client.Name))
-					if playerInfo and playerInfo.Name == Client.Name then
-						print("He chatted")
-						Commands(v,msg:sub(5+#Client.Name))
-					else
-						if playerInfo then
-							print(playerInfo.Name)
-						end
-						print(msg:sub(4,#Client.Name))
-					end
-				end
-				print(msg)
+				Commands(v,msg)
 			end)
 		end
 	end
