@@ -298,6 +298,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		local enemytorso = GetTorso(ROOT.Position)	
 		if enemytorso then 
 			local function checkw(t)
+				if not ActiveAI then
+					return
+				end
 				local ci = 3
 				if ci > #t then
 					ci = 3
@@ -361,7 +364,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
 							end
 						end)
 					end
-
 					if connection then
 						connection:Disconnect()
 					end
@@ -396,7 +398,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 						local waypoints = ranompath:GetWaypoints()
 						if ranompath.Status == Enum.PathStatus.Success then
 							for i,v in pairs(waypoints) do
-								if path == nil then 
+								if path == nil and not ActiveAI then 
 									if Debug then
 										local walkpart = Instance.new("Part",CHARACTER)
 										table.insert(waypointTable,walkpart)
