@@ -289,161 +289,159 @@ function RequestSlap(enemyGlove)
 	end)
 end
 local ActiveAI = false
-for i,v in pairs({game:GetService("RunService").Heartbeat,workspace.Changed,game:GetService("Lighting").Changed}) do
-	v:Connect(function()
-		pcall(function()
-			local enemytorso = GetTorso(ROOT.Position)	
-			if not ActiveAI then
-				return
-			end
-			if enemytorso then 
-				local function checkw(t)
-					local ci = 3
-					if ci > #t then
-						ci = 3
-					end
-					if t[ci] == nil and ci < #t then
-						repeat
-							ci = ci + 1
-							wait()
-						until t[ci] ~= nil
-						return Vector3.new(1, 0, 0) + t[ci]
-					else
-						ci = 3
-						return t[ci]
-					end
+game:GetService("RunService").RenderStepped:Connect(function()
+	pcall(function()
+		if not ActiveAI then
+			return
+		end
+		local enemytorso = GetTorso(ROOT.Position)	
+		if enemytorso then 
+			local function checkw(t)
+				local ci = 3
+				if ci > #t then
+					ci = 3
 				end
-				task.spawn(function()
-					local Magnit = (ROOT.Position - enemytorso.Position).Magnitude
-					if Magnit <= 8 then
-						if not SlapCooldown then
-							SlapCooldown = true
-							local Toolname = "Default"
-							if enemytorso.Parent:FindFirstChildWhichIsA("Tool") then
-								Toolname = enemytorso.Parent:FindFirstChildWhichIsA("Tool").Name
-							else
-								local MainPlayer = game:GetService("Players"):FindFirstChild(enemytorso.Parent.Name)
-								if MainPlayer:FindFirstChild('leaderstats') then
-									local Glove = MainPlayer:FindFirstChild('leaderstats'):FindFirstChild("Glove")
-									if Glove then
-										Toolname = Glove.Value
-									end
+				if t[ci] == nil and ci < #t then
+					repeat
+						ci = ci + 1
+						wait()
+					until t[ci] ~= nil
+					return Vector3.new(1, 0, 0) + t[ci]
+				else
+					ci = 3
+					return t[ci]
+				end
+			end
+			task.spawn(function()
+				local Magnit = (ROOT.Position - enemytorso.Position).Magnitude
+				if Magnit <= 8 then
+					if not SlapCooldown then
+						SlapCooldown = true
+						local Toolname = "Default"
+						if enemytorso.Parent:FindFirstChildWhichIsA("Tool") then
+							Toolname = enemytorso.Parent:FindFirstChildWhichIsA("Tool").Name
+						else
+							local MainPlayer = game:GetService("Players"):FindFirstChild(enemytorso.Parent.Name)
+							if MainPlayer:FindFirstChild('leaderstats') then
+								local Glove = MainPlayer:FindFirstChild('leaderstats'):FindFirstChild("Glove")
+								if Glove then
+									Toolname = Glove.Value
 								end
 							end
-							RequestSlap(Toolname)
-							wait(1)
-							SlapCooldown = false
 						end
+						RequestSlap(Toolname)
+						wait(1)
+						SlapCooldown = false
 					end
-				end)
-				path = game:GetService("PathfindingService"):FindPathAsync(ROOT.Position, enemytorso.Position)
-				local waypoint = path:GetWaypoints()
-				local connection;
-				local PlayerChar = enemytorso.Parent
-				local Humanoid = PlayerChar:FindFirstChildWhichIsA("Humanoid")
-				if path.Status == Enum.PathStatus.Success then
-					if waypoint or checkw(waypoint) then
-						if checkw(waypoint) ~= nil and checkw(waypoint).Action == Enum.PathWaypointAction.Walk then
-							HUMANOID:MoveTo(checkw(waypoint).Position)
-						end
-						if checkw(waypoint) ~= nil and checkw(waypoint).Action == Enum.PathWaypointAction.Jump then
-							HUMANOID.Jump = true
-							connection = HUMANOID.Changed:connect(function()
+				end
+			end)
+			path = game:GetService("PathfindingService"):FindPathAsync(ROOT.Position, enemytorso.Position)
+			local waypoint = path:GetWaypoints()
+			local connection;
+			local PlayerChar = enemytorso.Parent
+			local Humanoid = PlayerChar:FindFirstChildWhichIsA("Humanoid")
+			if path.Status == Enum.PathStatus.Success then
+				if waypoint or checkw(waypoint) then
+					if checkw(waypoint) ~= nil and checkw(waypoint).Action == Enum.PathWaypointAction.Walk then
+						HUMANOID:MoveTo(checkw(waypoint).Position)
+					end
+					if checkw(waypoint) ~= nil and checkw(waypoint).Action == Enum.PathWaypointAction.Jump then
+						HUMANOID.Jump = true
+						connection = HUMANOID.Changed:connect(function()
+							HUMANOID.Jump = false
+						end)
+						HUMANOID:MoveTo(checkw(waypoint).Position)
+					else
+						task.spawn(function() -- devious
+							if Humanoid.Jump then
+								HUMANOID.Jump = true
+							else
 								HUMANOID.Jump = false
-							end)
-							HUMANOID:MoveTo(checkw(waypoint).Position)
-						else
-							task.spawn(function() -- devious
-								if Humanoid.Jump then
-									HUMANOID.Jump = true
-								else
-									HUMANOID.Jump = false
-								end
-							end)
-						end
-
-						if connection then
-							connection:Disconnect()
-						end
+							end
+						end)
 					end
-				else
-					HUMANOID:MoveTo(enemytorso.Position)
+
+					if connection then
+						connection:Disconnect()
+					end
 				end
 			else
-				path = nil
-				task.spawn(function()
-					if not startwalkrandom and math.random(1,15) == 1 then
-						startwalkrandom = true
-						local Dist = 20
-						local function Moverandom()
-							if path then
-								return
-							end
-							local Location = ROOT.CFrame * CFrame.new(math.random(-Dist,Dist),math.random(-30,30),math.random(-Dist,Dist))
-							local waypointTable = {}
-							if Debug then
-								local walkpart = Instance.new("Part",CHARACTER)
-								table.insert(waypointTable,walkpart)
-								walkpart.Size = Vector3.new(1,1,1)
-								walkpart.Anchored = true
-								walkpart.CanCollide = false
-								walkpart.Material = "Neon"
-								walkpart.Transparency = 0
-								walkpart.BrickColor = BrickColor.new("Neon green")
-								walkpart.Position = Location.Position
-							end
-							local ranompath = game:GetService("PathfindingService"):FindPathAsync(ROOT.Position, Location.Position)
-							local waypoints = ranompath:GetWaypoints()
-							if ranompath.Status == Enum.PathStatus.Success then
-								for i,v in pairs(waypoints) do
-									if path == nil then 
-										if Debug then
-											local walkpart = Instance.new("Part",CHARACTER)
-											table.insert(waypointTable,walkpart)
-											walkpart.Size = Vector3.new(1,1,1)
-											walkpart.Anchored = true
-											walkpart.CanCollide = false
-											walkpart.Material = "Neon"
-											walkpart.Transparency = 0
-											walkpart.BrickColor = BrickColor.new("Maroon")
-											walkpart.Position = v.Position
-										end
-										HUMANOID:MoveTo(v.Position)
-										if (ROOT.Position - v.Position).Magnitude >= 10 then
-											break
-										end
-										local allow = 0
-										while (ROOT.Position - v.Position).Magnitude > 4 and allow < 25 do
-											allow = allow + 1
-											wait()
-										end
-										if v.Action == Enum.PathWaypointAction.Jump then
-											HUMANOID.Jump = true
-										end
-									else
+				HUMANOID:MoveTo(enemytorso.Position)
+			end
+		else
+			path = nil
+			task.spawn(function()
+				if not startwalkrandom and math.random(1,15) == 1 then
+					startwalkrandom = true
+					local Dist = 20
+					local function Moverandom()
+						if path then
+							return
+						end
+						local Location = ROOT.CFrame * CFrame.new(math.random(-Dist,Dist),math.random(-30,30),math.random(-Dist,Dist))
+						local waypointTable = {}
+						if Debug then
+							local walkpart = Instance.new("Part",CHARACTER)
+							table.insert(waypointTable,walkpart)
+							walkpart.Size = Vector3.new(1,1,1)
+							walkpart.Anchored = true
+							walkpart.CanCollide = false
+							walkpart.Material = "Neon"
+							walkpart.Transparency = 0
+							walkpart.BrickColor = BrickColor.new("Neon green")
+							walkpart.Position = Location.Position
+						end
+						local ranompath = game:GetService("PathfindingService"):FindPathAsync(ROOT.Position, Location.Position)
+						local waypoints = ranompath:GetWaypoints()
+						if ranompath.Status == Enum.PathStatus.Success then
+							for i,v in pairs(waypoints) do
+								if path == nil then 
+									if Debug then
+										local walkpart = Instance.new("Part",CHARACTER)
+										table.insert(waypointTable,walkpart)
+										walkpart.Size = Vector3.new(1,1,1)
+										walkpart.Anchored = true
+										walkpart.CanCollide = false
+										walkpart.Material = "Neon"
+										walkpart.Transparency = 0
+										walkpart.BrickColor = BrickColor.new("Maroon")
+										walkpart.Position = v.Position
+									end
+									HUMANOID:MoveTo(v.Position)
+									if (ROOT.Position - v.Position).Magnitude >= 10 then
 										break
 									end
+									local allow = 0
+									while (ROOT.Position - v.Position).Magnitude > 4 and allow < 25 do
+										allow = allow + 1
+										wait()
+									end
+									if v.Action == Enum.PathWaypointAction.Jump then
+										HUMANOID.Jump = true
+									end
+								else
+									break
 								end
-							end
-							HUMANOID:MoveTo(ROOT.Position)
-							for i,v in pairs(waypointTable)  do
-								if v then
-									v:Destroy()
-								end
-							end
-							if math.random(1,5) == 1 then
-								Moverandom()
 							end
 						end
-						Moverandom()
-						wait(math.random(3,10))
-						startwalkrandom = false
+						HUMANOID:MoveTo(ROOT.Position)
+						for i,v in pairs(waypointTable)  do
+							if v then
+								v:Destroy()
+							end
+						end
+						if math.random(1,5) == 1 then
+							Moverandom()
+						end
 					end
-				end)
-			end
-		end)
+					Moverandom()
+					wait(math.random(3,10))
+					startwalkrandom = false
+				end
+			end)
+		end
 	end)
-end
+end)
 function Notifyclient(Text)
 	local goofynotiids = {6823153536,6823153536,7991347388,6879335951,217548941,4891171429,17660225827,6879335951}
 	local Notisong = Instance.new("Sound",game:GetService("SoundService"))
