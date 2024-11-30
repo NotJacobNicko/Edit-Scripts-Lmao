@@ -42,12 +42,16 @@ function GetTorso(part)
 			local hum = getHumanoid(Char)
 			local charRoot = Char:FindFirstChild('HumanoidRootPart') or Char:FindFirstChild('Torso') or Char:FindFirstChild('Head')
 			
-			if charRoot and not FindIngnore(Char) and Char:FindFirstChild("entered") and Char.HumanoidRootPart.BrickColor ~= BrickColor.new("New Yeller") then
+			if charRoot and not FindIngnore(Char) and Char:FindFirstChild("entered") then
 				if hum and hum.Health > 0 then
 					if (charRoot.Position - part).magnitude < mag then
 						mag = (charRoot.Position - part).magnitude
 						Torso = charRoot
 					end
+				end
+			else
+				if not Char:FindFirstChild("entered")  then
+					print("Player Havent Enter Arena")
 				end
 			end
 		end
@@ -292,7 +296,6 @@ for i,v in pairs({game:GetService("RunService").Heartbeat,workspace.Changed,game
 			if not ActiveAI then
 				return
 			end
-			print("AI activated")
 			if enemytorso then 
 				local function checkw(t)
 					local ci = 3
