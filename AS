@@ -35,7 +35,7 @@ function GetTorso(part)
 	--Char
 	local chaseRoot = nil
 	local Torso = nil
-	local mag = 400
+	local mag = 700
 
 	for _, Char in pairs(workspace:GetDescendants()) do
 		if Char:IsA'Model' and Char ~= script.Parent and Char.Name ~= CHARACTER.Name and getHumanoid(Char) then
@@ -49,10 +49,6 @@ function GetTorso(part)
 						Torso = charRoot
 					end
 				end
-			else
-				if not Char:FindFirstChild("entered")  then
-					print("Player Havent Enter Arena")
-				end
 			end
 		end
 	end
@@ -61,7 +57,7 @@ function GetTorso(part)
 end
 local SlapCooldown = false
 local slaptps = 0
-function RequestSlap()
+function RequestSlap(enemyGlove)
 	if Studio then
 		return
 	end
@@ -260,12 +256,16 @@ function RequestSlap()
 		["God's Hand"] = game.ReplicatedStorage.Godshand,
 		["Error"] = game.ReplicatedStorage.Errorhit
 	}
+	local SlapDistance = 8
+	if enemyGlove == "OVERKILL" then -- yeah fuck you p2w
+		SlapDistance = 10 
+	end
 	task.spawn(function()
 		for i,v in pairs(workspace:GetChildren()) do
 			if v ~= plrlol.Character and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") then
 				if v:FindFirstChild("entered") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("rock") == nil and v.HumanoidRootPart.BrickColor ~= BrickColor.new("New Yeller") then
-					if v.Head:FindFirstChild("UnoReverseCard") == nil or plrlol:FindFirstChild("leaderstats"):FindFirstChild("Glove").Value == "Error" then
-						if (plrlol.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude <= 8 then
+					if not v:FindFirstChild("Counterd") or (v.Head:FindFirstChild("UnoReverseCard") and plrlol:FindFirstChild("leaderstats"):FindFirstChild("Glove").Value == "Error") then
+						if (plrlol.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude <= SlapDistance then
 							if slaptps < 20 and game:GetService("Players"):FindFirstChild(v.Name) then
 								SlapRemotes[plrlol.leaderstats.Glove.Value]:FireServer(v:WaitForChild("HumanoidRootPart"),true)
 								task.defer(function()
@@ -318,7 +318,19 @@ for i,v in pairs({game:GetService("RunService").Heartbeat,workspace.Changed,game
 					if Magnit <= 8 then
 						if not SlapCooldown then
 							SlapCooldown = true
-							RequestSlap()
+							local Toolname = "Default"
+							if enemytorso.Parent:FindFirstChildWhichIsA("Tool") then
+								Toolname = enemytorso.Parent:FindFirstChildWhichIsA("Tool").Name
+							else
+								local MainPlayer = game:GetService("Players"):FindFirstChild(enemytorso.Parent.Name)
+								if MainPlayer:FindFirstChild('leaderstats') then
+									local Glove = MainPlayer:FindFirstChild('leaderstats'):FindFirstChild("Glove")
+									if Glove then
+										Toolname = Glove.Value
+									end
+								end
+							end
+							RequestSlap(Toolname)
 							wait(1)
 							SlapCooldown = false
 						end
