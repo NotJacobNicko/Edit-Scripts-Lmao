@@ -64,8 +64,7 @@ function RequestSlap(enemyGlove)
 	local SlapRemotes = {
 		["Default"] = game.ReplicatedStorage.b,
 		["Extended"] = game.ReplicatedStorage.b,
-
-		-----------// Used Same Remotes \\-----------
+		-----------// Glove Hit General Or New Glove \\-----------
 		["T H I C K"] = game.ReplicatedStorage.GeneralHit,
 		["Squid"] = game.ReplicatedStorage.GeneralHit,
 		["Gummy"] = game.ReplicatedStorage.GeneralHit,
@@ -158,7 +157,10 @@ function RequestSlap(enemyGlove)
 		["Hunter"] = game.ReplicatedStorage.GeneralHit,
 		["Relude"] = game.ReplicatedStorage.GeneralHit,
 		["Avatar"] = game.ReplicatedStorage.GeneralHit,
-		-----------// Custom Remote Hit \\-----------
+		["Demolition"] = game.ReplicatedStorage.GeneralHit,
+		["Shotgun"] = game.ReplicatedStorage.GeneralHit,
+		["Beachball"] = game.ReplicatedStorage.GeneralHit,
+		-----------// Glove Hit Normal Or New Glove \\-----------
 		["ZZZZZZZ"] = game.ReplicatedStorage.ZZZZZZZHit,
 		["Brick"] = game.ReplicatedStorage.BrickHit,
 		["Snow"] = game.ReplicatedStorage.SnowHit,
@@ -169,7 +171,6 @@ function RequestSlap(enemyGlove)
 		["Bull"] = game.ReplicatedStorage.BullHit,
 		["Dice"] = game.ReplicatedStorage.DiceHit,
 		["Ghost"] = game.ReplicatedStorage.GhostHit,
-		["Thanos"] = game.ReplicatedStorage.ThanosHit,
 		["Stun"] = game.ReplicatedStorage.HtStun,
 		["Za Hando"] = game.ReplicatedStorage.zhramt,
 		["Fort"] = game.ReplicatedStorage.Fort,
