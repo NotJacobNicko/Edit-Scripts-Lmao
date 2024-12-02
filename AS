@@ -4,11 +4,13 @@ local CHARACTER = plrlol.Character
 local HUMANOID = CHARACTER:FindFirstChildWhichIsA("Humanoid")
 local ROOT = CHARACTER.HumanoidRootPart
 
-plrlol.CharacterAdded:Connect(function()
+plrlol.CharacterAdded:Connect(function(cha)
 	repeat
 		wait()
 	until plrlol.Character and plrlol:FindFirstChildWhichIsA("Humanoid") and plrlol:FindFirstChildWhichIsA("Humanoid").Health > 0
-	CHARACTER = plrlol.Character
+	wait(.5)
+	print("sush")
+	CHARACTER = cha
 	HUMANOID = CHARACTER:FindFirstChildWhichIsA("Humanoid")
 	ROOT = CHARACTER.HumanoidRootPart
 end)
@@ -264,8 +266,8 @@ function RequestSlap(enemyGlove)
 	task.spawn(function()
 		for i,v in pairs(workspace:GetChildren()) do
 			if v ~= plrlol.Character and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") then
-				if v:FindFirstChild("entered") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("rock") == nil and v.HumanoidRootPart.BrickColor ~= BrickColor.new("New Yeller") then
-					if not v:FindFirstChild("Counterd") or (v.Head:FindFirstChild("UnoReverseCard") and plrlol:FindFirstChild("leaderstats"):FindFirstChild("Glove").Value == "Error") then
+				if v:FindFirstChild("Counterd") == nil and v:FindFirstChild("entered") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("rock") == nil and v.HumanoidRootPart.BrickColor ~= BrickColor.new("New Yeller") then
+					if (v.Head:FindFirstChild("UnoReverseCard") and plrlol:FindFirstChild("leaderstats"):FindFirstChild("Glove").Value == "Error") then
 						if (plrlol.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude <= SlapDistance then
 							if slaptps < 20 and game:GetService("Players"):FindFirstChild(v.Name) then
 								SlapRemotes[plrlol.leaderstats.Glove.Value]:FireServer(v:WaitForChild("HumanoidRootPart"),true)
@@ -333,6 +335,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 								end
 							end
 						end
+						
 						RequestSlap(Toolname)
 						wait(1)
 						SlapCooldown = false
