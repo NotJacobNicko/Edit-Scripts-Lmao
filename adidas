@@ -9,6 +9,7 @@ function Notifyclient(Text)
 end
 
 local TagHighligh = {}
+local Touched = {}
 local whitelist = {"Egor_KozhoffFake","JennyHenson2","BOIwhatshaun","rzkrd000"}
 
 function TouchObj(Instan)
@@ -53,10 +54,12 @@ function getPresentsbecauseufuckyouexploiter()
 										if Character and Character:FindFirstChildWhichIsA("Humanoid") and Character:FindFirstChildWhichIsA("Humanoid").Health > 0 then
 											local plrroot = Character:FindFirstChild("HumanoidRootPart") or Character:FindFirstChild("Torso")
 											
-											if plrroot and Instan.Parent and not table.find(whitelist,Plrs.Name) then
-												if (plrroot.Position - Instan.Parent.Position).Magnitude < 15 then
+											if plrroot and Instan.Parent and not table.find(whitelist,Plrs.Name) and not table.find(Touched,Instan.Parent) then
+												if (plrroot.Position - Instan.Parent.Position).Magnitude < 18 then
+													table.insert(Touched,Instan.Parent)
 													Notifyclient("Nuh Uh "..Plrs.Name)
 													TouchObj(Instan.Parent)
+													break
 												end
 											end
 										end
