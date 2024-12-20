@@ -8,7 +8,7 @@ function Notifyclient(Text)
 	Notisong:Destroy()
 end
 
-
+local TagHighligh = {}
 function getPresentsbecauseufuckyouexploiter()
 	local PresentFolder = workspace:FindFirstChild("PresentsSpawn")
 	if not PresentFolder then
@@ -19,28 +19,20 @@ function getPresentsbecauseufuckyouexploiter()
 			if slots:IsA("BasePart") then
 				local Gift = slots:FindFirstChildWhichIsA("MeshPart")
 				if Gift and Gift.Name == "Gift" then
-					for i,Instan in pairs(Gift:GetChildren()) do
+					for i,Instan in pairs(Gift:GetDescendants()) do
 						if Instan:IsA("TouchTransmitter") then
 							local player = game:GetService("Players").LocalPlayer
-							local Root = player.Character:FindFirstChild("Head")
+							if not table.find(TagHighligh,Instan.Parent) then
+								table.insert(TagHighligh,Instan.Parent)
+								local Highligh = Instance.new("Highlight",Instan.Parent)
+								Highligh.OutlineColor = Color3.new(1,0,0)
+							end
+							local Limbs = {"Head","Torso","HumanoidRootPart"}
+							local Root = player.Character:FindFirstChild(Limbs[math.random(1,#Limbs)])
 							if not Root then
+								print("Root not Found")
 								return
 							end
-							task.spawn(function()
-								for i,v in pairs(game:GetService("Players"):GetChildren()) do
-									if v ~= player then
-										if v.Character and v.Character:FindFirstChildWhichIsA("Humanoid") and v.Character:FindFirstChildWhichIsA("Humanoid").Health > 0 then
-											local anotherroot = v.Character:FindFirstChild("HumanoidRootPart")
-											
-											if anotherroot then
-												if (anotherroot.Position - Instan.Parent.Position).Magnitude < 10 then
-													Notifyclient("nuh uh! "..v.Name)
-												end
-											end
-										end
-									end
-								end
-							end)
 							firetouchinterest(Root, Instan.Parent, 0)
 							firetouchinterest(Root, Instan.Parent, 1)
 						end
@@ -51,7 +43,7 @@ function getPresentsbecauseufuckyouexploiter()
 	end)
 end
 
-Notifyclient("gonna ruin this christmas with this one hehe...")
+Notifyclient("gonna ruin this christmas with this one hehe... attempt 2")
 
 while wait() do
 	getPresentsbecauseufuckyouexploiter()
