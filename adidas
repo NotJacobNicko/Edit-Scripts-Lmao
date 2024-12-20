@@ -9,6 +9,18 @@ function Notifyclient(Text)
 end
 
 local TagHighligh = {}
+local whitelist = {"Egor_KozhoffFake","JennyHenson2","BOIwhatshaun","rzkrd000"}
+
+function TouchObj(Instan)
+	local Limbs = {"Head","Torso","HumanoidRootPart"}
+	local Root = game:GetService("Players").LocalPlayer.Character:FindFirstChild(Limbs[math.random(1,#Limbs)])
+	if not Root then
+		print("Root not Found")
+		return
+	end
+	firetouchinterest(Root, Instan, 0)
+	firetouchinterest(Root, Instan , 1)
+end
 function getPresentsbecauseufuckyouexploiter()
 	local PresentFolder = workspace:FindFirstChild("PresentsSpawn")
 	if not PresentFolder then
@@ -26,15 +38,31 @@ function getPresentsbecauseufuckyouexploiter()
 								table.insert(TagHighligh,Instan.Parent)
 								local Highligh = Instance.new("Highlight",Instan.Parent)
 								Highligh.OutlineColor = Color3.new(1,0,0)
+								task.delay(30,function()
+									if Instan then
+										TouchObj(Instan.Parent)
+									end
+								end)
 							end
-							local Limbs = {"Head","Torso","HumanoidRootPart"}
-							local Root = player.Character:FindFirstChild(Limbs[math.random(1,#Limbs)])
-							if not Root then
-								print("Root not Found")
-								return
-							end
-							firetouchinterest(Root, Instan.Parent, 0)
-							firetouchinterest(Root, Instan.Parent, 1)
+							
+							task.spawn(function()
+								for i,Plrs in pairs(game:GetService("Players"):GetPlayers()) do
+									if Plrs and Plrs ~= player then
+										local Character = Plrs.Character
+										
+										if Character and Character:FindFirstChildWhichIsA("Humanoid") and Character:FindFirstChildWhichIsA("Humanoid").Health > 0 then
+											local plrroot = Character:FindFirstChild("HumanoidRootPart") or Character:FindFirstChild("Torso")
+											
+											if plrroot and Instan.Parent and not table.find(whitelist,Plrs.Name) then
+												if (plrroot.Position - Instan.Parent.Position).Magnitude < 15 then
+													Notifyclient("Nuh Uh "..Plrs.Name)
+													TouchObj(Instan.Parent)
+												end
+											end
+										end
+									end
+								end
+							end)
 						end
 					end
 				end
@@ -42,11 +70,7 @@ function getPresentsbecauseufuckyouexploiter()
 		end
 	end)
 end
-
-Notifyclient("gonna ruin this christmas with this one hehe... attempt 2")
-
+Notifyclient("gonna ruin this christmas with this one hehe...")
 while wait() do
 	getPresentsbecauseufuckyouexploiter()
 end
-
-
