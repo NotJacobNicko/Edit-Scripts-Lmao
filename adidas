@@ -1,0 +1,60 @@
+function Notifyclient(Text)
+	local goofynotiids = {6823153536,6823153536,7991347388,6879335951,217548941,4891171429,17660225827,6879335951}
+	local Notisong = Instance.new("Sound",game:GetService("SoundService"))
+	Notisong.SoundId = "rbxassetid://"..goofynotiids[math.random(1,#goofynotiids)]
+	Notisong.Volume = 4
+	Notisong.PlayOnRemove = true
+	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "HX?H Guide",Text = Text,Icon = "rbxassetid://18584222941",Duration = 5})
+	Notisong:Destroy()
+end
+
+
+function getPresentsbecauseufuckyouexploiter()
+	local PresentFolder = workspace:FindFirstChild("PresentsSpawn")
+	if not PresentFolder then
+		return
+	end
+	task.spawn(function()
+		for i,slots in pairs(PresentFolder:GetChildren()) do
+			if slots:IsA("BasePart") then
+				local Gift = slots:FindFirstChildWhichIsA("MeshPart")
+				if Gift and Gift.Name == "Gift" then
+					for i,Instan in pairs(Gift:GetChildren()) do
+						if Instan:IsA("TouchTransmitter") then
+							local player = game:GetService("Players").LocalPlayer
+							local Root = player.Character:FindFirstChild("Head")
+							if not Root then
+								return
+							end
+							task.spawn(function()
+								for i,v in pairs(game:GetService("Players"):GetChildren()) do
+									if v ~= player then
+										if v.Character and v.Character:FindFirstChildWhichIsA("Humanoid") and v.Character:FindFirstChildWhichIsA("Humanoid").Health > 0 then
+											local anotherroot = v.Character:FindFirstChild("HumanoidRootPart")
+											
+											if anotherroot then
+												if (anotherroot.Position - Instan.Parent.Position).Magnitude < 10 then
+													Notifyclient("nuh uh! "..v.Name)
+												end
+											end
+										end
+									end
+								end
+							end)
+							firetouchinterest(Root, Instan.Parent, 0)
+							firetouchinterest(Root, Instan.Parent, 1)
+						end
+					end
+				end
+			end
+		end
+	end)
+end
+
+Notifyclient("gonna ruin this christmas with this one hehe...")
+
+while wait() do
+	getPresentsbecauseufuckyouexploiter()
+end
+
+
