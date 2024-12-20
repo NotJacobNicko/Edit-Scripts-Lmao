@@ -39,7 +39,7 @@ function getPresentsbecauseufuckyouexploiter()
 								table.insert(TagHighligh,Instan.Parent)
 								local Highligh = Instance.new("Highlight",Instan.Parent)
 								Highligh.OutlineColor = Color3.new(1,0,0)
-								task.delay(30,function()
+								task.delay(15,function()
 									if Instan then
 										TouchObj(Instan.Parent)
 									end
