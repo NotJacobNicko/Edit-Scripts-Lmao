@@ -55,7 +55,7 @@ function getPresentsbecauseufuckyouexploiter()
 											local plrroot = Character:FindFirstChild("HumanoidRootPart") or Character:FindFirstChild("Torso")
 											local plrhuman = Character:FindFirstChildWhichIsA("Humanoid")
 											if plrroot and Instan.Parent and not table.find(whitelist,Plrs.Name) and not table.find(Touched,Instan.Parent) then
-												if (plrroot.Position - Instan.Parent.Position).Magnitude < 15+plrhuman.WalkSpeed/3 then
+												if (plrroot.Position - Instan.Parent.Position).Magnitude < 18+plrhuman.WalkSpeed/2 then
 													table.insert(Touched,Instan.Parent)
 													Notifyclient("Nuh Uh "..Plrs.Name)
 													TouchObj(Instan.Parent)
