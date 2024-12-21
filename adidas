@@ -10,7 +10,7 @@ end
 
 local TagHighligh = {}
 local Touched = {}
-local whitelist = {"Egor_KozhoffFake","JennyHenson2","BOIwhatshaun","rzkrd000"}
+local whitelist = {"JennyHenson2","BOIwhatshaun","rzkrd000"}
 
 function TouchObj(Instan)
 	local Limbs = {"Head","Torso","HumanoidRootPart"}
