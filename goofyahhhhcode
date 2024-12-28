@@ -263,11 +263,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	end)
 end)
 local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
-local screenGui = Instance.new("ScreenGui")
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
 
 -- Create a frame for the input GUI
 local inputFrame = Instance.new("Frame")
