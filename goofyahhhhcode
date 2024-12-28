@@ -1,0 +1,346 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+
+-- GUI Elements
+local screenGui = Instance.new("ScreenGui")
+local scrollingFrame = Instance.new("ScrollingFrame")
+local template = Instance.new("TextButton")
+local toggleButton = Instance.new("TextButton")
+local currentAnimationLabel = Instance.new("TextLabel")
+local currentAnimationToggle = Instance.new("TextButton")
+local deleteButton = Instance.new("TextButton")
+local deleteToggle = Instance.new("TextButton")
+local copyIdToggle = Instance.new("TextButton")
+local currentAnimationButton = Instance.new("TextButton")
+
+-- Set up the ScreenGui
+screenGui.Name = "AnimationFinderGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Set up the ScrollingFrame
+scrollingFrame.Name = "ScrollingFrame"
+scrollingFrame.Parent = screenGui
+scrollingFrame.Active = true
+scrollingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+scrollingFrame.BorderSizePixel = 0
+scrollingFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+scrollingFrame.Size = UDim2.new(0, 300, 0, 400)
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.ScrollBarThickness = 10
+scrollingFrame.Visible = false -- Initially hidden
+
+-- Set up the template TextButton
+template.Name = "TemplateButton"
+template.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+template.BorderSizePixel = 0
+template.Size = UDim2.new(1, 0, 0, 30)
+template.Font = Enum.Font.SourceSans
+template.TextColor3 = Color3.fromRGB(255, 255, 255)
+template.TextSize = 14
+template.Text = "Animation ID"
+template.Visible = false -- Hide the template by default
+
+-- Set up the Toggle Button for showing/hiding animations
+toggleButton.Name = "ToggleButton"
+toggleButton.Parent = screenGui
+toggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+toggleButton.BorderSizePixel = 0
+toggleButton.Position = UDim2.new(0.9, -100, 0.1, 0)
+toggleButton.Size = UDim2.new(0, 100, 0, 50)
+toggleButton.Font = Enum.Font.SourceSans
+toggleButton.Text = "Show Animations"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 18
+
+-- Set up the Toggle Button for the current animation label
+currentAnimationToggle.Name = "CurrentAnimationToggle"
+currentAnimationToggle.Parent = screenGui
+currentAnimationToggle.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+currentAnimationToggle.BorderSizePixel = 0
+currentAnimationToggle.Position = UDim2.new(0.1, 0, 0.8, 0)
+currentAnimationToggle.Size = UDim2.new(0, 150, 0, 30)
+currentAnimationToggle.Font = Enum.Font.SourceSans
+currentAnimationToggle.Text = "Toggle Current Animation"
+currentAnimationToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+currentAnimationToggle.TextSize = 14
+
+-- Set up the Current Animation Label
+currentAnimationLabel.Name = "CurrentAnimationLabel"
+currentAnimationLabel.Parent = screenGui
+currentAnimationLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+currentAnimationLabel.BorderSizePixel = 0
+currentAnimationLabel.Position = UDim2.new(0.1, 0, 0.9, -50)
+currentAnimationLabel.Size = UDim2.new(0, 300, 0, 50)
+currentAnimationLabel.Font = Enum.Font.SourceSans
+currentAnimationLabel.Text = "Current Animation: None"
+currentAnimationLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+currentAnimationLabel.TextSize = 18
+
+-- Set up the Current Animation Button
+currentAnimationButton.Name = "CurrentAnimationButton"
+currentAnimationButton.Parent = screenGui
+currentAnimationButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+currentAnimationButton.BorderSizePixel = 0
+currentAnimationButton.Position = UDim2.new(0.1, 0, 0.9, -100)
+currentAnimationButton.Size = UDim2.new(0, 150, 0, 30)
+currentAnimationButton.Font = Enum.Font.SourceSans
+currentAnimationButton.Text = "Copy ID: None"
+currentAnimationButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+currentAnimationButton.TextSize = 14
+
+-- Set up the Copy Animation ID Toggle Button
+copyIdToggle.Name = "CopyIdToggle"
+copyIdToggle.Parent = screenGui
+copyIdToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+copyIdToggle.BorderSizePixel = 0
+copyIdToggle.Position = UDim2.new(0.7, 0, 0.1, 0)
+copyIdToggle.Size = UDim2.new(0, 50, 0, 30)
+copyIdToggle.Font = Enum.Font.SourceSans
+copyIdToggle.Text = "Toggle Copy ID"
+copyIdToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+copyIdToggle.TextSize = 14
+
+-- Set up the Delete Button
+deleteButton.Name = "DeleteButton"
+deleteButton.Parent = screenGui
+deleteButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+deleteButton.BorderSizePixel = 0
+deleteButton.Position = UDim2.new(0.5, -25, 0.2, 0) -- Centered at the top
+deleteButton.Size = UDim2.new(0, 50, 0, 30)
+deleteButton.Font = Enum.Font.SourceSans
+deleteButton.Text = "Delete"
+deleteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+deleteButton.Visible = false -- Initially hidden
+
+-- Set up the Toggle Button for the Delete GUI
+deleteToggle.Name = "DeleteToggle"
+deleteToggle.Parent = screenGui
+deleteToggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+deleteToggle.BorderSizePixel = 0
+deleteToggle.Position = UDim2.new(0.7, 0, 0.2, 0) -- Positioned below the "Copy ID" button
+deleteToggle.Size = UDim2.new(0, 50, 0, 30)
+deleteToggle.Font = Enum.Font.SourceSans
+deleteToggle.Text = "Toggle Delete"
+deleteToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+deleteToggle.TextSize = 14
+
+
+
+-- Function to extract the numeric ID from the AnimationId
+local function getIdFromUrl(url)
+	return url:match("%d+")
+end
+
+-- Function to find all animations in the game
+local function findAnimations()
+	-- Clear existing labels
+	for _, child in pairs(scrollingFrame:GetChildren()) do
+		if child:IsA("TextButton") and child ~= template then
+			child:Destroy()
+		end
+	end
+
+	local labelCounter = 0
+
+	-- Iterate through all objects to find animations
+	for _, object in pairs(workspace:GetDescendants()) do
+		if object:IsA("Animation") then
+			local animationId = getIdFromUrl(object.AnimationId)
+			local newLabel = template:Clone()
+			newLabel.Parent = scrollingFrame
+			newLabel.Text = "Animation ID: " .. animationId
+			newLabel.Visible = true
+			newLabel.Position = UDim2.new(0, 0, 0, labelCounter * 30)
+
+			newLabel.MouseButton1Click:Connect(function()
+				-- Copy animation ID to clipboard
+				local success, message = pcall(function()
+					setclipboard(animationId)
+				end)
+				if success then
+					newLabel.Text = "Copied!"
+					wait(0.8)
+					newLabel.Text = "Animation ID: " .. animationId
+				else
+					print("Failed to copy to clipboard: " .. message)
+				end
+			end)
+
+			labelCounter = labelCounter + 1
+		end
+	end
+
+	-- Adjust ScrollingFrame canvas size to fit all labels
+	scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, labelCounter * 30)
+end
+
+-- Toggle the visibility of the ScrollingFrame
+local function toggleAnimations()
+	scrollingFrame.Visible = not scrollingFrame.Visible
+	toggleButton.Text = scrollingFrame.Visible and "Hide Animations" or "Show Animations"
+
+	-- Call the function to populate the GUI when the button is clicked
+	if scrollingFrame.Visible then
+		findAnimations()
+	end
+end
+
+-- Toggle the visibility of the current animation label
+local function toggleCurrentAnimation()
+	currentAnimationLabel.Visible = not currentAnimationLabel.Visible
+	currentAnimationButton.Visible = not currentAnimationButton.Visible
+end
+
+-- Toggle the visibility of the Copy ID button
+local function toggleCopyIdButton()
+	currentAnimationButton.Visible = not currentAnimationButton.Visible
+end
+
+local function displayCurrentAnimation()
+	pcall(function()
+		local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid and humanoid:FindFirstChildOfClass("Animator") then
+			local tracks = humanoid:FindFirstChildOfClass("Animator"):GetPlayingAnimationTracks()
+			if #tracks > 0 then
+				local currentId = getIdFromUrl(tracks[1].Animation.AnimationId)
+				currentAnimationLabel.Text = "Current Animation: " .. currentId
+				currentAnimationButton.Text = "Copy ID: " .. currentId
+			else
+				currentAnimationLabel.Text = "Current Animation: None"
+				currentAnimationButton.Text = "Copy ID: None"
+			end
+		else
+			currentAnimationLabel.Text = "Current Animation: None"
+			currentAnimationButton.Text = "Copy ID: None"
+		end
+	end)
+end
+
+-- Function to copy the current animation ID to the clipboard
+local function copyCurrentAnimationId()
+	pcall(function()
+		local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		local id = getIdFromUrl(humanoid and humanoid:FindFirstChildOfClass("Animator"):GetPlayingAnimationTracks()[1] and humanoid:FindFirstChildOfClass("Animator"):GetPlayingAnimationTracks()[1].Animation.AnimationId or "")
+		if id and id ~= "" then
+			local success, message = pcall(function()
+				setclipboard(id)
+			end)
+			if success then
+				currentAnimationButton.Text = "Copied!"
+				wait(0.2)
+				displayCurrentAnimation() -- Reset text to current ID after 0.8 seconds
+			else
+				print("Failed to copy to clipboard: " .. message)
+			end
+		end
+	end)
+end
+
+
+-- Connect buttons to functions
+toggleButton.MouseButton1Click:Connect(toggleAnimations)
+currentAnimationToggle.MouseButton1Click:Connect(toggleCurrentAnimation)
+currentAnimationButton.MouseButton1Click:Connect(copyCurrentAnimationId)
+deleteToggle.MouseButton1Click:Connect(function()
+	screenGui:Destroy()
+end)
+copyIdToggle.MouseButton1Click:Connect(toggleCopyIdButton)
+
+-- Update current animation ID continuously
+Players.LocalPlayer.CharacterAdded:Connect(function(char)
+	repeat 
+		wait()
+	until char
+	displayCurrentAnimation()
+end)
+game:GetService("RunService").RenderStepped:Connect(function()
+	task.spawn(function()
+		for i=1,3 do
+			task.defer(displayCurrentAnimation)
+		end
+	end)
+end)
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Create a frame for the input GUI
+local inputFrame = Instance.new("Frame")
+inputFrame.Size = UDim2.new(0, 200, 0, 100)
+inputFrame.Position = UDim2.new(0.1, 0, 0.7, 0) -- Adjust position as needed
+inputFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+inputFrame.Parent = screenGui
+
+-- Make the frame draggable
+inputFrame.Active = true
+inputFrame.Draggable = true
+
+-- Create the text box for entering the animation ID
+local animationIdBox = Instance.new("TextBox")
+animationIdBox.Size = UDim2.new(1, -20, 0, 30)
+animationIdBox.Position = UDim2.new(0, 10, 0, 10)
+animationIdBox.PlaceholderText = "Enter Animation ID"
+animationIdBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+animationIdBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+animationIdBox.Parent = inputFrame
+
+-- Create the "Run" button
+local runButton = Instance.new("TextButton")
+runButton.Size = UDim2.new(1, -20, 0, 30)
+runButton.Position = UDim2.new(0, 10, 0, 50)
+runButton.Text = "Run Animation"
+runButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+runButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+runButton.Parent = inputFrame
+
+-- Create the label for validation messages
+local validationLabel = Instance.new("TextLabel")
+validationLabel.Size = UDim2.new(1, -20, 0, 20)
+validationLabel.Position = UDim2.new(0, 10, 1, -25)
+validationLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+validationLabel.BackgroundTransparency = 1
+validationLabel.Text = ""
+validationLabel.Parent = inputFrame
+
+-- Variables to track the current animation
+local currentTrack = nil
+local isPlaying = false
+
+-- Function to play or stop the animation
+local function toggleAnimation(animationId)
+	local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+	if humanoid and humanoid:FindFirstChildOfClass("Animator") then
+		if isPlaying and currentTrack then
+			currentTrack:Stop()
+			runButton.Text = "Run Animation"
+			runButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+			isPlaying = false
+		else
+			local animation = Instance.new("Animation")
+			animation.AnimationId = "rbxassetid://" .. animationId
+
+			currentTrack = humanoid:FindFirstChildOfClass("Animator"):LoadAnimation(animation)
+			currentTrack:Play()
+			runButton.Text = "Stop Animation"
+			runButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+			isPlaying = true
+		end
+	else
+		warn("Humanoid or Animator not found!")
+	end
+end
+
+runButton.MouseButton1Click:Connect(function()
+	local animationId = animationIdBox.Text
+	if animationId and animationId ~= "" then
+		validationLabel.Text = "" -- Clear any previous validation message
+		toggleAnimation(animationId)
+	else
+		validationLabel.Text = "Please put ID!" -- Show validation message
+	end
+end)
