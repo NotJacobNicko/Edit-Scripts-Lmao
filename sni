@@ -333,8 +333,7 @@ StartButton.MouseButton1Click:Connect(function()
 									end)
 								end
 							else
-								Status("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
-								--print("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
+								Status("token failed",3)
 							end
 						end
 					else
@@ -359,6 +358,7 @@ StartButton.MouseButton1Click:Connect(function()
 
 			-- Player not found
 			if not cursor then
+				warn("stopped due to cursor missing")
 				break
 			end
 		else
