@@ -1,367 +1,375 @@
-repeat
-	wait()
-until game:IsLoaded()
-local h = game:GetService("HttpService")
-local RequestFunction
-local found = true
-if not game:GetService("RunService"):IsStudio() then
-	if syn and syn.request then
-		RequestFunction = syn.request
-	elseif request then
-		RequestFunction = request
-	elseif http and http.request then
-		RequestFunction = http.request
-	elseif http_request then
-		RequestFunction = http_request
+local Screenguini = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local TextLabel_2 = Instance.new("TextLabel")
+local UsernameBox = Instance.new("TextBox")
+local TextLabel_3 = Instance.new("TextLabel")
+local PlaceIdBox = Instance.new("TextBox")
+local StartButton = Instance.new("TextButton")
+local TextLabel_4 = Instance.new("TextLabel")
+local UsernameLabel = Instance.new("TextLabel")
+local TextLabel_5 = Instance.new("TextLabel")
+local UserIdLabel = Instance.new("TextLabel")
+local GamerPicture = Instance.new("ImageLabel")
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+
+Screenguini.Name = HttpService:GenerateGUID(false)
+Screenguini.Parent = game:GetService("CoreGui")
+
+Frame.Parent = Screenguini
+Frame.Active = true
+Frame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+Frame.BorderColor3 = Color3.fromRGB(31, 31, 31)
+Frame.Draggable = true
+Frame.Size = UDim2.new(0, 400, 0, 260)
+
+TextLabel.Parent = Frame
+TextLabel.Active = true
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+TextLabel.BorderColor3 = Color3.fromRGB(31, 31, 40)
+TextLabel.Size = UDim2.new(0, 400, 0, 40)
+TextLabel.Font = Enum.Font.SourceSansLight
+TextLabel.Text = "Synapse X Stream Sniper"
+TextLabel.TextSize = 24.000
+
+TextLabel_2.Parent = Frame
+TextLabel_2.Active = true
+TextLabel_2.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_2.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_2.Position = UDim2.new(0, 10, 0, 49)
+TextLabel_2.Size = UDim2.new(0, 150, 0, 20)
+TextLabel_2.Font = Enum.Font.SourceSansLight
+TextLabel_2.Text = "Username/UserId:"
+TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_2.TextSize = 16.000
+
+UsernameBox.Name = "UsernameBox"
+UsernameBox.Parent = Frame
+UsernameBox.BackgroundColor3 = Color3.fromRGB(61, 61, 61)
+UsernameBox.BorderColor3 = Color3.fromRGB(31, 31, 31)
+UsernameBox.Position = UDim2.new(0, 10, 0, 80)
+UsernameBox.Size = UDim2.new(0, 150, 0, 35)
+UsernameBox.Font = Enum.Font.SourceSansLight
+UsernameBox.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+UsernameBox.PlaceholderText = "Enter Username Here"
+UsernameBox.Text = ""
+UsernameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+UsernameBox.TextSize = 18.000
+
+TextLabel_3.Parent = Frame
+TextLabel_3.Active = true
+TextLabel_3.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_3.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_3.Position = UDim2.new(0, 10, 0, 130)
+TextLabel_3.Size = UDim2.new(0, 150, 0, 20)
+TextLabel_3.Font = Enum.Font.SourceSansLight
+TextLabel_3.Text = "Place Id:"
+TextLabel_3.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_3.TextSize = 16.000
+
+PlaceIdBox.Name = "PlaceIdBox"
+PlaceIdBox.Parent = Frame
+PlaceIdBox.BackgroundColor3 = Color3.fromRGB(61, 61, 61)
+PlaceIdBox.BorderColor3 = Color3.fromRGB(31, 31, 31)
+PlaceIdBox.Position = UDim2.new(0, 10, 0, 157)
+PlaceIdBox.Size = UDim2.new(0, 150, 0, 35)
+PlaceIdBox.Font = Enum.Font.SourceSansLight
+PlaceIdBox.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+PlaceIdBox.PlaceholderText = "Enter PlaceId Here"
+PlaceIdBox.Text = ""
+PlaceIdBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlaceIdBox.TextSize = 18.000
+
+StartButton.Name = "StartButton"
+StartButton.Parent = Frame
+StartButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+StartButton.BorderColor3 = Color3.fromRGB(31, 31, 31)
+StartButton.Position = UDim2.new(0, 10, 0, 210)
+StartButton.Size = UDim2.new(0, 380, 0, 40)
+StartButton.Font = Enum.Font.SourceSansLight
+StartButton.Text = "Start"
+StartButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+StartButton.TextSize = 24.000
+
+TextLabel_4.Parent = Frame
+TextLabel_4.Active = true
+TextLabel_4.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_4.BackgroundTransparency = 1.000
+TextLabel_4.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_4.Position = UDim2.new(0, 200, 0, 49)
+TextLabel_4.Size = UDim2.new(0, 0, 0, 20)
+TextLabel_4.AutomaticSize = Enum.AutomaticSize.X
+TextLabel_4.Font = Enum.Font.SourceSansBold
+TextLabel_4.Text = "Username:"
+TextLabel_4.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_4.TextSize = 16.000
+TextLabel_4.TextWrapped = true
+TextLabel_4.TextXAlignment = Enum.TextXAlignment.Left
+
+UsernameLabel.Name = "UsernameLabel"
+UsernameLabel.Parent = TextLabel_4
+UsernameLabel.Active = true
+UsernameLabel.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+UsernameLabel.BackgroundTransparency = 1.000
+UsernameLabel.BorderColor3 = Color3.fromRGB(31, 31, 31)
+UsernameLabel.Position = UDim2.new(0.5, 0, 0, 0)
+UsernameLabel.Size = UDim2.new(0, 150, 0, 20)
+UsernameLabel.Font = Enum.Font.SourceSansLight
+UsernameLabel.Text = ""
+UsernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UsernameLabel.TextSize = 16.000
+UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+TextLabel_5.Parent = Frame
+TextLabel_5.Active = true
+TextLabel_5.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_5.BackgroundTransparency = 1.000
+TextLabel_5.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_5.Position = UDim2.new(0, 200, 0, 69)
+TextLabel_5.Size = UDim2.new(0, 0, 0, 20)
+TextLabel_5.AutomaticSize = Enum.AutomaticSize.X
+TextLabel_5.Font = Enum.Font.SourceSansBold
+TextLabel_5.Text = "UserId:"
+TextLabel_5.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_5.TextSize = 16.000
+TextLabel_5.TextWrapped = true
+TextLabel_5.TextXAlignment = Enum.TextXAlignment.Left
+
+UserIdLabel.Name = "UserIdLabel"
+UserIdLabel.Parent = TextLabel_5
+UserIdLabel.Active = true
+UserIdLabel.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+UserIdLabel.BackgroundTransparency = 1.000
+UserIdLabel.BorderColor3 = Color3.fromRGB(31, 31, 31)
+UserIdLabel.Position = UDim2.new(0.5, 0, 0, 0)
+UserIdLabel.Size = UDim2.new(0, 150, 0, 20)
+UserIdLabel.Font = Enum.Font.SourceSansLight
+UserIdLabel.Text = ""
+UserIdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UserIdLabel.TextSize = 16.000
+UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+GamerPicture.Name = "GamerPicture"
+GamerPicture.Parent = Frame
+GamerPicture.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+GamerPicture.Position = UDim2.new(0, 200, 0, 95)
+GamerPicture.Size = UDim2.new(0, 97, 0, 97)
+GamerPicture.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+
+if shared.STREAM_SNIPER then
+	shared.STREAM_SNIPER:Destroy()
+end
+shared.STREAM_SNIPER = Screenguini
+
+local searching = false
+local confirm = false
+
+local function HttpGet(url)
+	return pcall(HttpService.JSONDecode, HttpService, game:HttpGet(url))
+end
+
+local function Status(text, tout)
+	StartButton.Text = text
+
+	if tout then
+		task.delay(tout, function()
+			if StartButton.Text == text then
+				searching = false
+				StartButton.Text = "Start"    
+			end
+		end)
 	end
 end
 
-local function Teleport(PlaceId,idk)
-	print(PlaceId.." "..idk)
-	game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceId,idk,game:GetService("Players").LocalPlayer)
+local function getServers(id, cursor)
+	local fullurl = "https://games.roblox.com/v1/games/".. id .."/servers/Public?limit=100"
+	if cursor then
+		fullurl = "&cursor=".. cursor
+	end
+
+	return HttpGet(fullurl)
+end
+
+local function fetchThumbs(tokens)
+	local payload = {
+		Url = "https://thumbnails.roblox.com/v1/batch",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Method = "POST",
+
+		Body = {}
+	}
+
+	for _, token in ipairs(tokens) do
+		table.insert(payload.Body, {
+			requestId = "0:".. token ..":AvatarHeadshot:150x150:png:regular",
+			type = "AvatarHeadShot",
+			targetId = 0,
+			token = token,
+			format = "png",
+			size = "150x150"
+		})
+	end
+
+	payload.Body = HttpService:JSONEncode(payload.Body)
+	local result = syn.request(payload)
+	local s, data = pcall(HttpService.JSONDecode, HttpService, result.Body)
+	return s, data and data.data or data
+end
+
+local function teleport(placeId, guid)
+	TeleportService:TeleportToPlaceInstance(placeId, guid)
 end
 
 
-local screenGui = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer.PlayerGui)
-screenGui.Name = "StreamSniper"
-screenGui.IgnoreGuiInset = true
+local threads = 30
 
-local TBox1 = Instance.new("TextBox", screenGui)
-TBox1.Size = UDim2.new(0.1, 0, 0.1, 0)
-TBox1.Position = UDim2.new(0.8, 0, 0.3, 0)
-TBox1.Text = ""
-TBox1.PlaceholderColor3 = Color3.new(1, 1, 0)
-TBox1.TextColor3 = Color3.new(1, 1, 0)
-TBox1.BackgroundColor3 = Color3.new(0, 0, 0)
-TBox1.BorderColor3 = Color3.new(0, 0, 0)
+StartButton.MouseButton1Click:Connect(function()
+	if confirm then
+		confirm = false
+		searching = false
+		Status("Cancelled")
+		return
+	end
 
-local TBox2 = Instance.new("TextBox", screenGui)
-TBox2.Size = UDim2.new(0.1, 0, 0.1, 0)
-TBox2.Position = UDim2.new(0.9, 0, 0.3, 0)
-TBox2.Text = ""
-TBox2.PlaceholderColor3 = Color3.new(1, 1, 0)
-TBox2.TextColor3 = Color3.new(1, 1, 0)
-TBox2.BackgroundColor3 = Color3.new(0, 0, 0)
-TBox2.BorderColor3 = Color3.new(0, 0, 0)
-
-TBox1.TextScaled = true
-TBox2.TextScaled = true
-TBox1.PlaceholderText = "PlaceId"
-TBox2.PlaceholderText = "Player Name/ID"
-
-local TButton = Instance.new("TextButton", screenGui)
-TButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-TButton.Position = UDim2.new(0.8, 0, 0.4, 0)
-TButton.Text = "Find"
-TButton.TextScaled = true
-TButton.TextColor3 = Color3.new(1, 1, 0)
-TButton.BackgroundColor3 = Color3.new(0, 0, 0)
-TButton.BorderColor3 = Color3.new(0, 0, 0)
-
-function runScript(placeId, user)
-	spawn(function()
-		local timecount = tick()
-
-		if _G.available == nil then
-			_G.available = true
-		end
-
-		local function round(num)
-			return tostring(math.floor(num * 100 + 0.5) / 100)
-		end
-
-		local function checktokens(tokens)
-			local payload = {
-				Url = "https://thumbnails.roblox.com/v1/batch",
-				Headers = {
-					["Content-Type"] = "application/json"
-				},
-				Method = "POST",
-				Body = {}
-			}
-
-			for i, v in pairs(tokens) do
-				table.insert(
-					payload.Body,
-					{
-						requestId = "0:" .. v[3] .. ":AvatarHeadshot:150x150:png:regular",
-						type = "AvatarHeadShot",
-						targetId = 0,
-						token = v[3],
-						format = "png",
-						size = "150x150"
-					}
-				)
+	if searching then
+		confirm = true
+		local old = StartButton.Text
+		Status("Click again to confirm.")
+		task.delay(5, function()
+			if "Click again to confirm." == StartButton.Text then
+				confirm = false
+				StartButton.Text = old
 			end
-			payload.Body = h:JSONEncode(payload.Body)
-			local result = RequestFunction(payload)
-			local s, data = pcall(h.JSONDecode, h, result.Body)
-			return data.data
-		end
+		end)
+		return
+	end
 
-		local function json2()
-			repeat
-				spawn(function()
-					found = false
-					if #_G.token >= 1 then
-						if #_G.token > 100 then
-							local tab = {}
-							for i = 1, 100 do
-								table.insert(tab, _G.token[i])
-								table.insert(_G.playertoken, _G.token[i])
-								table.remove(_G.token, i)
-							end
-							local leymans = checktokens(tab)
-							if leymans then
-								for i, v in pairs(leymans) do
-									if v.imageUrl == _G.image then
-										local id = string.sub(v.requestId, 3, #v.requestId - 35)
-										for a, b in pairs(_G.playertoken) do
-											if b[3] == id then
-												if not found then
-													found = true
-													_G.available = true
-													TButton.Text = "Teleporting to: " .. _G.plrname
-													local ye,yea = pcall(function()
-														Teleport(b[1],b[2])
-													end)
-													if yea then
-														TButton.Text = "Failed To Teleport Due to Restriction"
-													end
-												end
-												return
-											end
-										end
-									end
-								end
-							end
-						elseif #_G.token <= 100 then
-							local tab2 = {}
-							for i, v in pairs(_G.token) do
-								table.insert(tab2, _G.token[i])
-								table.insert(_G.playertoken, _G.token[i])
-								table.remove(_G.token, i)
-							end
-							local video = checktokens(tab2)
-							if video then
-								for i, v in pairs(video) do
-									if v.imageUrl == _G.image then
-										local id = string.sub(v.requestId, 3, #v.requestId - 35)
-										for a, b in pairs(_G.playertoken) do
-											if b[3] == id then
-												if not found then
-													found = true
-													_G.available = true
-													TButton.Text = "Teleporting to: " .. _G.plrname
-													local ye,yea = pcall(function()
-														Teleport(b[1],b[2])
-													end)
-													if yea then
-														TButton.Text = "Failed To Teleport Due to Restriction"
-													end
-												end
-											end
-										end
-									end
-								end
-							end
-							wait(1.5)
-							TButton.Text = game:GetService("Players"):GetNameFromUserIdAsync(_G.plr) .. " not found"
-						end
-					end
-				end)
-				local ti = tick()
-				repeat
-					game.RunService.RenderStepped:Wait()
-				until tick() - ti > 0.015
-			until #_G.token == 0
-			_G.available = true
-		end
+	searching = true
 
-		local function playertoken(gameid, target)
-			_G.token = {}
-			_G.playertoken = {}
-			_G.logged = false
-			local id, b, found, ended, page, cursor, link, tokencount =nil,false,false,false,nil,nil,nil,nil
-			local suc, err =
-				pcall(
-					function()
-						if _G.cursor[tostring(gameid)] and _G.available then
-							_G.available = false
-							if tonumber(target) then
-								_G.plrname = game:GetService("Players"):GetNameFromUserIdAsync(tonumber(target))
-							else
-								_G.plrname = target
-								target = game:GetService("Players"):GetUserIdFromNameAsync(target)
-							end
+	-- User ID
+	Status("Getting user id...")
 
-							_G.plr = target
+	local checkplr, Username, UserId = pcall(function()
+		local userId = tonumber(UsernameBox.Text) or Players:GetUserIdFromNameAsync(UsernameBox.Text)
+		local username = Players:GetNameFromUserIdAsync(userId)
 
-							local url = RequestFunction({
-								["Url"] = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" ..target .. "&format=Png&size=150x150&isCircular=false",
-								["Method"] = "GET"
-
-							})
-							_G.image = h:JSONDecode(url.Body).data[1].imageUrl
-
-							if string.sub(_G.image, 10, 10) ~= "r" then
-								TButton.Text = "Broken pfp"
-								return
-							end
-							TButton.Text = "Searching: " .. gameid
-							local a = {}
-
-							for i = 1, #_G.cursor[tostring(gameid)] + 1 do
-								if i > 1 then
-									a[i] = _G.cursor[tostring(gameid)][i - 1]
-								else
-									a[i] = ""
-								end
-							end
-							local num
-							local waittime
-							for i, v in ipairs(a) do
-								spawn(function()
-									if waittime then
-										wait(1 / 3.2)
-										waittime = false
-									end
-									a[i] = RequestFunction({
-										["Url"] = "https://games.roblox.com/v1/games/" ..gameid .."/servers/0?excludeFullGames=false&limit=100&cursor=" ..a[i],
-										["Method"] = "GET"
-									})
-									a[i] = h:JSONDecode(a[i].Body).data
-									if a[i] then
-										if not a[i][100] then
-											b = true
-											num = i
-										end
-									end
-								end)
-								if b then
-									b = false
-									waittime = false
-									break
-								end
-								wait(1 / 3.2)
-							end
-							if num == nil then
-								num = #a
-							end
-
-							local function check(c)
-								for i = 1, c do
-									if type(a[i]) == "table" then
-									else
-										return false
-									end
-								end
-								return true
-							end
-
-							repeat
-								game:GetService("RunService").RenderStepped:Wait()
-							until check(num)
-
-							for i, v in pairs(a) do
-								if i <= num then
-									for i2, v2 in pairs(v) do
-										for i3, v3 in pairs(v2.playerTokens) do
-											table.insert(_G.token, {gameid, v2.id, v3})
-										end
-									end
-								end
-							end
-
-							TButton.Text = "Sending JSON..."
-							json2()
-						elseif not _G.cursor[tostring(gameid)] and _G.available then
-							_G.available = false
-							if tonumber(target) then
-								_G.plrname = game:GetService("Players"):GetNameFromUserIdAsync(tonumber(target))
-							else
-								_G.plrname = target
-								target = game:GetService("Players"):GetUserIdFromNameAsync(target)
-							end
-
-							_G.plr = target
-							local url = RequestFunction({
-								["Url"] = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. target .. "&format=Png&size=150x150&isCircular=false",
-								["Method"] = "GET"
-							})
-							_G.image = h:JSONDecode(url.Body).data[1].imageUrl
-							if string.sub(_G.image, 10, 10) ~= "r" then
-								TButton.Text = "Broken pfp"
-								return
-							end
-
-							TButton.Text = "Searching: " .. gameid
-							local function s(g)
-								link = "https://games.roblox.com/v1/games/" ..g .. "/servers/0?excludeFullGames=false&limit=100"
-								if cursor then
-									link = link .. "&cursor=" .. cursor
-									page = game:HttpGet(link)
-									page = h:JSONDecode(page)
-									cursor = page.nextPageCursor
-									page = page.data
-								else
-									page = game:HttpGet(link)
-									page = h:JSONDecode(page)
-									cursor = page.nextPageCursor
-									page = page.data
-								end
-							end
-
-							local tokencount = 0
-
-							local function t()
-								for i, v in pairs(page) do
-									for i2, v2 in pairs(v["playerTokens"]) do
-										tokencount = tokencount + 1
-										table.insert(_G.token, {gameid, v.id, v2})
-									end
-								end
-							end
-
-							repeat
-								s(gameid)
-								t()
-							until cursor == nil
-
-							if tokencount == 0 then
-								TButton.Text = "The game has no players"
-								_G.available = true
-								return
-							end
-
-							TButton.Text = "Sending JSON..."
-							json2()
-						elseif not _G.available then
-							TButton.Text = "Reached Http Request Limit"
-						end
-					end)
-			if not suc then
-				_G.available = true
-			end
-		end
-
-		playertoken(placeId, user)
+		return username, userId
 	end)
-end
 
-game:GetService("UserInputService").InputBegan:Connect(function(a, b)
-	if not b then
-		local keycode = a.KeyCode
-		if keycode == Enum.KeyCode.RightShift then
-			--game.CoreGui.StreamSniper.Enabled = not game.CoreGui.StreamSniper.Enabled
-		end
+	if not checkplr then
+		return Status("Username or UserId does not exist!", 3)
 	end
-end)
 
-TButton.MouseButton1Click:Connect(function()
-	local t1 = TBox1.Text
-	local t2 = TBox2.Text
-	
-	
-	runScript(game.PlaceId, 312160553, nil)
+	local er, thumbUrl = pcall(Players.GetUserThumbnailAsync, Players, UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
+
+	UsernameLabel.Text = Username
+	UserIdLabel.Text = UserId
+	GamerPicture.Image = er and thumbUrl or ""
+
+	Status("Getting user's thumbnail...")
+	local isreal, response = HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. UserId .. "&format=Png&size=150x150&isCircular=false")
+	local thumbnail = isreal and response['data'][1].imageUrl
+
+	Status("Searching for (".. UserId ..")")
+
+	-- Place ID
+	Status("Getting place id...")
+
+	local placeId = tonumber(PlaceIdBox.Text)
+
+	if PlaceIdBox.Text:gsub("%s", "") == "" then
+		placeId = game.PlaceId
+
+	elseif not placeId then
+		Status("Invalid place id", 3)
+		return
+	end
+
+	Status("Searching...")
+	local cursor = nil
+	local searched = 0
+	local maxSearchs = 0
+	local players = 0
+	-- Server search
+	while searching do
+		if not Screenguini or not Screenguini.Parent then
+			break
+		end
+		local ServerNo, result = getServers(placeId, cursor)
+
+		if ServerNo then
+			local servers = result.data
+			cursor = result.nextPageCursor
+
+			if StartButton.Text:match("Searching") then
+				maxSearchs = maxSearchs + #servers
+				Status(searched .."/".. maxSearchs .." servers scanned, players found: ".. players)
+			end
+
+			-- Search all servers
+			for index, server in ipairs(servers) do
+				local function fetchServer()
+					local plrno, thumbs = fetchThumbs(server.playerTokens)
+					if plrno then
+						players = players + #thumbs
+						for _, playerThumb in ipairs(thumbs) do
+							if playerThumb.imageUrl then
+								if playerThumb.imageUrl == thumbnail then
+									searching = false
+									Status("Found player, teleporting...")
+
+									teleport(placeId, server.id)
+									local try = 0
+									Player.OnTeleport:Connect(function(teleportState)
+										if teleportState == Enum.TeleportState.Failed then
+											try = try + 1
+											Status("Teleport failed, try #".. try)
+											teleport(placeId, server.id)
+										end
+									end)
+								end
+							else
+								Status("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
+								--print("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
+							end
+						end
+					else
+						Status("token failed", isreal)
+						--print("token failed", s, thumbs)
+					end
+				end
+				
+				searched = searched + 1
+				if index % threads ~= 0 then
+					task.spawn(fetchServer)
+					task.wait()
+
+				else
+					fetchServer()
+				end
+
+				if searching then
+					Status(searched .."/".. maxSearchs .." servers scanned, players found: ".. players)
+				end
+			end
+
+			-- Player not found
+			if not cursor then
+				break
+			end
+		else
+			Status("Failed to find servers retrying", 3)
+		end
+
+		task.wait()
+	end
+
+	if searching then
+		Status("Failed to find ".. Username ..", maybe in a vip server", 3)
+	end
 end)
