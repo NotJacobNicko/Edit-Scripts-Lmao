@@ -216,8 +216,7 @@ local function fetchThumbs(tokens)
 	end
 
 	payload.Body = HttpService:JSONEncode(payload.Body)
-	local result = syn.request(payload)
-	local s, data = pcall(HttpService.JSONDecode, HttpService, result.Body)
+	local s, data = pcall(HttpService.JSONDecode, HttpService, payload.Body)
 	return s, data and data.data or data
 end
 
@@ -343,7 +342,7 @@ StartButton.MouseButton1Click:Connect(function()
 						--print("token failed", s, thumbs)
 					end
 				end
-				
+
 				searched = searched + 1
 				if index % threads ~= 0 then
 					task.spawn(fetchServer)
