@@ -30,12 +30,15 @@ function TouchObj(Instan)
 	firetouchinterest(Root, Instan, 0)
 	firetouchinterest(Root, Instan , 1)
 end
+local IsFound = false
 local CollectCoins = function()
 	task.spawn(function()
 		if not CoinFolder then
 			for i,fol in pairs(workspace:GetDescendants()) do
 				if fol:IsA("Model") and fol.Name == "CoinContainer" and fol:FindFirstChild("Coin_Server") then
 					if isAcoin(fol:FindFirstChild("Coin_Server") or fol:FindFirstChildWhichIsA("Part")) then
+						warn("Found Folder")
+						IsFound = true
 						CoinFolder = fol
 						break
 					else
@@ -54,7 +57,10 @@ local CollectCoins = function()
 				end)
 			end
 		else
-			print("not found")
+			if IsFound then
+				IsFound = false
+				warn("Folder Not Found")
+			end
 		end
 	end)
 end
