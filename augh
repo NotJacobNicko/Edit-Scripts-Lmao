@@ -28,15 +28,15 @@ function TouchObj(Instan)
 	firetouchinterest(Root, Instan, 0)
 	firetouchinterest(Root, Instan , 1)
 end
-local IsFound = true
+local SelectedTable = {}
 local CollectCoins = function()
 	task.spawn(function()
-		if not CoinFolder then
+		if not CoinFolder or CoinFolder == nil then
 			for i,fol in pairs(workspace:GetDescendants()) do
-				if fol:IsA("Model") and fol.Name == "CoinContainer" and fol:FindFirstChild("Coin_Server") then
+				print("OK")
+				if fol:IsA("Model") and fol.Name == "CoinContainer" then
 					if isAcoin(fol:FindFirstChild("Coin_Server") or fol:FindFirstChildWhichIsA("Part")) then
 						warn("Found Folder")
-						IsFound = true
 						CoinFolder = fol
 						break
 					else
@@ -50,18 +50,16 @@ local CollectCoins = function()
 			for i,coins in CoinFolder:GetChildren() do
 				task.spawn(function()
 					if coins:IsA("BasePart") and isAcoin(coins) then
-						print("grabbing coins")
 						TouchObj(coins)
-					else
-						print("false coins")
+						if table.find(SelectedTable,coins) then
+							table.insert(SelectedTable,coins)
+							Instance.new("Highlight",coins).OutlineColor = Color3.new(1, 0.933333, 0)
+						end
 					end
 				end)
 			end
 		else
-			if IsFound then
-				IsFound = false
-				warn("Folder Not Found")
-			end
+			warn("Folder Not Found")
 		end
 	end)
 end
