@@ -8,25 +8,27 @@ function isAcoin(sample)
 	end
 end
 function TouchObj(Instan)
-	local R6Limbs = {"Head","Torso","HumanoidRootPart"}
-	local R15Limbs = {"Head","UpperTorso","LowerTorso","HumanoidRootPart"}
 	local char = game:GetService("Players").LocalPlayer.Character
 	if not char then
 		return
 	end
 	local Root = nil
-	local Selected = R6Limbs[math.random(1,#R6Limbs)]
-	if char:FindFirstChild(Selected) then
-		Root = char:FindFirstChild(Selected)
-	else
-		Root = char:FindFirstChild(R15Limbs[math.random(1,#R15Limbs)]) or char:FindFirstChild("Head")
+	local Limbs = {}
+	
+	for i,part in pairs(char:GetChildren()) do
+		if part:IsA("BasePart") then
+			table.insert(Limbs,part)
+		end
 	end
+	
+	Root = Limbs[math.random(1,#Limbs)] or char:FindFirstChild("Head")
+	
 	if not Root then
 		warn("Root not Found")
 		return
 	end
-	firetouchinterest(Root, Instan, 0)
-	firetouchinterest(Root, Instan , 1)
+	firetouchinterest(Root,Instan,0)
+	firetouchinterest(Root,Instan,1)
 end
 local SelectedTable = {}
 local CollectCoins = function()
@@ -45,16 +47,10 @@ local CollectCoins = function()
 			for i,touchtrans in CoinFolder:GetDescendants() do
 				task.spawn(function()
 					if touchtrans:IsA("TouchTransmitter") and touchtrans.Parent:IsA("BasePart") then
-						if not table.find(SelectedTable,touchtrans) then
-							table.insert(SelectedTable,touchtrans)
-							Instance.new("Highlight",touchtrans.Parent).OutlineColor = Color3.new(1, 0.933333, 0)
-						end
 						local Coin = touchtrans.Parent
-						if game:GetService("Players").LocalPlayer.Character then
-							if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-								game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Anchored = true
-							end
-							game:GetService("Players").LocalPlayer.Character:PivotTo(Coin.CFrame)
+						if not table.find(SelectedTable,Coin) then
+							table.insert(SelectedTable,Coin)
+							Instance.new("Highlight",Coin).OutlineColor = Color3.new(1, 0.933333, 0)
 						end
 						TouchObj(Coin)
 					end
@@ -64,8 +60,6 @@ local CollectCoins = function()
 	end)
 end
 warn("Collecting coins lmao")
-local Con
-
 workspace.DescendantAdded:Connect(function(isn) 
 	if isAcoin(isn) then
 		TouchObj(isn)
