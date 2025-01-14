@@ -1,7 +1,7 @@
 local CoinFolder = nil
---istg if this shit did not update
+
 function isAcoin(sample)
-	if sample and sample:IsA("BasePart") and sample.Size == Vector3.new(2,2,1) and sample:FindFirstChildWhichIsA("TouchTransmitter") then
+	if sample and sample:IsA("BasePart") and sample.Size == Vector3.new(2,2,1) and sample:FindFirstChildWhichIsA("TouchTransmitter") and sample:FindFirstChild("CoinVisual") then
 		return true
 	else
 		return false
@@ -33,14 +33,9 @@ local CollectCoins = function()
 	task.spawn(function()
 		if not CoinFolder or CoinFolder == nil then
 			for i,fol in pairs(workspace:GetDescendants()) do
-				if fol:IsA("Model") and fol.Name == "CoinContainer" then
-					if isAcoin(fol:FindFirstChild("Coin_Server") or fol:FindFirstChildWhichIsA("Part")) then
-						warn("Found Folder")
-						CoinFolder = fol
-						break
-					else
-						warn("folder is made to be fake!")
-					end
+				if fol:IsA("Model") and fol.Name == "CoinContainer" and #fol:GetChildren() > 2 then
+					CoinFolder = fol
+					break
 				end
 			end
 		end
@@ -49,30 +44,25 @@ local CollectCoins = function()
 			for i,coins in CoinFolder:GetChildren() do
 				task.spawn(function()
 					if coins:IsA("BasePart") and isAcoin(coins) then
-						TouchObj(coins)
-						if table.find(SelectedTable,coins) then
-							table.insert(SelectedTable,coins)
+						if not table.find(SelectedTable,coins) then
+							table.insert(SelectedTable,coins:FindFirstChildWhichIsA("BasePart"))
 							Instance.new("Highlight",coins).OutlineColor = Color3.new(1, 0.933333, 0)
 						end
+						TouchObj(coins)
 					end
 				end)
 			end
-		else
-			warn("Folder Not Found")
 		end
 	end)
 end
 warn("Collecting coins lmao")
 local Con
-while wait() do
-	
-	if CoinFolder and not Con then
-		Con = CoinFolder.DescendantAdded:Connect(function(isn) 
-			if isAcoin(isn) then
-				CollectCoins()
-			end
-		end)
+
+workspace.DescendantAdded:Connect(function(isn) 
+	if isAcoin(isn) then
+		TouchObj(isn)
 	end
-	
+end)
+while wait() do
 	CollectCoins()
 end
