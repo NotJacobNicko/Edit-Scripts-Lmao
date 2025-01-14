@@ -35,10 +35,12 @@ local CollectCoins = function()
 	task.spawn(function()
 		if not CoinFolder then
 			for i,fol in pairs(workspace:GetDescendants()) do
-				if fol:IsA("Model") and fol.Name == "Coins" and fol:FindFirstChild("Coin_Server") then
-					if isAcoin(fol:FindFirstChild("Coin_Server")) then
+				if fol:IsA("Model") and fol.Name == "CoinContainer" and fol:FindFirstChild("Coin_Server") then
+					if isAcoin(fol:FindFirstChild("Coin_Server") or fol:FindFirstChildWhichIsA("Part")) then
 						CoinFolder = fol
 						break
+					else
+						warn("folder is made to be fake!")
 					end
 				end
 			end
@@ -48,7 +50,7 @@ local CollectCoins = function()
 			for i,coins in CoinFolder:GetChildren() do
 				task.spawn(function()
 					if isAcoin(coins) then
-
+						TouchObj(coins)
 					end
 				end)
 			end
