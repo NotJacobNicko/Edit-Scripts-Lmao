@@ -54,7 +54,7 @@ local CollectCoins = function()
 							if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
 								game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Anchored = true
 							end
-							game:GetService("Players").LocalPlayer.Character:MoveTo(Coin.Position)
+							game:GetService("Players").LocalPlayer.Character:PivotTo(Coin.CFrame)
 						end
 						TouchObj(Coin)
 					end
