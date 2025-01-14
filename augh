@@ -37,7 +37,7 @@ local CollectCoins = function()
 			for i,fol in pairs(workspace:GetDescendants()) do
 				if fol:IsA("Model") and fol.Name == "CoinContainer" and fol:FindFirstChild("Coin_Server") then
 					if isAcoin(fol:FindFirstChild("Coin_Server") or fol:FindFirstChildWhichIsA("Part")) then
-						warn("Found Folder")
+						warn("Found Folder At Map")
 						IsFound = true
 						CoinFolder = fol
 						break
