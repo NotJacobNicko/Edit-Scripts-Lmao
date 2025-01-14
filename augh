@@ -31,7 +31,7 @@ end
 local SelectedTable = {}
 local CollectCoins = function()
 	task.spawn(function()
-		if not CoinFolder or CoinFolder == nil then
+		if CoinFolder == nil or not CoinFolder then
 			for i,fol in pairs(workspace:GetDescendants()) do
 				if fol:IsA("Model") and fol.Name == "CoinContainer" and #fol:GetChildren() > 2 then
 					warn("found")
@@ -49,9 +49,11 @@ local CollectCoins = function()
 							table.insert(SelectedTable,touchtrans)
 							Instance.new("Highlight",touchtrans.Parent).OutlineColor = Color3.new(1, 0.933333, 0)
 						end
-						print("requesting touch")
 						local Coin = touchtrans.Parent
 						if game:GetService("Players").LocalPlayer.Character then
+							if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+								game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Anchored = true
+							end
 							game:GetService("Players").LocalPlayer.Character:MoveTo(Coin.Position)
 						end
 						TouchObj(Coin)
