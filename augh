@@ -34,6 +34,7 @@ local CollectCoins = function()
 		if not CoinFolder or CoinFolder == nil then
 			for i,fol in pairs(workspace:GetDescendants()) do
 				if fol:IsA("Model") and fol.Name == "CoinContainer" and #fol:GetChildren() > 2 then
+					warn("found")
 					CoinFolder = fol
 					break
 				end
@@ -41,14 +42,19 @@ local CollectCoins = function()
 		end
 
 		if CoinFolder then
-			for i,coins in CoinFolder:GetChildren() do
+			for i,touchtrans in CoinFolder:GetDescendants() do
 				task.spawn(function()
-					if coins:IsA("BasePart") and isAcoin(coins) then
-						if not table.find(SelectedTable,coins) then
-							table.insert(SelectedTable,coins:FindFirstChildWhichIsA("BasePart"))
-							Instance.new("Highlight",coins).OutlineColor = Color3.new(1, 0.933333, 0)
+					if touchtrans:IsA("TouchTransmitter") and touchtrans.Parent:IsA("BasePart") then
+						if not table.find(SelectedTable,touchtrans) then
+							table.insert(SelectedTable,touchtrans)
+							Instance.new("Highlight",touchtrans.Parent).OutlineColor = Color3.new(1, 0.933333, 0)
 						end
-						TouchObj(coins)
+						print("requesting touch")
+						local Coin = touchtrans.Parent
+						if game:GetService("Players").LocalPlayer.Character then
+							game:GetService("Players").LocalPlayer.Character:MoveTo(Coin.Position)
+						end
+						TouchObj(Coin)
 					end
 				end)
 			end
