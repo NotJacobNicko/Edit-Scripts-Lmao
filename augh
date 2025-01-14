@@ -63,9 +63,16 @@ local CollectCoins = function()
 	end)
 end
 warn("Collecting coins lmao")
-
-
-
+local Con
 while wait() do
+	
+	if CoinFolder and not Con then
+		Con = CoinFolder.DescendantAdded:Connect(function(isn) 
+			if isAcoin(isn) then
+				CollectCoins()
+			end
+		end)
+	end
+	
 	CollectCoins()
 end
