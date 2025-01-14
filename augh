@@ -11,7 +11,9 @@ function TouchObj(Instan)
 	local R6Limbs = {"Head","Torso","HumanoidRootPart"}
 	local R15Limbs = {"Head","UpperTorso","LowerTorso","HumanoidRootPart"}
 	local char = game:GetService("Players").LocalPlayer.Character
-
+	if not char then
+		return
+	end
 	local Root = nil
 	local Selected = R6Limbs[math.random(1,#R6Limbs)]
 	if char:FindFirstChild(Selected) then
@@ -19,18 +21,14 @@ function TouchObj(Instan)
 	else
 		Root = char:FindFirstChild(R15Limbs[math.random(1,#R15Limbs)]) or char:FindFirstChild("Head")
 	end
-	
-	
-	
-	
 	if not Root then
-		print("Root not Found")
+		warn("Root not Found")
 		return
 	end
 	firetouchinterest(Root, Instan, 0)
 	firetouchinterest(Root, Instan , 1)
 end
-local IsFound = false
+local IsFound = true
 local CollectCoins = function()
 	task.spawn(function()
 		if not CoinFolder then
@@ -51,8 +49,11 @@ local CollectCoins = function()
 		if CoinFolder then
 			for i,coins in CoinFolder:GetChildren() do
 				task.spawn(function()
-					if isAcoin(coins) then
+					if coins:IsA("BasePart") and isAcoin(coins) then
+						print("grabbing coins")
 						TouchObj(coins)
+					else
+						print("false coins")
 					end
 				end)
 			end
@@ -65,6 +66,9 @@ local CollectCoins = function()
 	end)
 end
 warn("Collecting coins lmao")
+
+
+
 while wait() do
 	CollectCoins()
 end
