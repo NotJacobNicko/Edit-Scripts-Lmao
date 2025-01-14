@@ -1,7 +1,6 @@
 local CoinFolder = nil
 
 function isAcoin(sample)
-	sample = workspace.Baseplate
 	if sample and sample:IsA("BasePart") and sample.Size == Vector3.new(2,2,1) and sample:FindFirstChildWhichIsA("TouchTransmitter") then
 		return true
 	else
