@@ -33,7 +33,6 @@ local CollectCoins = function()
 	task.spawn(function()
 		if not CoinFolder or CoinFolder == nil then
 			for i,fol in pairs(workspace:GetDescendants()) do
-				print("OK")
 				if fol:IsA("Model") and fol.Name == "CoinContainer" then
 					if isAcoin(fol:FindFirstChild("Coin_Server") or fol:FindFirstChildWhichIsA("Part")) then
 						warn("Found Folder")
