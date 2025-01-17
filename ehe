@@ -1,0 +1,127 @@
+local Plr = game:GetService("Players").LocalPlayer
+local Mouse = Plr:GetMouse()
+local ISStudio = game:GetService("RunService"):IsStudio()
+function randomstring()
+	local e = {}
+	for i = 1,math.random(5,50) do
+		table.insert(e,utf8.char(math.random(10,100)))
+	end
+	return table.concat(e)
+end
+local GUI = Instance.new("ScreenGui")
+if not ISStudio then
+	GUI.Parent = game:GetService("CoreGui")
+else
+	GUI.Parent = Plr.PlayerGui
+end
+GUI.Name = randomstring()
+GUI.ResetOnSpawn = false
+GUI.IgnoreGuiInset = true
+local button1 = Instance.new("TextButton",GUI)
+button1.Name = randomstring()
+button1.Size = UDim2.new(0,60,0,20)
+button1.BackgroundColor3 = Color3.new(1, 0, 0)
+button1.Position = UDim2.new(0.467, 0,0.728, 0)
+button1.Text = "Exposer"
+button1.Visible = true
+
+local canselect = false
+
+
+local Selectedpart = nil
+local Connection = {}
+local hightlights,highplaceholder = {},{}
+local selected = nil
+button1.MouseButton1Click:Connect(function()
+	if not canselect then
+		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
+		canselect = true
+	else
+		button1.BackgroundColor3 = Color3.new(1, 0, 0)
+		canselect = false
+		
+		if Selectedpart then
+			if selected then
+				selected:Destroy()
+			end
+			for i,v in highplaceholder do
+				if v then
+					v:Destroy()
+				end
+			end
+			for i,Parts in pairs(workspace:GetDescendants()) do
+				task.spawn(function()
+					if Parts:IsA("BasePart") and Parts.ClassName == Selectedpart.ClassName and Parts.Size == Selectedpart.Size then
+						local Con 
+						Con = Parts.Changed:Connect(function()
+							if not Parts.CanCollide or Parts.Parent == nil then
+								local Highlight = Instance.new("Highlight",Parts)
+								table.insert(hightlights,Highlight)
+								Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+								Highlight.OutlineColor = Color3.new(1, 0, 0)
+								Highlight.FillColor = Color3.new(1, 0, 0)
+								Highlight.FillTransparency = 0.7
+								Con:Disconnect()
+							end
+						end)
+						table.insert(Connection,Con)
+					end
+				end)
+			end
+		end
+		
+		
+	end
+end)
+
+Mouse.Button1Down:Connect(function()
+	local Target = Mouse.Target
+	if Target and Target:IsA("BasePart") and canselect then
+		if Selectedpart then
+			Selectedpart:Destroy()
+			if selected then
+				selected:Destroy()
+			end
+			task.spawn(function()
+				for i,v in Connection do
+					if v then
+						v:Disconnect()
+					end
+				end
+			end)
+			task.spawn(function()
+				for i,v in hightlights do
+					if v then
+						v:Destroy()
+					end
+				end
+			end)
+		end
+		button1.Text = "selected"
+		task.delay(2,function()
+			button1.Text = "exposer"
+		end)
+		
+		
+		selected = Instance.new("Highlight",Target)
+		selected.OutlineColor = Color3.new(0.301961, 1, 0)
+		selected.FillColor = Color3.new(1, 0, 0)
+		selected.FillTransparency = 0.7
+		Selectedpart = Target:Clone()
+		Selectedpart.Parent = nil
+		
+		for i,Parts in pairs(workspace:GetDescendants()) do
+			task.spawn(function()
+				if Parts:IsA("BasePart") and Parts.ClassName == Target.ClassName and Parts.Size == Target.Size then
+					local selected1 = Instance.new("Highlight",Parts)
+					table.insert(highplaceholder,selected1)
+					selected1.OutlineColor = Color3.new(0.301961, 1, 0)
+					selected1.FillColor = Color3.new(1, 0, 0)
+					selected1.FillTransparency = 0.7
+				end
+			end)
+		end
+		
+		
+	end
+end)
