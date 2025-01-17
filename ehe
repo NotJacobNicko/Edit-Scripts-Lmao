@@ -39,7 +39,7 @@ button1.MouseButton1Click:Connect(function()
 	else
 		button1.BackgroundColor3 = Color3.new(1, 0, 0)
 		canselect = false
-		
+
 		if Selectedpart then
 			if selected then
 				selected:Destroy()
@@ -55,6 +55,7 @@ button1.MouseButton1Click:Connect(function()
 						local Con 
 						Con = Parts.Changed:Connect(function()
 							if not Parts.CanCollide or Parts.Parent == nil then
+								Parts.Transparency = 0
 								local Highlight = Instance.new("Highlight",Parts)
 								table.insert(hightlights,Highlight)
 								Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
@@ -69,8 +70,8 @@ button1.MouseButton1Click:Connect(function()
 				end)
 			end
 		end
-		
-		
+
+
 	end
 end)
 
@@ -101,18 +102,19 @@ Mouse.Button1Down:Connect(function()
 		task.delay(2,function()
 			button1.Text = "exposer"
 		end)
-		
-		
+
+
 		selected = Instance.new("Highlight",Target)
 		selected.OutlineColor = Color3.new(0.301961, 1, 0)
 		selected.FillColor = Color3.new(1, 0, 0)
 		selected.FillTransparency = 0.7
 		Selectedpart = Target:Clone()
 		Selectedpart.Parent = nil
-		
+		Selectedpart.Transparency = 0
 		for i,Parts in pairs(workspace:GetDescendants()) do
 			task.spawn(function()
 				if Parts:IsA("BasePart") and Parts.ClassName == Target.ClassName and Parts.Size == Target.Size then
+					Parts.Transparency = 0
 					local selected1 = Instance.new("Highlight",Parts)
 					table.insert(highplaceholder,selected1)
 					selected1.OutlineColor = Color3.new(0.301961, 1, 0)
@@ -121,7 +123,7 @@ Mouse.Button1Down:Connect(function()
 				end
 			end)
 		end
-		
-		
+
+
 	end
 end)
