@@ -83,6 +83,11 @@ Mouse.Button1Down:Connect(function()
 			if selected then
 				selected:Destroy()
 			end
+			for i,v in highplaceholder do
+				if v then
+					v:Destroy()
+				end
+			end
 			task.spawn(function()
 				for i,v in Connection do
 					if v then
