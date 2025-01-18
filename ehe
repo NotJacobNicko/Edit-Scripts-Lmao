@@ -74,6 +74,9 @@ button1.MouseButton1Click:Connect(function()
 							if base and base.Parent:FindFirstChildWhichIsA("Humanoid") and onceeee then
 								onceeee = false
 								Parts.Material = Enum.Material.Glass
+								if not Parts.CanCollide or Parts.Parent == nil then
+									return
+								end
 								Highlight = Instance.new("Highlight",Parts)
 								table.insert(hightlights,Highlight)
 								Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
