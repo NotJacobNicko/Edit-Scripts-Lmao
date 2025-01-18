@@ -59,11 +59,15 @@ task.spawn(function()
 						if base and base.Parent:FindFirstChildWhichIsA("Humanoid") and onceeee then
 							onceeee = false
 							Parts.Material = Enum.Material.Glass
-							wait(.2)
+							wait(.3)
 							onceeee = true
 							if not Parts.CanCollide or Parts.Parent == nil then
 								return
 							else
+								if not Highlight then
+									Highlight = Instance.new("Highlight",Parts)
+									table.insert(hightlights,Highlight)
+								end
 								if Highlight then
 									Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
 									Highlight.OutlineColor = Color3.new(0, 1, 0)
