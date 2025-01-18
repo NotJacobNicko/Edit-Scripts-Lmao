@@ -1,6 +1,6 @@
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
 local Window = OrionLib:MakeWindow({IntroText = "Slap Battles 👏", IntroIcon = "rbxassetid://15315284749",Name = ("skillhub"),IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = true, ConfigFolder = "slap battles"})
-
+local GloveExtendOption,SlappleFarm 
 local Tab7 = Window:MakeTab({
 	Name = "Home",
 	Icon = "rbxassetid://4370318685",
@@ -35,6 +35,7 @@ Tab7:AddToggle({
 					objs.CanTouch = false
 				end
 			end
+			task.wait()
 		end
 	end    
 })
@@ -54,18 +55,6 @@ Tab7:AddToggle({
 			end
 			task.wait()
 		end
-	end    
-})
-Tab7:AddSlider({
-	Name = "Reach HitBox",
-	Min = 2,
-	Max = 30,
-	Default = 15,
-	Color = Color3.fromRGB(255,255,255),
-	Increment = 1,
-	ValueName = "Reach",
-	Callback = function(Value)
-		_G.ReachHitbox = Value
 	end    
 })
 
@@ -94,50 +83,16 @@ Tab7:AddToggle({
 	end    
 })
 
-Tab7:AddToggle({
-	Name = "ESP Kill",
-	Default = false,
+Tab7:AddSlider({
+	Name = "Reach HitBox",
+	Min = 2,
+	Max = 30,
+	Default = 15,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	ValueName = "Reach",
 	Callback = function(Value)
-		_G.KillESP = Value
-		if _G.KillESP == false then
-			for i, v in ipairs(game.Players:GetChildren()) do
-				if v.Character and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("KillESP") then
-					v.Character.Head.KillESP:Destroy()
-				end
-			end
-		end
-		while _G.KillESP do
-			for i,v in ipairs(game.Players:GetChildren()) do
-				if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("KillstreakLevel") then
-					if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.TextColor3 ~= _G.ColorESP then
-						v.Character.Head.KillESP.TextLabel.TextColor3 = _G.ColorESP
-					end
-					if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.Text ~= "Kill [ "..v.Character.KillstreakLevel.Value.." ]" then
-						if v.Character:FindFirstChild("KillstreakLevel") and v.Character.KillstreakLevel.Value ~= 0 then
-							v.Character.Head.KillESP.TextLabel.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
-						end
-					end
-					if v.Character:FindFirstChild("KillstreakLevel") and v.Character.Head:FindFirstChild("KillESP") == nil then
-						KillESP = Instance.new("BillboardGui", v.Character.Head)
-						KillESP.Adornee = v.Character.Head
-						KillESP.Name = "KillESP"
-						KillESP.Size = UDim2.new(0, 100, 0, 150)
-						KillESP.StudsOffset = Vector3.new(0, 1, 0)
-						KillESP.AlwaysOnTop = true
-						KillESP.StudsOffset = Vector3.new(0, 3, 0)
-						KillESPText = Instance.new("TextLabel", KillESP)
-						KillESPText.BackgroundTransparency = 1
-						KillESPText.Size = UDim2.new(0, 100, 0, 100)
-						KillESPText.TextSize = 20
-						KillESPText.Font = Enum.Font.FredokaOne
-						KillESPText.TextColor3 = _G.ColorESP
-						KillESPText.TextStrokeTransparency = 0.5
-						KillESPText.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
-					end
-				end
-			end
-			task.wait()
-		end
+		_G.ReachHitbox = Value
 	end    
 })
 Tab7:AddSlider({
@@ -229,6 +184,52 @@ Tab7:AddToggle({
 					end
 				end
 			end
+		end
+	end    
+})
+Tab7:AddToggle({
+	Name = "ESP Kill",
+	Default = false,
+	Callback = function(Value)
+		_G.KillESP = Value
+		if _G.KillESP == false then
+			for i, v in ipairs(game.Players:GetChildren()) do
+				if v.Character and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("KillESP") then
+					v.Character.Head.KillESP:Destroy()
+				end
+			end
+		end
+		while _G.KillESP do
+			for i,v in ipairs(game.Players:GetChildren()) do
+				if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("KillstreakLevel") then
+					if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.TextColor3 ~= _G.ColorESP then
+						v.Character.Head.KillESP.TextLabel.TextColor3 = _G.ColorESP
+					end
+					if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.Text ~= "Kill [ "..v.Character.KillstreakLevel.Value.." ]" then
+						if v.Character:FindFirstChild("KillstreakLevel") and v.Character.KillstreakLevel.Value ~= 0 then
+							v.Character.Head.KillESP.TextLabel.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
+						end
+					end
+					if v.Character:FindFirstChild("KillstreakLevel") and v.Character.Head:FindFirstChild("KillESP") == nil then
+						local KillESP = Instance.new("BillboardGui", v.Character.Head)
+						KillESP.Adornee = v.Character.Head
+						KillESP.Name = "KillESP"
+						KillESP.Size = UDim2.new(0, 100, 0, 150)
+						KillESP.StudsOffset = Vector3.new(0, 1, 0)
+						KillESP.AlwaysOnTop = true
+						KillESP.StudsOffset = Vector3.new(0, 3, 0)
+						local KillESPText = Instance.new("TextLabel", KillESP)
+						KillESPText.BackgroundTransparency = 1
+						KillESPText.Size = UDim2.new(0, 100, 0, 100)
+						KillESPText.TextSize = 20
+						KillESPText.Font = Enum.Font.FredokaOne
+						KillESPText.TextColor3 = _G.ColorESP
+						KillESPText.TextStrokeTransparency = 0.5
+						KillESPText.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
+					end
+				end
+			end
+			task.wait()
 		end
 	end    
 })
