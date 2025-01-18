@@ -74,8 +74,17 @@ button1.MouseButton1Click:Connect(function()
 							if base and base.Parent:FindFirstChildWhichIsA("Humanoid") and onceeee then
 								onceeee = false
 								Parts.Material = Enum.Material.Glass
+								wait(.2)
 								if not Parts.CanCollide or Parts.Parent == nil then
 									return
+								else
+									if Highlight then
+										Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+										Highlight.OutlineColor = Color3.new(0, 1, 0)
+										Highlight.FillColor = Color3.new(0, 1, 0)
+										Highlight.FillTransparency = 0.7
+										return
+									end
 								end
 								Highlight = Instance.new("Highlight",Parts)
 								table.insert(hightlights,Highlight)
@@ -83,7 +92,7 @@ button1.MouseButton1Click:Connect(function()
 								Highlight.OutlineColor = Color3.new(0, 1, 0)
 								Highlight.FillColor = Color3.new(0, 1, 0)
 								Highlight.FillTransparency = 0.7
-								Touchy:Disconnect()
+								onceeee = true
 							end
 						end)			
 						
