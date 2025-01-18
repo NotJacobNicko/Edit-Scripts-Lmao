@@ -30,30 +30,17 @@ local canselect = false
 
 local Selectedpart = nil
 local Connection = {}
-local hightlights,highplaceholder = {},{}
+local hightlights,highplaceholder,AllSelectedParts = {},{},{}
 local selected = nil
-button1.MouseButton1Click:Connect(function()
-	if not canselect then
-		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
-		canselect = true
-	else
-		button1.BackgroundColor3 = Color3.new(1, 0, 0)
-		canselect = false
-
-		if Selectedpart then
-			if selected then
-				selected:Destroy()
-			end
-			for i,v in highplaceholder do
-				if v then
-					v:Destroy()
-				end
-			end
+task.spawn(function()
+	while wait() do
+		if not canselect and Selectedpart then
 			for i,Parts in pairs(workspace:GetDescendants()) do
 				task.spawn(function()
-					if Parts:IsA("BasePart") and Parts.ClassName == Selectedpart.ClassName and Parts.Size == Selectedpart.Size then
+					if Parts:IsA("BasePart") and not table.find(AllSelectedParts,Parts) and Parts.ClassName == Selectedpart.ClassName and Parts.Size == Selectedpart.Size then
+						table.insert(AllSelectedParts,Parts)
 						local Con,Touchy 
-						
+
 						local Highlight = nil
 						Con = Parts.Changed:Connect(function()
 							if not Parts.CanCollide or Parts.Parent == nil then
@@ -66,7 +53,6 @@ button1.MouseButton1Click:Connect(function()
 								Highlight.OutlineColor = Color3.new(1, 0, 0)
 								Highlight.FillColor = Color3.new(1, 0, 0)
 								Highlight.FillTransparency = 0.7
-								Con:Disconnect()
 							end
 						end)
 						local onceeee = true
@@ -75,6 +61,7 @@ button1.MouseButton1Click:Connect(function()
 								onceeee = false
 								Parts.Material = Enum.Material.Glass
 								wait(.2)
+								onceeee = true
 								if not Parts.CanCollide or Parts.Parent == nil then
 									return
 								else
@@ -92,18 +79,35 @@ button1.MouseButton1Click:Connect(function()
 								Highlight.OutlineColor = Color3.new(0, 1, 0)
 								Highlight.FillColor = Color3.new(0, 1, 0)
 								Highlight.FillTransparency = 0.7
-								onceeee = true
 							end
 						end)			
-						
+
 						table.insert(Connection,Touchy)
 						table.insert(Connection,Con)
 					end
 				end)
 			end
 		end
-
-
+	end
+end)
+button1.MouseButton1Click:Connect(function()
+	if not canselect then
+		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
+		canselect = true
+	else
+		if Selectedpart then
+			AllSelectedParts = {}
+			if selected then
+				selected:Destroy()
+			end
+			for i,v in highplaceholder do
+				if v then
+					v:Destroy()
+				end
+			end
+		end
+		button1.BackgroundColor3 = Color3.new(1, 0, 0)
+		canselect = false
 	end
 end)
 
@@ -115,6 +119,7 @@ Mouse.Button1Down:Connect(function()
 			if selected then
 				selected:Destroy()
 			end
+			AllSelectedParts = {}
 			for i,v in highplaceholder do
 				if v then
 					v:Destroy()
