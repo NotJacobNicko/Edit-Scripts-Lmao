@@ -36,56 +36,55 @@ task.spawn(function()
 	while wait() do
 		if not canselect and Selectedpart then
 			for i,Parts in pairs(workspace:GetDescendants()) do
-				task.spawn(function()
-					if Parts:IsA("BasePart") and not table.find(AllSelectedParts,Parts) and Parts.ClassName == Selectedpart.ClassName and Parts.Size == Selectedpart.Size then
-						table.insert(AllSelectedParts,Parts)
-						local Con,Touchy 
+				if Parts:IsA("BasePart") and not table.find(AllSelectedParts,Parts) and Parts.ClassName == Selectedpart.ClassName and Parts.Size == Selectedpart.Size then
+					table.insert(AllSelectedParts,Parts)
+					local Con,Touchy 
 
-						local Highlight = nil
-						Con = Parts.Changed:Connect(function()
-							if not Parts.CanCollide or Parts.Parent == nil then
-								Parts.Material = Enum.Material.Glass
-								if not Highlight then
-									Highlight = Instance.new("Highlight",Parts)
-									table.insert(hightlights,Highlight)
-								end
-								Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
-								Highlight.OutlineColor = Color3.new(1, 0, 0)
-								Highlight.FillColor = Color3.new(1, 0, 0)
-								Highlight.FillTransparency = 0.7
-							end
-						end)
-						local onceeee = true
-						Touchy = Parts.Touched:Connect(function(base)		
-							if base and base.Parent:FindFirstChildWhichIsA("Humanoid") and onceeee then
-								onceeee = false
-								Parts.Material = Enum.Material.Glass
-								wait(.2)
-								onceeee = true
-								if not Parts.CanCollide or Parts.Parent == nil then
-									return
-								else
-									if Highlight then
-										Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
-										Highlight.OutlineColor = Color3.new(0, 1, 0)
-										Highlight.FillColor = Color3.new(0, 1, 0)
-										Highlight.FillTransparency = 0.7
-										return
-									end
-								end
+					local Highlight = nil
+					Con = Parts.Changed:Connect(function()
+						if not Parts.CanCollide or Parts.Parent == nil then
+							Parts.Material = Enum.Material.Glass
+							if not Highlight then
 								Highlight = Instance.new("Highlight",Parts)
 								table.insert(hightlights,Highlight)
-								Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
-								Highlight.OutlineColor = Color3.new(0, 1, 0)
-								Highlight.FillColor = Color3.new(0, 1, 0)
-								Highlight.FillTransparency = 0.7
 							end
-						end)			
+							Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+							Highlight.OutlineColor = Color3.new(1, 0, 0)
+							Highlight.FillColor = Color3.new(1, 0, 0)
+							Highlight.FillTransparency = 0.7
+						end
+					end)
+					local onceeee = true
+					Touchy = Parts.Touched:Connect(function(base)		
+						if base and base.Parent:FindFirstChildWhichIsA("Humanoid") and onceeee then
+							onceeee = false
+							Parts.Material = Enum.Material.Glass
+							wait(.2)
+							onceeee = true
+							if not Parts.CanCollide or Parts.Parent == nil then
+								return
+							else
+								if Highlight then
+									Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+									Highlight.OutlineColor = Color3.new(0, 1, 0)
+									Highlight.FillColor = Color3.new(0, 1, 0)
+									Highlight.FillTransparency = 0.7
+									return
+								end
+							end
+							Highlight = Instance.new("Highlight",Parts)
+							table.insert(hightlights,Highlight)
+							Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+							Highlight.OutlineColor = Color3.new(0, 1, 0)
+							Highlight.FillColor = Color3.new(0, 1, 0)
+							Highlight.FillTransparency = 0.7
+						end
+					end)			
 
-						table.insert(Connection,Touchy)
-						table.insert(Connection,Con)
-					end
-				end)
+					table.insert(Connection,Touchy)
+					table.insert(Connection,Con)
+				end
+				
 			end
 		end
 	end
