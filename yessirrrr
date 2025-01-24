@@ -450,6 +450,9 @@ Tab7:AddToggle({
 							elseif _G.GloveExtendOption == "Slight Extend" then
 								Glove.Size = Vector3.new(3, 3, 3.7)
 							end
+							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
+								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
+							end
 							Glove.Transparency = 0.5
 						end
 					end
@@ -463,7 +466,7 @@ Tab7:AddToggle({
 					if v:IsA("Tool") and v.Name ~= "Radio" then
 						local Glove = v:FindFirstChild("Glove")
 						if Glove ~= nil then
-							Glove.Size = Vector3.new(2.5, 2.5, 1.7)
+							Glove.Size = Vector3.new(2.5, 2.5, 1.75)
 							Glove.Transparency = 0
 							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
 								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
@@ -476,7 +479,7 @@ Tab7:AddToggle({
 					if v:IsA("Tool") and v.Name ~= "Radio" then
 						local Glove = v:FindFirstChild("Glove")
 						if Glove ~= nil then
-							Glove.Size = Vector3.new(2.5, 2.5, 1.7)
+							Glove.Size = Vector3.new(2.5, 2.5, 1.75)
 							Glove.Transparency = 0
 							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
 								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
