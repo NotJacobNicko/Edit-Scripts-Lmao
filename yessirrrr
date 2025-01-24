@@ -751,7 +751,8 @@ Tab2:AddToggle({
 	Name = "No Lighting",
 	Default = false,
 	Callback = function(Value)
-		while Value do
+		_G.ByeLighting = Value
+		while _G.ByeLighting do
 			task.wait()
 			local Lighting = game:GetService("Lighting")
 
@@ -766,9 +767,10 @@ Tab2:AddToggle({
 			Lighting.ShadowSoftness = .2
 			Lighting.ClockTime = 12
 			Lighting.GeographicLatitude = 0
+			Lighting.ExposureCompensation = 0
 			Lighting.FogColor = Color3.fromRGB(255, 255, 255)
 			Lighting.FogStart = math.huge
-			Lighting.FogEnd = math.huge
+			Lighting.FogEnd = 0
 			for i,v in pairs(Lighting:GetDescendants()) do
 				if v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
 					v.Enabled = false
@@ -889,9 +891,6 @@ Tab2:AddToggle({
 		end
 	end    
 })
-
-
-
 
 wait(.5)
 for i,v in ShouldEnable do
