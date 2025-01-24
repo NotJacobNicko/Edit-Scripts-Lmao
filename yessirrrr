@@ -769,8 +769,8 @@ Tab2:AddToggle({
 			Lighting.GeographicLatitude = 0
 			Lighting.ExposureCompensation = 0
 			Lighting.FogColor = Color3.fromRGB(255, 255, 255)
-			Lighting.FogStart = math.huge
-			Lighting.FogEnd = 0
+			Lighting.FogStart = 0
+			Lighting.FogEnd = math.huge
 			for i,v in pairs(Lighting:GetDescendants()) do
 				if v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
 					v.Enabled = false
@@ -874,7 +874,7 @@ Tab2:AddToggle({
 						end
 					elseif _G.TypesOfragdoll == "fake lag" and not table.find(Tagged,RagdollValue) then
 						table.insert(Tagged,RagdollValue)
-						if math.random(1,10) == 1 then
+						if math.random(1,5) == 1 then
 							repeat task.wait()
 								if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
 									game:GetService("Players").LocalPlayer.Character.Torso.Anchored = true
@@ -891,6 +891,9 @@ Tab2:AddToggle({
 		end
 	end    
 })
+
+
+
 
 wait(.5)
 for i,v in ShouldEnable do
