@@ -330,8 +330,10 @@ Tab7:AddButton({
 	Name = "Enable PVP",
 	Callback = function()
 		for i,v in ShouldEnable do
-			pcall(function()
-				v:Set(true)
+			task.spawn(function()
+				pcall(function()
+					v:Set(true)
+				end)
 			end)
 		end
 	end    
@@ -662,8 +664,8 @@ Tab2:AddToggle({
 	Name = "Kick When Staff Joins",
 	Default = false,
 	Callback = function(Value)
-		_G.AntiMods1 = Value
-		while _G.AntiMods1 do
+		_G.KickWhenStaffJoins = Value
+		while _G.KickWhenStaffJoins do
 			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 				if v:GetRankInGroup(9950771) >= 2 then
 					_G.AntiKick = false
@@ -697,12 +699,10 @@ Tab2:AddToggle({
 })
 Tab2:AddToggle({
 	Name = "No ScreenBlind",
-	Default = true,
+	Default = false,
 	Callback = function(Value)
-		if not Value then
-			game:GetService("Players").LocalPlayer.PlayerGui.SquidInk.Enabled = true
-		end
-		while Value do
+		_G.FRICKYOUBLIND = Value
+		while _G.FRICKYOUBLIND do
 			if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("SquidInk") then
 				game:GetService("Players").LocalPlayer.PlayerGui.SquidInk.Enabled = false
 			end
@@ -810,21 +810,46 @@ Tab2:AddToggle({
 	end    
 })
 
+Tab2:AddDropdown({
+	Name = "RagdollType",
+	Default = "random",
+	Options = {"always","fake lag"},
+	Callback = function(Value)
+		_G.TypesOfragdoll = Value
+	end    
+})
+local Tagged = {}
 Tab2:AddToggle({
 	Name = "Anti Ragdoll",
 	Default = false,
 	Callback = function(Value)
 		_G.AntiRagdoll = Value
 		while _G.AntiRagdoll do
-			if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ragdolled") then
-				if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ragdolled") and game:GetService("Players").LocalPlayer.Character:WaitForChild("Ragdolled").Value == true then
-					repeat task.wait()
+			if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") and RagdollValue then
+				local RagdollValue =  game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ragdolled")
+				if RagdollValue and RagdollValue.Value == true then
+					
+					if _G.TypesOfragdoll == "always" then
+						repeat task.wait()
+							if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
+								game:GetService("Players").LocalPlayer.Character.Torso.Anchored = true
+							end
+						until RagdollValue and RagdollValue.Value == false
 						if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
-							game:GetService("Players").LocalPlayer.Character.Torso.Anchored = true
+							game:GetService("Players").LocalPlayer.Character.Torso.Anchored = false
 						end
-					until game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ragdolled") and game:GetService("Players").LocalPlayer.Character:WaitForChild("Ragdolled").Value == false
-					if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
-						game:GetService("Players").LocalPlayer.Character.Torso.Anchored = false
+					elseif _G.TypesOfragdoll == "fake lag" and not table.find(Tagged,RagdollValue) then
+						table.insert(Tagged,RagdollValue)
+						if math.random(1,10) == 1 then
+							repeat task.wait()
+								if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
+									game:GetService("Players").LocalPlayer.Character.Torso.Anchored = true
+								end
+							until RagdollValue and RagdollValue.Value == false
+							if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
+								game:GetService("Players").LocalPlayer.Character.Torso.Anchored = false
+							end
+						end
 					end
 				end
 			end
