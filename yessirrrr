@@ -2,7 +2,6 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 repeat wait() until game:GetService("Players").LocalPlayer
-wait(3)
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
