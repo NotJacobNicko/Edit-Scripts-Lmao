@@ -1,7 +1,8 @@
 if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
-game:GetService("GuiService"):ClearError()
+repeat wait() until game:GetService("Players").LocalPlayer
+wait(3)
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
@@ -482,7 +483,46 @@ table.insert(ShouldEnable,Tab7:AddToggle({
 		end
 	end    
 }))
+Tab7:AddButton({
+	Name = "ServerHop",
+	Callback = function()
+		local teleportFunc = queueonteleport or queue_on_teleport
+		if teleportFunc then
+			teleportFunc([[
+        		if not game:IsLoaded() then
+				game.Loaded:Wait()
+			end
+			repeat wait() until game.Players.LocalPlayer
+			wait(3)
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/refs/heads/main/yessirrrr"))()
+    		]])
+			local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+			if httprequest then
+				local servers = {}
+				local req = httprequest({Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true", PlaceId)})
+				local body = game:GetService("HttpService"):JSONDecode(req.Body)
 
+				if body and body.data then
+					for i, v in next, body.data do
+						if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
+							table.insert(servers, 1, v.id)
+						end
+					end
+				end
+
+				if #servers > 0 then
+					game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], Players.LocalPlayer)
+				else
+					Notifyclient("Couldn't find a server.")
+					return 
+				end
+			else
+				Notifyclient("Your exploit does not support this command (missing request)")
+			end
+
+		end
+	end    
+})
 
 if game.PlaceId == 11520107397 then
 	Tab7:AddColorpicker({
@@ -618,15 +658,13 @@ game:GetService("Players").PlayerAdded:Connect(function(v)
 end)
 Tab2:AddToggle({
 	Name = "Notify High Rank",
-	Default = true,
+	Default = false,
 	Callback = function(Value)
 		_G.AntiMods = Value  
-		if not _G.AntiMods then
-			TaggedTable = {}
-		end
+		TaggedTable = {}
 		while _G.AntiMods do
-			for i,v in pairs(game:GetService("Players"):GetChildren()) do
-				if v:GetRankInGroup(9950771) >= 2 then
+			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+				if v and v:GetRankInGroup(9950771) >= 2 then
 					if v.Character.Head:FindFirstChild("AdminTagger") == nil then
 						KillESP = Instance.new("BillboardGui", v.Character.Head)
 						KillESP.Adornee = v.Character.Head
