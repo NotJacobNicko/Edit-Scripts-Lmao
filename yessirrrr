@@ -652,6 +652,7 @@ table.insert(ShouldEnable,Tab2:AddToggle({
 		while _G.AntiMods do
 			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 				if v and v:GetRankInGroup(9950771) >= 2 then
+					
 					if v.Character.Head:FindFirstChild("AdminTagger") == nil then
 						KillESP = Instance.new("BillboardGui", v.Character.Head)
 						KillESP.Adornee = v.Character.Head
@@ -669,17 +670,21 @@ table.insert(ShouldEnable,Tab2:AddToggle({
 						KillESPText.TextStrokeTransparency = 0.5
 						KillESPText.Text = "![Admin]!"
 					end
-					if not table.find(TaggedTable,v) then
-						table.insert(TaggedTable,v)
-						local InfoPlayer = {
-							["PlrName"] = v.Name,
-							["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
-							["Role"] = v:GetRoleInGroup(9950771) or "??"
-						}
+					
+					
+					task.spawn(function()
+						if not table.find(TaggedTable,v) then
+							table.insert(TaggedTable,v)
+							local InfoPlayer = {
+								["PlrName"] = v.Name,
+								["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
+								["Role"] = v:GetRoleInGroup(9950771) or "??"
+							}
 
-						Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Is In The Server.")
-						_G.SlappleFarm = false
-					end
+							Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Is In The Server.")
+							_G.SlappleFarm = false
+						end
+					end)
 				end
 			end
 			task.wait()
