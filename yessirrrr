@@ -337,12 +337,16 @@ Tab7:AddToggle({
 		end
 	end    
 })
+local ShouldEnable = {}
 Tab7:AddToggle({
 	Name = "Enable PVP",
 	Default = false,
 	Callback = function(Value)
-		_G.HitboxPlayer = Value
-		_G.GloveExtendGet = Value
+		for i,v in ShouldEnable do
+			pcall(function()
+				v:Set(Value)
+			end)
+		end
 	end    
 })
 Tab7:AddSlider({
@@ -357,8 +361,7 @@ Tab7:AddSlider({
 		_G.ReachHitbox = Value
 	end    
 })
-
-Tab7:AddToggle({
+table.insert(ShouldEnable,Tab7:AddToggle({
 	Name = "Hitbox Player",
 	Default = false,
 	Callback = function(Value)
@@ -381,7 +384,7 @@ Tab7:AddToggle({
 			end
 		end
 	end    
-})
+}))
 
 Tab7:AddSlider({
 	Name = "Extend Glove",
@@ -404,8 +407,7 @@ Tab7:AddDropdown({
 		_G.GloveExtendOption = Value
 	end    
 })
-
-Tab7:AddToggle({
+table.insert(ShouldEnable,Tab7:AddToggle({
 	Name = "Extend Glove",
 	Default = false,
 	Callback = function(Value)
@@ -490,7 +492,7 @@ Tab7:AddToggle({
 			end
 		end
 	end    
-})
+}))
 
 
 if game.PlaceId == 11520107397 then
@@ -596,7 +598,7 @@ Tab2:AddToggle({
 })
 local TaggedTable = {}
 game:GetService("Players").PlayerAdded:Connect(function(v)
-	if v:GetRankInGroup(9950771) >= 2 and _G.AntiMods then
+	if (v:GetRankInGroup(9950771) >= 2) and _G.AntiMods then
 		if v.Character.Head:FindFirstChild("AdminTagger") == nil then
 			KillESP = Instance.new("BillboardGui", v.Character.Head)
 			KillESP.Adornee = v.Character.Head
@@ -614,7 +616,14 @@ game:GetService("Players").PlayerAdded:Connect(function(v)
 			KillESPText.TextStrokeTransparency = 0.5
 			KillESPText.Text = "![Admin]!"
 		end
-		Notifyclient("Staff Member Joined "..v.Name..`({v.DisplayName})`)
+		
+		local InfoPlayer = {
+			["PlrName"] = v.Name.."{@"..v.DisplayName.."}",
+			["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
+			["Role"] = v:GetRoleInGroup(9950771) or "??"
+		}
+		
+		Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Joined The Server.")
 		_G.SlappleFarm = false
 	end
 end)
@@ -627,7 +636,7 @@ Tab2:AddToggle({
 			TaggedTable = {}
 		end
 		while _G.AntiMods do
-			for i,v in pairs(game.Players:GetChildren()) do
+			for i,v in pairs(game:GetService("Players"):GetChildren()) do
 				if v:GetRankInGroup(9950771) >= 2 then
 					if v.Character.Head:FindFirstChild("AdminTagger") == nil then
 						KillESP = Instance.new("BillboardGui", v.Character.Head)
@@ -646,6 +655,38 @@ Tab2:AddToggle({
 						KillESPText.TextStrokeTransparency = 0.5
 						KillESPText.Text = "![Admin]!"
 					end
+					if not table.find(TaggedTable,v) then
+						local InfoPlayer = {
+							["PlrName"] = v.Name.."{@"..v.DisplayName.."}",
+							["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
+							["Role"] = v:GetRoleInGroup(9950771) or "??"
+						}
+
+						Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Joined The Server.")
+						_G.SlappleFarm = false
+					end
+				end
+			end
+			task.wait()
+		end
+	end    
+})
+Tab2:AddToggle({
+	Name = "Kick When Staff Joins",
+	Default = false,
+	Callback = function(Value)
+		_G.AntiMods = Value
+		while _G.AntiMods do
+			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+				if v:GetRankInGroup(9950771) >= 2 then
+					_G.AntiKick = false
+					local InfoPlayer = {
+						["PlrName"] = v.Name.."{@"..v.DisplayName.."}",
+						["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
+						["Role"] = v:GetRoleInGroup(9950771) or "??"
+					}
+					game:GetService("Players").LocalPlayer:Kick("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Joined The Server.")
+					break
 				end
 			end
 			task.wait()
@@ -667,7 +708,58 @@ Tab2:AddToggle({
 		end
 	end    
 })
+Tab2:AddToggle({
+	Name = "No ScreenBlind",
+	Default = false,
+	Callback = function(Value)
+		if not Value then
+			game:GetService("Players").PlayerGui.SquidInk.Enabled = true
+		end
+		while Value do
+			if game:GetService("Players").PlayerGui:FindFirstChild("SquidInk") then
+				game:GetService("Players").PlayerGui.SquidInk.Enabled = false
+			end
+			if game:GetService("Players").LocalPlayer.Character:FindFirstChild("YouHaveGotMail") then
+				game:GetService("Players").LocalPlayer.Character.YouHaveGotMail.Disabled = true
+			end
+			if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("MittenBlind") then
+				game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("MittenBlind"):Destroy()
+			end
+			task.wait()
+		end
+	end    
+})
+Tab2:AddToggle({
+	Name = "No Lighting",
+	Default = false,
+	Callback = function(Value)
+		while Value do
+			local Lighting = game:GetService("Lighting")
 
+			Lighting.Ambient = Color3.fromRGB(70, 70, 70)
+			Lighting.Brightness = 3
+			Lighting.ColorShift_Top = Color3.new(0, 0, 0)
+			Lighting.ColorShift_Bottom = Color3.new(0, 0, 0)
+			Lighting.EnvironmentDiffuseScale = 1
+			Lighting.EnvironmentSpecularScale = 1
+			Lighting.GlobalShadows = true
+			Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
+			Lighting.ShadowSoftness = .2
+			Lighting.ClockTime = 12
+			Lighting.GeographicLatitude = 0
+			Lighting.FogColor = Color3.fromRGB(255, 255, 255)
+			Lighting.FogStart = math.huge
+			Lighting.FogEnd = math.huge
+			for i,v in pairs(Lighting:GetDescendants()) do
+				if v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
+					v.Enabled = false
+				else
+					v.Parent = nil
+				end
+			end
+		end
+	end    
+})
 Tab2:AddToggle({
 	Name = "Anti Afk",
 	Default = true,
@@ -753,55 +845,3 @@ Tab2:AddToggle({
 		end
 	end    
 })
-
---------------------------------------------------------
-if gethui():FindFirstChild("Orion") and game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("ToggleUi") == nil then
-	local TOGGLE = {}
-	TOGGLE["Ui"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer.PlayerGui)
-	TOGGLE["DaIcon"] = Instance.new("ImageButton", TOGGLE["Ui"])
-	TOGGLE["das"] = Instance.new("UICorner", TOGGLE["DaIcon"])
-
-	TOGGLE["Ui"].Name = "ToggleUi"
-	TOGGLE["Ui"].ResetOnSpawn = false
-
-	TOGGLE["DaIcon"].Size = UDim2.new(0,45,0,45)
-	TOGGLE["DaIcon"].Position = UDim2.new(0,0,0,0)
-	TOGGLE["DaIcon"].Draggable = true
-	TOGGLE["DaIcon"].Image = "rbxassetid://15315284749"
-	TOGGLE["DaIcon"].BackgroundColor3 = Color3.fromRGB(255, 186, 117)
-	TOGGLE["DaIcon"].BorderColor3 = Color3.fromRGB(255, 186, 117)
-	task.spawn(function()
-		while true do
-			for i = 0, 255, 4 do
-				TOGGLE["DaIcon"].BorderColor3 = Color3.fromHSV(i/256, 1, 1)
-				TOGGLE["DaIcon"].BackgroundColor3 = Color3.fromHSV(i/256, .5, .8)
-				wait()
-			end
-		end
-	end)
-	TOGGLE["DaIcon"].MouseButton1Click:Connect(function()
-		if gethui():FindFirstChild("Orion") then
-			for i,v in pairs(gethui():GetChildren()) do
-				if v.Name == "Orion" then
-					v.Enabled = not v.Enabled
-				end
-			end
-		end
-	end)
-	TOGGLE["das"]["CornerRadius"] = UDim.new(0.20000000298023224, 0)
-end 
-------------------------------------------------------------------------
-if gethui():FindFirstChild("Orion") then
-	for _, i in pairs(gethui():GetChildren()) do
-		if i.Name == "Orion" then
-			for i,v in pairs(i:GetDescendants()) do
-				if v.ClassName == "Frame" and v.BackgroundTransparency < 0.3 then
-					v.BackgroundTransparency = 0.2
-				end
-			end
-		end
-	end
-	if AutoSetInfo then
-		AutoSetInfo:Set(true)
-	end
-end
