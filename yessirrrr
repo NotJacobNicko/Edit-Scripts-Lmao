@@ -681,7 +681,7 @@ table.insert(ShouldEnable,Tab2:AddToggle({
 								["Role"] = v:GetRoleInGroup(9950771) or "??"
 							}
 
-							Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Is In The Server.")
+							Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].." Aka ["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Is In The Server.")
 							_G.SlappleFarm = false
 						end
 					end)
@@ -754,8 +754,10 @@ Tab2:AddToggle({
 		_G.ByeLighting = Value
 		while _G.ByeLighting do
 			task.wait()
+			if workspace.CurrentCamera then
+				workspace.CurrentCamera:ClearAllChildren()
+			end
 			local Lighting = game:GetService("Lighting")
-
 			Lighting.Ambient = Color3.fromRGB(70, 70, 70)
 			Lighting.Brightness = 3
 			Lighting.ColorShift_Top = Color3.new(0, 0, 0)
@@ -771,7 +773,8 @@ Tab2:AddToggle({
 			Lighting.FogColor = Color3.fromRGB(255, 255, 255)
 			Lighting.FogStart = 0
 			Lighting.FogEnd = math.huge
-			for i,v in pairs(Lighting:GetDescendants()) do
+			
+			for i,v in pairs(Lighting:GetChildren()) do
 				if v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
 					v.Enabled = false
 				else
@@ -875,13 +878,16 @@ Tab2:AddToggle({
 						end
 					elseif _G.TypesOfragdoll == "fake lag" and not table.find(Tagged,RagdollValue) then
 						table.insert(Tagged,RagdollValue)
-						if math.random(1,6) == 1 then
+						if math.random(1,3) == 1 then
 							repeat task.wait()
 								if PlrChar:FindFirstChild("Torso") then
 									PlrChar.Torso.Anchored = true
 								end
 							until RagdollValue and RagdollValue.Value == false
 							if PlrChar:FindFirstChild("Torso") then
+								pcall(function()
+									PlrChar.Torso.Position = PlrChar.Torso.Position+Vector3.new(0,math.random(4,15),0)
+								end)
 								PlrChar.Torso.Anchored = false
 							end
 						end
@@ -892,9 +898,6 @@ Tab2:AddToggle({
 		end
 	end    
 })
-
-
-
 
 wait(.5)
 for i,v in ShouldEnable do
