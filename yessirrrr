@@ -321,13 +321,13 @@ Tab7:AddDropdown({
 
 Tab7:AddToggle({
 	Name = "Autofarm Slapples",
-	Default = true,
+	Default = false,
 	Callback = function(Value)
 		_G.SlappleFarm = Value
 		while _G.SlappleFarm do
 			if game:GetService("Players").LocalPlayer.Character:FindFirstChild("entered") then
 				for i, v in pairs(workspace.Arena.island5.Slapples:GetChildren()) do
-					if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("entered") and v.Name == "Slapple" or v.Name == "GoldenSlapple" and v:FindFirstChild("Glove") and v.Glove:FindFirstChildWhichIsA("TouchTransmitter") then
+					if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("entered") and v.Name == "Slapple" or v.Name == "GoldenSlapple" and Glove and v.Glove:FindFirstChildWhichIsA("TouchTransmitter") then
 						firetouchinterest(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart, v.Glove, 0)
 						firetouchinterest(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart, v.Glove, 1)
 					end
@@ -337,7 +337,14 @@ Tab7:AddToggle({
 		end
 	end    
 })
-
+Tab7:AddToggle({
+	Name = "Enable PVP",
+	Default = false,
+	Callback = function(Value)
+		_G.HitboxPlayer = Value
+		_G.GloveExtendGet = Value
+	end    
+})
 Tab7:AddSlider({
 	Name = "Reach HitBox",
 	Min = 2,
@@ -353,7 +360,7 @@ Tab7:AddSlider({
 
 Tab7:AddToggle({
 	Name = "Hitbox Player",
-	Default = true,
+	Default = false,
 	Callback = function(Value)
 		_G.HitboxPlayer = Value
 		while _G.HitboxPlayer do
@@ -394,51 +401,56 @@ Tab7:AddDropdown({
 	Default = "Meat Stick",
 	Options = {"Meat Stick","Pancake","Growth","North Korea Wall","Slight Extend"},
 	Callback = function(Value)
-		GloveExtendOption = Value
+		_G.GloveExtendOption = Value
 	end    
 })
 
 Tab7:AddToggle({
 	Name = "Extend Glove",
-	Default = true,
+	Default = false,
 	Callback = function(Value)
 		_G.GloveExtendGet = Value
 		while _G.GloveExtendGet do
 			if game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):FindFirstChildOfClass("Tool") ~= nil then
 				for _,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
-						if v:FindFirstChild("Glove") ~= nil then
-							if GloveExtendOption == "Meat Stick" then
-								v:FindFirstChild("Glove").Size = Vector3.new(0, _G.GloveExtendReach, 2)
-							elseif GloveExtendOption == "Pancake" then
-								v:FindFirstChild("Glove").Size = Vector3.new(0, _G.GloveExtendReach, _G.GloveExtendReach)
-							elseif GloveExtendOption == "Growth" then
-								v:FindFirstChild("Glove").Size = Vector3.new(_G.GloveExtendReach,_G.GloveExtendReach,_G.GloveExtendReach)
-							elseif GloveExtendOption == "North Korea Wall" then
-								v:FindFirstChild("Glove").Size = Vector3.new(_G.GloveExtendReach,0,_G.GloveExtendReach)
-							elseif GloveExtendOption == "Slight Extend" then
-								v:FindFirstChild("Glove").Size = Vector3.new(3, 3, 3.7)
+						local Glove = v:FindFirstChild("Glove")
+						if Glove ~= nil then
+							if _G.GloveExtendOption == "Meat Stick" then
+								Glove.Size = Vector3.new(0, _G.GloveExtendReach, 2)
+							elseif _G.GloveExtendOption == "Pancake" then
+								Glove.Size = Vector3.new(0, _G.GloveExtendReach, _G.GloveExtendReach)
+							elseif _G.GloveExtendOption == "Growth" then
+								Glove.Size = Vector3.new(_G.GloveExtendReach,_G.GloveExtendReach,_G.GloveExtendReach)
+							elseif _G.GloveExtendOption == "North Korea Wall" then
+								Glove.Size = Vector3.new(_G.GloveExtendReach,0,_G.GloveExtendReach)
+							elseif _G.GloveExtendOption == "Slight Extend" then
+								Glove.Size = Vector3.new(3, 3, 3.7)
 							end
-							v:FindFirstChild("Glove").Transparency = 0.5
+							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
+								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
+							end
+							Glove.Transparency = 0.5
 						end
 					end
 				end
 			else
 				for _,v in pairs(game:GetService("Players").LocalPlayer.Character:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
-						if v:FindFirstChild("Glove") ~= nil then
-							if GloveExtendOption == "Meat Stick" then
-								v:FindFirstChild("Glove").Size = Vector3.new(0, _G.GloveExtendReach, 2)
-							elseif GloveExtendOption == "Pancake" then
-								v:FindFirstChild("Glove").Size = Vector3.new(0, _G.GloveExtendReach, _G.GloveExtendReach)
-							elseif GloveExtendOption == "Growth" then
-								v:FindFirstChild("Glove").Size = Vector3.new(_G.GloveExtendReach,_G.GloveExtendReach,_G.GloveExtendReach)
-							elseif GloveExtendOption == "North Korea Wall" then
-								v:FindFirstChild("Glove").Size = Vector3.new(_G.GloveExtendReach,0,_G.GloveExtendReach)
-							elseif GloveExtendOption == "Slight Extend" then
-								v:FindFirstChild("Glove").Size = Vector3.new(3, 3, 3.7)
+						local Glove = v:FindFirstChild("Glove")
+						if Glove ~= nil then
+							if _G.GloveExtendOption == "Meat Stick" then
+								Glove.Size = Vector3.new(0, _G.GloveExtendReach, 2)
+							elseif _G.GloveExtendOption == "Pancake" then
+								Glove.Size = Vector3.new(0, _G.GloveExtendReach, _G.GloveExtendReach)
+							elseif _G.GloveExtendOption == "Growth" then
+								Glove.Size = Vector3.new(_G.GloveExtendReach,_G.GloveExtendReach,_G.GloveExtendReach)
+							elseif _G.GloveExtendOption == "North Korea Wall" then
+								Glove.Size = Vector3.new(_G.GloveExtendReach,0,_G.GloveExtendReach)
+							elseif _G.GloveExtendOption == "Slight Extend" then
+								Glove.Size = Vector3.new(3, 3, 3.7)
 							end
-							v:FindFirstChild("Glove").Transparency = 0.5
+							Glove.Transparency = 0.5
 						end
 					end
 				end
@@ -449,18 +461,26 @@ Tab7:AddToggle({
 			if game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):FindFirstChildOfClass("Tool") ~= nil then
 				for _,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
-						if v:FindFirstChild("Glove") ~= nil then
-							v:FindFirstChild("Glove").Size = Vector3.new(2.5, 2.5, 1.7)
-							v:FindFirstChild("Glove").Transparency = 0
+						local Glove = v:FindFirstChild("Glove")
+						if Glove ~= nil then
+							Glove.Size = Vector3.new(2.5, 2.5, 1.7)
+							Glove.Transparency = 0
+							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
+								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
+							end
 						end
 					end
 				end
 			else
 				for _,v in pairs(game:GetService("Players").LocalPlayer.Character:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
-						if v:FindFirstChild("Glove") ~= nil then
-							v:FindFirstChild("Glove").Size = Vector3.new(2.5, 2.5, 1.7)
-							v:FindFirstChild("Glove").Transparency = 0
+						local Glove = v:FindFirstChild("Glove")
+						if Glove ~= nil then
+							Glove.Size = Vector3.new(2.5, 2.5, 1.7)
+							Glove.Transparency = 0
+							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
+								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
+							end
 						end
 					end
 				end
