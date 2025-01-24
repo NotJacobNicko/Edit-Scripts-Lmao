@@ -1,84 +1,339 @@
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+game:GetService("GuiService"):ClearError()
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
-local Window = OrionLib:MakeWindow({IntroText = "Slap Battles 👏", IntroIcon = "rbxassetid://15315284749",Name = ("skillhub"),IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = true, ConfigFolder = "slap battles"})
-local GloveExtendOption,SlappleFarm 
+local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+
+
+function Notifyclient(Text)
+	local goofynotiids = {6823153536,6823153536,7991347388,6879335951,217548941,4891171429,17660225827,6879335951}
+	local Notisong = Instance.new("Sound",game:GetService("SoundService"))
+	Notisong.SoundId = "rbxassetid://"..goofynotiids[math.random(1,#goofynotiids)]
+	Notisong.Volume = 4
+	Notisong.PlayOnRemove = true
+	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "HX?H Guide",Text = Text,Icon = "rbxassetid://18584222941",Duration = 5})
+	Notisong:Destroy()
+end
+-- KILLSTREAKONE BITCHES
+local Window = OrionLib:MakeWindow({IntroText = (GameName), IntroIcon = "rbxassetid://15315284749",Name = ("Giang Hub - Killstreak Only"),IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = true, ConfigFolder = "slap battles"})
+
+local bypass;
+bypass = hookmetamethod(game, "__namecall", function(method, ...) 
+	if getnamecallmethod() == "FireServer" and method == game.ReplicatedStorage.Ban then
+		return
+	elseif getnamecallmethod() == "FireServer" and method == game.ReplicatedStorage.AdminGUI then
+		return
+	elseif getnamecallmethod() == "FireServer" and method == game.ReplicatedStorage.WalkSpeedChanged then
+		return
+	end
+	return bypass(method, ...)
+end)
+
+if workspace:FindFirstChild("NametagChanged") == nil then
+	local NametagChanged = Instance.new("StringValue", workspace)
+	NametagChanged.Name = "NametagChanged"
+	NametagChanged.Value = ""
+
+	local SlapChanged = Instance.new("StringValue", NametagChanged)
+	SlapChanged.Name = "SlapChanged"
+	SlapChanged.Value = ""
+end
+
+---Safe---
+
+if workspace:FindFirstChild("SafeBox") == nil then
+	local S = Instance.new("Part")
+	S.Name = "SafeBox"
+	S.Anchored = true
+	S.CanCollide = true
+	S.Transparency = .5
+	S.Position = Vector3.new(-5500, -5000, -5000)
+	S.Size = Vector3.new(21, 5, 21)
+	S.Parent = workspace
+
+	local S1 = Instance.new("Part")
+	S1.Name = "S1"
+	S1.Anchored = true
+	S1.CanCollide = true
+	S1.Transparency = .5
+	S1.Position = Vector3.new(-5499.91, -4991.5, -4989.09)
+	S1.Size = Vector3.new(20, 13, 2)
+	S1.Parent = workspace:FindFirstChild("SafeBox")
+
+	local S2 = Instance.new("Part")
+	S2.Name = "S2"
+	S2.Anchored = true
+	S2.CanCollide = true
+	S2.Transparency = .5
+	S2.Position = Vector3.new(-5510.27979, -4991.5, -5000.08984, -4.47034836e-07, 0, 0.999999881, 0, 1, 0, -0.999999881, 0, -3.69319451e-07)
+	S2.Size = Vector3.new(21, 14, 2)
+	S2.Rotation = Vector3.new(0, -90, 0)
+	S2.Parent = workspace:FindFirstChild("SafeBox")
+
+	local S3 = Instance.new("Part")
+	S3.Name = "S3"
+	S3.Anchored = true
+	S3.CanCollide = true
+	S3.Transparency = .5
+	S3.Position = Vector3.new(-5499.3, -4991.5, -5011.12)
+	S3.Size = Vector3.new(21, 13, 2)
+	S3.Parent = workspace:FindFirstChild("SafeBox")
+
+	local S4 = Instance.new("Part")
+	S4.Name = "S4"
+	S4.Anchored = true
+	S4.CanCollide = true
+	S4.Transparency = .5
+	S4.Position = Vector3.new(-5489.97559, -4991.5, -4999.52637, -4.37113883e-08, 0, 1, 0, 1, 0, -1, 0, -4.37113883e-08)
+	S4.Size = Vector3.new(22, 13, 2)
+	S4.Rotation = Vector3.new(0, -90, 0)
+	S4.Parent = workspace:FindFirstChild("SafeBox")
+
+	local S5 = Instance.new("Part")
+	S5.Name = "S5"
+	S5.Anchored = true
+	S5.CanCollide = true
+	S5.Transparency = .5
+	S5.Position = Vector3.new(-5499.39, -4984, -5000.07)
+	S5.Size = Vector3.new(24, 3, 24)
+	S5.Parent = workspace:FindFirstChild("SafeBox")
+end
+
+if workspace:FindFirstChild("BobWalk1") == nil then
+	local BobWalk1 = Instance.new("Part", workspace)
+	BobWalk1.CanCollide = false
+	BobWalk1.Anchored = true
+	BobWalk1.CFrame = CFrame.new(23.2798462, -19.8447475, 1.83554196, -1, 0, 0, 0, -1, 0, 0, 0, 1)
+	BobWalk1.Size = Vector3.new(1139.2593994140625, 1.5, 2048)
+	BobWalk1.Name = "BobWalk1"
+	BobWalk1.Transparency = 1
+
+	local BobWalk2 = Instance.new("Part", BobWalk1)
+	BobWalk2.CanCollide = false
+	BobWalk2.Anchored = true
+	BobWalk2.CFrame = CFrame.new(-458.458344, -9.25, 1.83554196, -1, 0, 0, 0, -1, 0, 0, 0, 1)
+	BobWalk2.Size = Vector3.new(1139.2593994140625, 1.5, 2048)
+	BobWalk2.Name = "BobWalk2"
+	BobWalk2.Transparency = 1
+
+	local BobWalk3 = Instance.new("Part", BobWalk1)
+	BobWalk3.CanCollide = false
+	BobWalk3.Anchored = true
+	BobWalk3.CFrame = CFrame.new(-690.65979, 47.25, 1.83554196, -1, 0, 0, 0, -1, 0, 0, 0, 1)
+	BobWalk3.Size = Vector3.new(674.8563232421875, 0.6048492789268494, 2048)
+	BobWalk3.Name = "BobWalk3"
+	BobWalk3.Transparency = 1
+
+	local BobWalk4 = Instance.new("Part", BobWalk1)
+	BobWalk4.CanCollide = false
+	BobWalk4.Anchored = true
+	BobWalk4.CFrame = CFrame.new(402.964996, 29.25, 222.310089, -1, 0, 0, 0, -1, 0, 0, 0, 1)
+	BobWalk4.Size = Vector3.new(379.88922119140625, 1.5, 160.8837127685547)
+	BobWalk4.Name = "BobWalk4"
+	BobWalk4.Transparency = 1
+
+	local BobWalk5 = Instance.new("Part", BobWalk1)
+	BobWalk5.CanCollide = false
+	BobWalk5.Anchored = true
+	BobWalk5.Orientation = Vector3.new(0, 0, 171.728)
+	BobWalk5.CFrame = CFrame.new(178.719162, -18.9417267, 1.83554196, -0.989596844, -0.143868446, 0, 0.143868446, -0.989596844, 0, 0, 0, 1)
+	BobWalk5.Size = Vector3.new(143.94830322265625, 1.5, 2048)
+	BobWalk5.Name = "BobWalk5"
+	BobWalk5.Transparency= 1
+
+	local BobWalk6 = Instance.new("Part", BobWalk1)
+	BobWalk6.CanCollide = false
+	BobWalk6.Anchored = true
+	BobWalk6.Orientation = Vector3.new(0, 0, 144.782)
+	BobWalk6.CFrame = CFrame.new(-309.152832, 15.4761791, 1.83554196, -0.816968799, -0.576681912, 0, 0.576681912, -0.816968799, 0, 0, 0, 1)
+	BobWalk6.Size = Vector3.new(110.13511657714844, 2.740000009536743, 2048)
+	BobWalk6.Name = "BobWalk6"
+	BobWalk6.Transparency = 1
+
+	local BobWalk7 = Instance.new("Part", BobWalk1)
+	BobWalk7.CanCollide = false
+	BobWalk7.Anchored = true
+	BobWalk7.Orientation = Vector3.new(0, 0, -147.002)
+	BobWalk7.CFrame = CFrame.new(174.971924, 5.34897423, 222.310089, -0.838688731, 0.544611216, 0, -0.544611216, -0.838688731, 0, 0, 0, 1)
+	BobWalk7.Size = Vector3.new(89.76103210449219, 1.5, 160.8837127685547)
+	BobWalk7.Name = "BobWalk7"
+	BobWalk7.Transparency = 1
+
+	local BobWalk8 = Instance.new("Part", BobWalk1)
+	BobWalk8.CanCollide = false
+	BobWalk8.Anchored = true
+	BobWalk8.Orientation = Vector3.new(0.001, -90.002, -138.076)
+	BobWalk8.CFrame = CFrame.new(402.965027, 5.49165154, 74.8157959, 2.98023224e-05, -1.14142895e-05, -1, -0.668144584, -0.744031429, -1.14142895e-05, -0.744031489, 0.668144584, -2.98023224e-05)
+	BobWalk8.Size = Vector3.new(74.23055267333984, 1, 379.88922119140625)
+	BobWalk8.Name = "BobWalk8"
+	BobWalk8.Transparency = 1
+
+	local BobWalk9 = Instance.new("Part", BobWalk1)
+	BobWalk9.CanCollide = false
+	BobWalk9.Anchored = true
+	BobWalk9.CFrame = CFrame.new(402.964996, 29.9136467, 121.981705, -1, 0, 0, 0, -1, 0, 0, 0, 1)
+	BobWalk9.Size = Vector3.new(379.88922119140625, 1.5, 39.77305603027344)
+	BobWalk9.Name = "BobWalk9"
+	BobWalk9.Transparency = 1
+
+	local BobWalk10 = Instance.new("WedgePart", BobWalk1)
+	BobWalk10.CanCollide = false
+	BobWalk10.Anchored = true
+	BobWalk10.Orientation = Vector3.new(-30.453, 117.775, -102.906)
+	BobWalk10.CFrame = CFrame.new(134.084229, -17.8583984, 94.3953705, 0.541196942, -0.354067981, 0.762719929, -0.840263784, -0.192543149, 0.506837189, -0.0325982571, -0.915184677, -0.401714325)
+	BobWalk10.Size = Vector3.new(1, 88.66793823242188, 34.42972946166992)
+	BobWalk10.Name = "BobWalk10"
+	BobWalk10.Transparency = 1
+
+	local BobWalk11 = Instance.new("WedgePart", BobWalk1)
+	BobWalk11.CanCollide = false
+	BobWalk11.Anchored = true
+	BobWalk11.Orientation = Vector3.new(-29.779, 117.596, -13.193)
+	BobWalk11.CFrame = CFrame.new(168.441879, 2.46393585, 125.815231, -0.350553155, -0.534268022, 0.769201458, -0.198098332, 0.845035911, 0.496660322, -0.915352523, 0.0217281878, -0.402067661)
+	BobWalk11.Size = Vector3.new(1, 0.9999924302101135, 82.1865463256836)
+	BobWalk11.Name = "BobWalk11"
+	BobWalk11.Transparency = 1
+
+	local BobWalk12 = Instance.new("WedgePart", BobWalk1)
+	BobWalk12.CanCollide = false
+	BobWalk12.Anchored = true
+	BobWalk12.Orientation = Vector3.new(26.893, -124.388, -108.64)
+	BobWalk12.CFrame = CFrame.new(206.315063, 26.9295502, 105.471031, 0.534210563, -0.415855825, -0.73599112, -0.845072925, -0.285055399, -0.452321947, -0.021697551, 0.863601387, -0.503708005)
+	BobWalk12.Size = Vector3.new(1, 13.53612232208252, 9.847718238830566)
+	BobWalk12.Name = "BobWalk12"
+	BobWalk12.Transparency = 1
+
+	local BobWalk13 = Instance.new("WedgePart", BobWalk1)
+	BobWalk13.CanCollide = false
+	BobWalk13.Anchored = true
+	BobWalk13.Orientation = Vector3.new(-26.893, 55.613, 108.64)
+	BobWalk13.CFrame = CFrame.new(165.965088, 2.12955856, 77.8575592, -0.53421092, -0.415855944, 0.735991359, 0.845073164, -0.285055757, 0.452322066, 0.0216975808, 0.863601625, 0.503708005)
+	BobWalk13.Size = Vector3.new(1, 13.53612232208252, 99.8001480102539)
+	BobWalk13.Name = "BobWalk13"
+	BobWalk13.Transparency = 1
+
+	local BobWalk14 = Instance.new("WedgePart", BobWalk1)
+	BobWalk14.CanCollide = false
+	BobWalk14.Anchored = true
+	BobWalk14.Orientation = Vector3.new(-0.001, 90.003, 48.072)
+	BobWalk14.CFrame = CFrame.new(172.67041, 5.49164963, 74.8157959, -4.58955765e-05, 2.05039978e-05, 1, 0.743987858, 0.668193102, 2.05039978e-05, -0.668193102, 0.743987858, -4.58955765e-05)
+	BobWalk14.Size = Vector3.new(1, 74.23055267333984, 80.699951171875)
+	BobWalk14.Name = "BobWalk14"
+	BobWalk14.Transparency = 1
+
+	local BobWalk15 = Instance.new("WedgePart", BobWalk1)
+	BobWalk15.CanCollide = false
+	BobWalk15.Anchored = true
+	BobWalk15.Orientation = Vector3.new(0, 0, 106.498)
+	BobWalk15.CFrame = CFrame.new(212.753906, 30.0632439, 121.981705, -0.283976078, -0.95883137, 0, 0.95883137, -0.283976078, 0, 0, 0, 1)
+	BobWalk15.Size = Vector3.new(1, 0.8520558476448059, 39.773048400878906)
+	BobWalk15.Name = "BobWalk15"
+	BobWalk15.Transparency = 1
+
+	local BobWalk16 = Instance.new("WedgePart", BobWalk1)
+	BobWalk16.CanCollide = false
+	BobWalk16.Anchored = true
+	BobWalk16.Orientation = Vector3.new(29.777, -62.406, -75.066)
+	BobWalk16.CFrame = CFrame.new(212.884216, 30.1233234, 121.984734, 0.544644356, 0.33412537, -0.769235253, -0.838644743, 0.223680317, -0.496630788, 0.00612583756, 0.915602207, 0.402038693)
+	BobWalk16.Size = Vector3.new(1, 36.08900451660156, 16.739320755004883)
+	BobWalk16.Name = "BobWalk16"
+	BobWalk16.Transparency = 1
+
+	local BobWalk17 = Instance.new("WedgePart", BobWalk1)
+	BobWalk17.CanCollide = false
+	BobWalk17.Anchored = true
+	BobWalk17.Orientation = Vector3.new(-29.777, 117.594, 75.066)
+	BobWalk17.CFrame = CFrame.new(174.83577, 5.55865097, 141.871262, -0.544644356, 0.33412537, 0.769235253, 0.838644743, 0.223680317, 0.496630788, -0.00612583756, 0.915602207, -0.402038693)
+	BobWalk17.Size = Vector3.new(1, 36.08900451660156, 82.1865463256836)
+	BobWalk17.Name = "BobWalk17"
+	BobWalk17.Transparency = 1
+
+	local BobWalk18 = Instance.new("WedgePart", BobWalk1)
+	BobWalk18.CanCollide = false
+	BobWalk18.Anchored = true
+	BobWalk18.Orientation = Vector3.new(30.453, -62.225, 102.906)
+	BobWalk18.CFrame = CFrame.new(165.427338, 2.97219658, 77.884697, -0.541196942, -0.354067981, -0.762719929, 0.840263784, -0.192543149, -0.506837189, 0.0325982571, -0.915184677, 0.401714325)
+	BobWalk18.Size = Vector3.new(1, 88.66793823242188, 47.76289749145508)
+	BobWalk18.Name = "BobWalk18"
+	BobWalk18.Transparency = 1
+end
+
+if workspace:FindFirstChild("VoidPart") == nil then
+	local VoidPart = Instance.new("Part", workspace)
+	VoidPart.Position = Vector3.new(-80.5, -10.005, -246.5)
+	VoidPart.Name = "VoidPart"
+	VoidPart.Size = Vector3.new(2048, 1, 2048)
+	VoidPart.Material = "ForceField"
+	VoidPart.Anchored = true
+	VoidPart.Transparency = 1
+	VoidPart.CanCollide = false
+end
+
 local Tab7 = Window:MakeTab({
-	Name = "Home",
+	Name = "PVP",
 	Icon = "rbxassetid://4370318685",
 	PremiumOnly = false
 })
-
-Tab7:AddToggle({
-	Name = "slap inmune",
-	Default = false,
+local Tab2 = Window:MakeTab({
+	Name = "Antis",
+	Icon = "rbxassetid://7734056608",
+	PremiumOnly = false
+})
+Tab7:AddDropdown({
+	Name = "Teleport",
+	Default = "",
+	Options = {"Arena", "Lobby", "Hunter Room", "Brazil", "Island Slapple", "Plate", "Tournament", "Cannon Island", "Keypad", "Moai Island", "Island 1", "Island 2", "Island 3"},
 	Callback = function(Value)
-		_G.Testingggg = Value
-		if _G.Testingggg == false then
-			for i,objs in pairs(workspace:GetDescendants()) do
-				if objs:IsA("BasePart") and objs.Name == "Glove" and objs:FindFirstChildWhichIsA("TouchTransmitter") then
-					objs.CanTouch = true
-				end
+		if Value == "Arena" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Origo.CFrame * CFrame.new(0,-5,0)
+		elseif Value == "Lobby" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-800,328,-2.5)
+		elseif Value == "Hunter Room" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.BountyHunterRoom.Union.CFrame * CFrame.new(0,5,0)
+		elseif Value == "Brazil" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Lobby.brazil.portal.CFrame
+		elseif Value == "Island Slapple" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Arena.island5.Union.CFrame * CFrame.new(0,3.25,0)
+		elseif Value == "Plate" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService("Workspace").Arena.Plate.CFrame
+		elseif Value == "Tournament" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Battlearena.Arena.CFrame * CFrame.new(0,10,0)
+		elseif Value == "Cannon Island" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Arena.CannonIsland.Cannon.Base.CFrame * CFrame.new(0,0,35)
+		elseif Value == "Keypad" then
+			if not workspace:FindFirstChild("Keypad") then
+				OrionLib:MakeNotification({Name = "Error",Content = "Server in don't have keypad.",Image = "rbxassetid://7733658504",Time = 5})
+			else
+				game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Keypad.Buttons.Enter.CFrame
 			end
-			for i,objs in pairs(game:GetService("Players"):GetDescendants()) do
-				if objs:IsA("BasePart") and objs.Name == "Glove" and objs:FindFirstChildWhichIsA("TouchTransmitter") then
-					objs.CanTouch = true
-				end
-			end
-		end
-		while _G.Testingggg do
-			for i,objs in pairs(workspace:GetDescendants()) do
-				if objs:IsA("BasePart") and objs.Name == "Glove" and objs:FindFirstChildWhichIsA("TouchTransmitter") then
-					objs.CanTouch = false
-				end
-			end
-			for i,objs in pairs(game:GetService("Players"):GetDescendants()) do
-				if objs:IsA("BasePart") and objs.Name == "Glove" and objs:FindFirstChildWhichIsA("TouchTransmitter") then
-					objs.CanTouch = false
-				end
-			end
-			task.wait()
+		elseif Value == "Moai Island" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(215, -15.5, 0.5)
+		elseif Value == "Island 1" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-211.210846, -5.27827597, 4.13719559, -0.0225322824, 1.83683113e-08, -0.999746144, -1.83560154e-08, 1, 1.87866842e-08, 0.999746144, 1.87746618e-08, -0.0225322824)
+		elseif Value == "Island 2" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-8.17191315, -5.14452887, -205.249741, -0.98216176, -3.48867246e-09, -0.188037917, -4.19987778e-09, 1, 3.38382322e-09, 0.188037917, 4.11319823e-09, -0.98216176)
+		elseif Value == "Island 3" then
+			game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-6.66747713, -5.06731462, 213.575378, 0.945777893, 2.52095178e-10, 0.324814111, -3.7823856e-08, 1, 1.09357536e-07, -0.324814111, -1.15713661e-07, 0.945777893)
 		end
 	end    
 })
+
 Tab7:AddToggle({
 	Name = "Autofarm Slapples",
 	Default = true,
 	Callback = function(Value)
-		SlappleFarm = Value
-		while SlappleFarm do
-			if game.Players.LocalPlayer.Character:FindFirstChild("entered") then
+		_G.SlappleFarm = Value
+		while _G.SlappleFarm do
+			if game:GetService("Players").LocalPlayer.Character:FindFirstChild("entered") then
 				for i, v in pairs(workspace.Arena.island5.Slapples:GetChildren()) do
-					if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:FindFirstChild("entered") and v.Name == "Slapple" or v.Name == "GoldenSlapple" and v:FindFirstChild("Glove") and v.Glove:FindFirstChildWhichIsA("TouchTransmitter") then
-						firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Glove, 0)
-						firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Glove, 1)
+					if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("entered") and v.Name == "Slapple" or v.Name == "GoldenSlapple" and v:FindFirstChild("Glove") and v.Glove:FindFirstChildWhichIsA("TouchTransmitter") then
+						firetouchinterest(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart, v.Glove, 0)
+						firetouchinterest(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart, v.Glove, 1)
 					end
 				end
 			end
 			task.wait()
-		end
-	end    
-})
-
-Tab7:AddToggle({
-	Name = "Hitbox Player",
-	Default = true,
-	Callback = function(Value)
-		_G.HitboxPlayer = Value
-		while _G.HitboxPlayer do
-			for i,v in pairs(game.Players:GetChildren()) do
-				if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-					v.Character.HumanoidRootPart.Size = Vector3.new(_G.ReachHitbox,_G.ReachHitbox,_G.ReachHitbox)
-					v.Character.HumanoidRootPart.Transparency = 0.75
-				end
-			end
-			task.wait()
-		end
-		if _G.HitboxPlayer == false then
-			for i,v in pairs(game.Players:GetChildren()) do
-				if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-					v.Character.HumanoidRootPart.Size = Vector3.new(2, 2, 1)
-					v.Character.HumanoidRootPart.Transparency = 1
-				end
-			end
 		end
 	end    
 })
@@ -95,11 +350,37 @@ Tab7:AddSlider({
 		_G.ReachHitbox = Value
 	end    
 })
+
+Tab7:AddToggle({
+	Name = "Hitbox Player",
+	Default = true,
+	Callback = function(Value)
+		_G.HitboxPlayer = Value
+		while _G.HitboxPlayer do
+			for i,v in pairs(game:GetService("Players"):GetChildren()) do
+				if v ~= game:GetService("Players").LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+					v.Character.HumanoidRootPart.Size = Vector3.new(_G.ReachHitbox,_G.ReachHitbox,_G.ReachHitbox)
+					v.Character.HumanoidRootPart.Transparency = 0.75
+				end
+			end
+			task.wait()
+		end
+		if _G.HitboxPlayer == false then
+			for i,v in pairs(game:GetService("Players"):GetChildren()) do
+				if v ~= game:GetService("Players").LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+					v.Character.HumanoidRootPart.Size = Vector3.new(2, 2, 1)
+					v.Character.HumanoidRootPart.Transparency = 1
+				end
+			end
+		end
+	end    
+})
+
 Tab7:AddSlider({
 	Name = "Extend Glove",
 	Min = 2,
 	Max = 50,
-	Default = 10,
+	Default = 13,
 	Color = Color3.fromRGB(255,255,255),
 	Increment = 1,
 	ValueName = "Extend",
@@ -119,12 +400,12 @@ Tab7:AddDropdown({
 
 Tab7:AddToggle({
 	Name = "Extend Glove",
-	Default = false,
+	Default = true,
 	Callback = function(Value)
 		_G.GloveExtendGet = Value
 		while _G.GloveExtendGet do
-			if game.Players.LocalPlayer:WaitForChild("Backpack"):FindFirstChildOfClass("Tool") ~= nil then
-				for _,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+			if game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):FindFirstChildOfClass("Tool") ~= nil then
+				for _,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
 						if v:FindFirstChild("Glove") ~= nil then
 							if GloveExtendOption == "Meat Stick" then
@@ -143,7 +424,7 @@ Tab7:AddToggle({
 					end
 				end
 			else
-				for _,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+				for _,v in pairs(game:GetService("Players").LocalPlayer.Character:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
 						if v:FindFirstChild("Glove") ~= nil then
 							if GloveExtendOption == "Meat Stick" then
@@ -165,17 +446,17 @@ Tab7:AddToggle({
 			task.wait()
 		end
 		if _G.GloveExtendGet == false then
-			if game.Players.LocalPlayer:WaitForChild("Backpack"):FindFirstChildOfClass("Tool") ~= nil then
-				for _,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+			if game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):FindFirstChildOfClass("Tool") ~= nil then
+				for _,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
 						if v:FindFirstChild("Glove") ~= nil then
-							v:FindFirstChild("Glove").Size =  Vector3.new(2.5, 2.5, 1.7)
+							v:FindFirstChild("Glove").Size = Vector3.new(2.5, 2.5, 1.7)
 							v:FindFirstChild("Glove").Transparency = 0
 						end
 					end
 				end
 			else
-				for _,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+				for _,v in pairs(game:GetService("Players").LocalPlayer.Character:GetChildren()) do
 					if v:IsA("Tool") and v.Name ~= "Radio" then
 						if v:FindFirstChild("Glove") ~= nil then
 							v:FindFirstChild("Glove").Size = Vector3.new(2.5, 2.5, 1.7)
@@ -187,45 +468,160 @@ Tab7:AddToggle({
 		end
 	end    
 })
-Tab7:AddToggle({
-	Name = "ESP Kill",
+
+
+if game.PlaceId == 11520107397 then
+	Tab7:AddColorpicker({
+		Name = "Color ESP",
+		Default = Color3.fromRGB(43, 0, 255),
+		Callback = function(Value)
+			_G.ColorESP = Value
+		end	  
+	})
+	Tab7:AddToggle({
+		Name = "ESP Kill",
+		Default = false,
+		Callback = function(Value)
+			_G.KillESP = Value
+			if _G.KillESP == false then
+				for i, v in ipairs(game:GetService("Players"):GetChildren()) do
+					if v.Character and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("KillESP") then
+						v.Character.Head.KillESP:Destroy()
+					end
+				end
+			end
+			while _G.KillESP do
+				for i,v in ipairs(game:GetService("Players"):GetChildren()) do
+					if v ~= game:GetService("Players").LocalPlayer and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("KillstreakLevel") then
+						if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.TextColor3 ~= _G.ColorESP then
+							v.Character.Head.KillESP.TextLabel.TextColor3 = _G.ColorESP
+						end
+						if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.Text ~= "Kill [ "..v.Character.KillstreakLevel.Value.." ]" then
+							if v.Character:FindFirstChild("KillstreakLevel") and v.Character.KillstreakLevel.Value ~= 0 then
+								v.Character.Head.KillESP.TextLabel.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
+							end
+						end
+						if v.Character:FindFirstChild("KillstreakLevel") and v.Character.Head:FindFirstChild("KillESP") == nil then
+							KillESP = Instance.new("BillboardGui", v.Character.Head)
+							KillESP.Adornee = v.Character.Head
+							KillESP.Name = "KillESP"
+							KillESP.Size = UDim2.new(0, 100, 0, 150)
+							KillESP.StudsOffset = Vector3.new(0, 1, 0)
+							KillESP.AlwaysOnTop = true
+							KillESP.StudsOffset = Vector3.new(0, 3, 0)
+							KillESPText = Instance.new("TextLabel", KillESP)
+							KillESPText.BackgroundTransparency = 1
+							KillESPText.Size = UDim2.new(0, 100, 0, 100)
+							KillESPText.TextSize = 20
+							KillESPText.Font = Enum.Font.FredokaOne
+							KillESPText.TextColor3 = _G.ColorESP
+							KillESPText.TextStrokeTransparency = 0.5
+							KillESPText.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
+						end
+					end
+				end
+				task.wait()
+			end
+		end    
+	})
+end
+
+
+Tab2:AddDropdown({
+	Name = "Anti Void",
+	Default = "Normal",
+	Options = {"Normal","Bob"},
+	Callback = function(Value)
+		if _G.AntiVoid == true then
+			_G.AntiVoidChoose = Value
+		elseif _G.AntiVoid == false then
+			_G.AntiVoidChoose = Value
+		end
+	end    
+})
+
+Tab2:AddToggle({
+	Name = "Anti Void",
 	Default = false,
 	Callback = function(Value)
-		_G.KillESP = Value
-		if _G.KillESP == false then
-			for i, v in ipairs(game.Players:GetChildren()) do
-				if v.Character and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("KillESP") then
-					v.Character.Head.KillESP:Destroy()
+		_G.AntiVoid = Value
+		if _G.AntiVoidChoose == "Normal" then
+			workspace["VoidPart"].CanCollide = Value
+			if Value == false then
+				workspace["VoidPart"].Transparency = 1
+			else
+				workspace["VoidPart"].Transparency = 0.5
+			end
+		elseif _G.AntiVoidChoose == "Bob" then
+			workspace["BobWalk1"].CanCollide = Value
+			for i,v in pairs(workspace.BobWalk1:GetChildren()) do
+				v.CanCollide = Value
+			end
+			if Value == true then
+				workspace["BobWalk1"].Transparency = _G.Transparency
+				for i,v in pairs(workspace.BobWalk1:GetChildren()) do
+					v.Transparency = 0.5
+				end
+			else
+				workspace["BobWalk1"].Transparency = 1
+				for i,v in pairs(workspace.BobWalk1:GetChildren()) do
+					v.Transparency = 1
 				end
 			end
 		end
-		while _G.KillESP do
-			for i,v in ipairs(game.Players:GetChildren()) do
-				if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("KillstreakLevel") then
-					if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.TextColor3 ~= _G.ColorESP then
-						v.Character.Head.KillESP.TextLabel.TextColor3 = _G.ColorESP
-					end
-					if v.Character.Head:FindFirstChild("KillESP") and v.Character.Head.KillESP:FindFirstChild("TextLabel") and v.Character.Head.KillESP.TextLabel.Text ~= "Kill [ "..v.Character.KillstreakLevel.Value.." ]" then
-						if v.Character:FindFirstChild("KillstreakLevel") and v.Character.KillstreakLevel.Value ~= 0 then
-							v.Character.Head.KillESP.TextLabel.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
-						end
-					end
-					if v.Character:FindFirstChild("KillstreakLevel") and v.Character.Head:FindFirstChild("KillESP") == nil then
-						local KillESP = Instance.new("BillboardGui", v.Character.Head)
+	end    
+})
+local TaggedTable = {}
+game:GetService("Players").PlayerAdded:Connect(function(v)
+	if v:GetRankInGroup(9950771) >= 2 and _G.AntiMods then
+		if v.Character.Head:FindFirstChild("AdminTagger") == nil then
+			KillESP = Instance.new("BillboardGui", v.Character.Head)
+			KillESP.Adornee = v.Character.Head
+			KillESP.Name = "AdminTagger"
+			KillESP.Size = UDim2.new(0, 100, 0, 150)
+			KillESP.StudsOffset = Vector3.new(0, 1, 0)
+			KillESP.AlwaysOnTop = true
+			KillESP.StudsOffset = Vector3.new(0, 4, 0)
+			KillESPText = Instance.new("TextLabel", KillESP)
+			KillESPText.BackgroundTransparency = 1
+			KillESPText.Size = UDim2.new(0, 100, 0, 100)
+			KillESPText.TextSize = 20
+			KillESPText.Font = Enum.Font.FredokaOne
+			KillESPText.TextColor3 = Color3.new(1, 1, 1)
+			KillESPText.TextStrokeTransparency = 0.5
+			KillESPText.Text = "![Admin]!"
+		end
+		Notifyclient("Staff Member Joined "..v.Name..`({v.DisplayName})`)
+		_G.SlappleFarm = false
+	end
+end)
+Tab2:AddToggle({
+	Name = "Notify High Rank",
+	Default = false,
+	Callback = function(Value)
+		_G.AntiMods = Value  
+		if not _G.AntiMods then
+			TaggedTable = {}
+		end
+		while _G.AntiMods do
+			for i,v in pairs(game.Players:GetChildren()) do
+				if v:GetRankInGroup(9950771) >= 2 then
+					if v.Character.Head:FindFirstChild("AdminTagger") == nil then
+						KillESP = Instance.new("BillboardGui", v.Character.Head)
 						KillESP.Adornee = v.Character.Head
-						KillESP.Name = "KillESP"
+						KillESP.Name = "AdminTagger"
 						KillESP.Size = UDim2.new(0, 100, 0, 150)
 						KillESP.StudsOffset = Vector3.new(0, 1, 0)
 						KillESP.AlwaysOnTop = true
-						KillESP.StudsOffset = Vector3.new(0, 3, 0)
-						local KillESPText = Instance.new("TextLabel", KillESP)
+						KillESP.StudsOffset = Vector3.new(0, 4, 0)
+						KillESPText = Instance.new("TextLabel", KillESP)
 						KillESPText.BackgroundTransparency = 1
 						KillESPText.Size = UDim2.new(0, 100, 0, 100)
 						KillESPText.TextSize = 20
 						KillESPText.Font = Enum.Font.FredokaOne
-						KillESPText.TextColor3 = _G.ColorESP
+						KillESPText.TextColor3 = Color3.new(1, 1, 1)
 						KillESPText.TextStrokeTransparency = 0.5
-						KillESPText.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
+						KillESPText.Text = "![Admin]!"
 					end
 				end
 			end
@@ -233,3 +629,156 @@ Tab7:AddToggle({
 		end
 	end    
 })
+Tab2:AddToggle({
+	Name = "Anti Kick",
+	Default = false,
+	Callback = function(Value)
+		_G.AntiKick = Value
+		while _G.AntiKick do
+			for i,v in pairs(game.CoreGui.RobloxPromptGui.promptOverlay:GetDescendants()) do
+				if v.Name == "ErrorPrompt" then
+					game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game:GetService("Players").LocalPlayer)
+				end
+			end
+			task.wait()
+		end
+	end    
+})
+
+Tab2:AddToggle({
+	Name = "Anti Afk",
+	Default = true,
+	Callback = function(Value)
+		_G.AntiAfk = Value
+		for i,v in next, getconnections(game:GetService("Players").LocalPlayer.Idled) do
+			if _G.AntiAfk then
+				v:Disable()
+			else
+				v:Enable()
+			end
+		end
+	end    
+})
+
+Tab2:AddToggle({
+	Name = "Anti Cube Of Death",
+	Default = false,
+	Callback = function(Value)
+		if Value == true then
+			if workspace:FindFirstChild("the cube of death(i heard it kills)", 1) and workspace.Arena.CubeOfDeathArea["the cube of death(i heard it kills)"]:FindFirstChild("Part") then
+				workspace.Arena.CubeOfDeathArea["the cube of death(i heard it kills)"].CanTouch = false
+				workspace.Arena.CubeOfDeathArea["the cube of death(i heard it kills)"].Part.CanTouch = false
+			end
+		else
+			if workspace:FindFirstChild("the cube of death(i heard it kills)", 1) and workspace.Arena.CubeOfDeathArea["the cube of death(i heard it kills)"]:FindFirstChild("Part") then
+				workspace.Arena.CubeOfDeathArea["the cube of death(i heard it kills)"].CanTouch = true
+				workspace.Arena.CubeOfDeathArea["the cube of death(i heard it kills)"].Part.CanTouch = true
+			end
+		end
+	end    
+})
+
+Tab2:AddToggle({
+	Name = "Anti Death Barriers",
+	Default = false,
+	Callback = function(Value)
+		if Value == true then
+			for i,v in pairs(workspace.DEATHBARRIER:GetChildren()) do
+				if v.ClassName == "Part" and v.Name == "BLOCK" then
+					v.CanTouch = false
+				end
+			end
+			workspace.DEATHBARRIER.CanTouch = false
+			workspace.DEATHBARRIER2.CanTouch = false
+			workspace.dedBarrier.CanTouch = false
+			workspace.ArenaBarrier.CanTouch = false
+			workspace.AntiDefaultArena.CanTouch = false
+		else
+			for i,v in pairs(workspace.DEATHBARRIER:GetChildren()) do
+				if v.ClassName == "Part" and v.Name == "BLOCK" then
+					v.CanTouch = true
+				end
+			end
+			workspace.DEATHBARRIER.CanTouch = true
+			workspace.DEATHBARRIER2.CanTouch = true
+			workspace.dedBarrier.CanTouch = true
+			workspace.ArenaBarrier.CanTouch = true
+			workspace.AntiDefaultArena.CanTouch = true
+		end
+	end    
+})
+
+Tab2:AddToggle({
+	Name = "Anti Ragdoll",
+	Default = false,
+	Callback = function(Value)
+		_G.AntiRagdoll = Value
+		while _G.AntiRagdoll do
+			if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ragdolled") then
+				if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ragdolled") and game:GetService("Players").LocalPlayer.Character:WaitForChild("Ragdolled").Value == true then
+					repeat task.wait()
+						if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
+							game:GetService("Players").LocalPlayer.Character.Torso.Anchored = true
+						end
+					until game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ragdolled") and game:GetService("Players").LocalPlayer.Character:WaitForChild("Ragdolled").Value == false
+					if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torso") then
+						game:GetService("Players").LocalPlayer.Character.Torso.Anchored = false
+					end
+				end
+			end
+			task.wait()
+		end
+	end    
+})
+
+--------------------------------------------------------
+if gethui():FindFirstChild("Orion") and game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("ToggleUi") == nil then
+	local TOGGLE = {}
+	TOGGLE["Ui"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer.PlayerGui)
+	TOGGLE["DaIcon"] = Instance.new("ImageButton", TOGGLE["Ui"])
+	TOGGLE["das"] = Instance.new("UICorner", TOGGLE["DaIcon"])
+
+	TOGGLE["Ui"].Name = "ToggleUi"
+	TOGGLE["Ui"].ResetOnSpawn = false
+
+	TOGGLE["DaIcon"].Size = UDim2.new(0,45,0,45)
+	TOGGLE["DaIcon"].Position = UDim2.new(0,0,0,0)
+	TOGGLE["DaIcon"].Draggable = true
+	TOGGLE["DaIcon"].Image = "rbxassetid://15315284749"
+	TOGGLE["DaIcon"].BackgroundColor3 = Color3.fromRGB(255, 186, 117)
+	TOGGLE["DaIcon"].BorderColor3 = Color3.fromRGB(255, 186, 117)
+	task.spawn(function()
+		while true do
+			for i = 0, 255, 4 do
+				TOGGLE["DaIcon"].BorderColor3 = Color3.fromHSV(i/256, 1, 1)
+				TOGGLE["DaIcon"].BackgroundColor3 = Color3.fromHSV(i/256, .5, .8)
+				wait()
+			end
+		end
+	end)
+	TOGGLE["DaIcon"].MouseButton1Click:Connect(function()
+		if gethui():FindFirstChild("Orion") then
+			for i,v in pairs(gethui():GetChildren()) do
+				if v.Name == "Orion" then
+					v.Enabled = not v.Enabled
+				end
+			end
+		end
+	end)
+	TOGGLE["das"]["CornerRadius"] = UDim.new(0.20000000298023224, 0)
+end 
+------------------------------------------------------------------------
+if gethui():FindFirstChild("Orion") then
+	for _, i in pairs(gethui():GetChildren()) do
+		if i.Name == "Orion" then
+			for i,v in pairs(i:GetDescendants()) do
+				if v.ClassName == "Frame" and v.BackgroundTransparency < 0.3 then
+					v.BackgroundTransparency = 0.2
+				end
+			end
+		end
+	end
+	if AutoSetInfo then
+		AutoSetInfo:Set(true)
+	end
+end
