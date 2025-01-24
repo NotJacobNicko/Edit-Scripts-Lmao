@@ -326,18 +326,6 @@ Tab7:AddToggle({
 	end    
 })
 local ShouldEnable = {}
-Tab7:AddButton({
-	Name = "Enable PVP",
-	Callback = function()
-		for i,v in ShouldEnable do
-			task.spawn(function()
-				pcall(function()
-					v:Set(true)
-				end)
-			end)
-		end
-	end    
-})
 Tab7:AddSlider({
 	Name = "Reach HitBox",
 	Min = 2,
@@ -492,7 +480,7 @@ Tab7:AddButton({
 				game.Loaded:Wait()
 			end
 			repeat wait() until game.Players.LocalPlayer
-			wait(3)
+			wait(2)
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/refs/heads/main/yessirrrr"))()
     		]])
 			local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
@@ -531,7 +519,7 @@ if game.PlaceId == 11520107397 then
 			_G.ColorESP = Value
 		end	  
 	})
-	Tab7:AddToggle({
+	table.insert(ShouldEnable,Tab7:AddToggle({
 		Name = "ESP Kill",
 		Default = false,
 		Callback = function(Value)
@@ -576,7 +564,7 @@ if game.PlaceId == 11520107397 then
 				task.wait()
 			end
 		end    
-	})
+	}))
 end
 
 
@@ -650,12 +638,12 @@ game:GetService("Players").PlayerAdded:Connect(function(v)
 			["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
 			["Role"] = v:GetRoleInGroup(9950771) or "??"
 		}
-		
+		table.insert(TaggedTable,v)
 		Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Joined The Server.")
 		_G.SlappleFarm = false
 	end
 end)
-Tab2:AddToggle({
+table.insert(ShouldEnable,Tab2:AddToggle({
 	Name = "Notify High Rank",
 	Default = false,
 	Callback = function(Value)
@@ -682,13 +670,14 @@ Tab2:AddToggle({
 						KillESPText.Text = "![Admin]!"
 					end
 					if not table.find(TaggedTable,v) then
+						table.insert(TaggedTable,v)
 						local InfoPlayer = {
-							["PlrName"] = v.Name.."{@"..v.DisplayName.."}",
+							["PlrName"] = v.Name,
 							["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
 							["Role"] = v:GetRoleInGroup(9950771) or "??"
 						}
 
-						Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Joined The Server.")
+						Notifyclient("High Rank Member: "..InfoPlayer["PlrName"].."["..InfoPlayer["Role"].."] With "..InfoPlayer["Slaps"].." Slaps Is In The Server.")
 						_G.SlappleFarm = false
 					end
 				end
@@ -696,7 +685,7 @@ Tab2:AddToggle({
 			task.wait()
 		end
 	end    
-})
+}))
 Tab2:AddToggle({
 	Name = "Kick When Staff Joins",
 	Default = false,
@@ -895,3 +884,15 @@ Tab2:AddToggle({
 		end
 	end    
 })
+
+
+
+
+wait(.5)
+for i,v in ShouldEnable do
+	task.spawn(function()
+		pcall(function()
+			v:Set(true)
+		end)
+	end)
+end
