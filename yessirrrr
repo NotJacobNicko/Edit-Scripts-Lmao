@@ -15,8 +15,7 @@ function Notifyclient(Text)
 	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "HX?H Guide",Text = Text,Icon = "rbxassetid://18584222941",Duration = 5})
 	Notisong:Destroy()
 end
--- KILLSTREAKONE BITCHES
-local Window = OrionLib:MakeWindow({IntroText = (GameName), IntroIcon = "rbxassetid://15315284749",Name = ("Giang Hub - Killstreak Only"),IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = true, ConfigFolder = "slap battles"})
+local Window = OrionLib:MakeWindow({IntroText = (GameName), IntroIcon = "rbxassetid://15315284749",Name = ("Slap Battles"),IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = true, ConfigFolder = "slap battles"})
 
 local bypass;
 bypass = hookmetamethod(game, "__namecall", function(method, ...) 
@@ -29,17 +28,6 @@ bypass = hookmetamethod(game, "__namecall", function(method, ...)
 	end
 	return bypass(method, ...)
 end)
-
-if workspace:FindFirstChild("NametagChanged") == nil then
-	local NametagChanged = Instance.new("StringValue", workspace)
-	NametagChanged.Name = "NametagChanged"
-	NametagChanged.Value = ""
-
-	local SlapChanged = Instance.new("StringValue", NametagChanged)
-	SlapChanged.Name = "SlapChanged"
-	SlapChanged.Value = ""
-end
-
 ---Safe---
 
 if workspace:FindFirstChild("SafeBox") == nil then
@@ -338,13 +326,12 @@ Tab7:AddToggle({
 	end    
 })
 local ShouldEnable = {}
-Tab7:AddToggle({
+Tab7:AddButton({
 	Name = "Enable PVP",
-	Default = false,
-	Callback = function(Value)
+	Callback = function()
 		for i,v in ShouldEnable do
 			pcall(function()
-				v:Set(Value)
+				v:Set(true)
 			end)
 		end
 	end    
@@ -629,7 +616,7 @@ game:GetService("Players").PlayerAdded:Connect(function(v)
 end)
 Tab2:AddToggle({
 	Name = "Notify High Rank",
-	Default = false,
+	Default = true,
 	Callback = function(Value)
 		_G.AntiMods = Value  
 		if not _G.AntiMods then
@@ -675,8 +662,8 @@ Tab2:AddToggle({
 	Name = "Kick When Staff Joins",
 	Default = false,
 	Callback = function(Value)
-		_G.AntiMods = Value
-		while _G.AntiMods do
+		_G.AntiMods1 = Value
+		while _G.AntiMods1 do
 			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 				if v:GetRankInGroup(9950771) >= 2 then
 					_G.AntiKick = false
@@ -710,14 +697,14 @@ Tab2:AddToggle({
 })
 Tab2:AddToggle({
 	Name = "No ScreenBlind",
-	Default = false,
+	Default = true,
 	Callback = function(Value)
 		if not Value then
-			game:GetService("Players").PlayerGui.SquidInk.Enabled = true
+			game:GetService("Players").LocalPlayer.PlayerGui.SquidInk.Enabled = true
 		end
 		while Value do
-			if game:GetService("Players").PlayerGui:FindFirstChild("SquidInk") then
-				game:GetService("Players").PlayerGui.SquidInk.Enabled = false
+			if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("SquidInk") then
+				game:GetService("Players").LocalPlayer.PlayerGui.SquidInk.Enabled = false
 			end
 			if game:GetService("Players").LocalPlayer.Character:FindFirstChild("YouHaveGotMail") then
 				game:GetService("Players").LocalPlayer.Character.YouHaveGotMail.Disabled = true
