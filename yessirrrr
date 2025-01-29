@@ -480,7 +480,7 @@ Tab7:AddButton({
 				game.Loaded:Wait()
 			end
 			repeat wait() until game.Players.LocalPlayer
-			wait(2)
+			wait(1)
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/refs/heads/main/yessirrrr"))()
     		]])
 			local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
@@ -511,14 +511,14 @@ Tab7:AddButton({
 	end    
 })
 
+Tab7:AddColorpicker({
+	Name = "Color ESP",
+	Default = Color3.fromRGB(43, 0, 255),
+	Callback = function(Value)
+		_G.ColorESP = Value
+	end	  
+})
 if game.PlaceId == 11520107397 then
-	Tab7:AddColorpicker({
-		Name = "Color ESP",
-		Default = Color3.fromRGB(43, 0, 255),
-		Callback = function(Value)
-			_G.ColorESP = Value
-		end	  
-	})
 	table.insert(ShouldEnable,Tab7:AddToggle({
 		Name = "ESP Kill",
 		Default = false,
@@ -559,6 +559,43 @@ if game.PlaceId == 11520107397 then
 							KillESPText.TextStrokeTransparency = 0.5
 							KillESPText.Text = "Kill [ "..v.Character.KillstreakLevel.Value.." | "..v.Name.." ]"
 						end
+					end
+				end
+				task.wait()
+			end
+		end    
+	}))
+else
+	table.insert(ShouldEnable,Tab7:AddToggle({
+		Name = "Glove Esp",
+		Default = false,
+		Callback = function(Value)
+			_G.GloveEsp = Value
+			if _G.GloveEsp == false then
+				for i, v in ipairs(game.Players:GetChildren()) do
+					if v.Character and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("GloveEsp") then
+						v.Character.Head.GloveEsp:Destroy()
+					end
+				end
+			end
+			while _G.GloveEsp do
+				for i, v in ipairs(game.Players:GetChildren()) do
+					if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Head") and v.Character.inMatch.Value == true and v.Character.Head:FindFirstChild("GloveEsp") == nil then
+						GloveEsp = Instance.new("BillboardGui", v.Character.Head)
+						GloveEsp.Adornee = v.Character.Head
+						GloveEsp.Name = "GloveEsp"
+						GloveEsp.Size = UDim2.new(0, 100, 0, 150)
+						GloveEsp.StudsOffset = Vector3.new(0, 1, 0)
+						GloveEsp.AlwaysOnTop = true
+						GloveEsp.StudsOffset = Vector3.new(0, 3, 0)
+						GloveEspText = Instance.new("TextLabel", GloveEsp)
+						GloveEspText.BackgroundTransparency = 1
+						GloveEspText.Size = UDim2.new(0, 100, 0, 100)
+						GloveEspText.TextSize = 25
+						GloveEspText.Font = Enum.Font.FredokaOne
+						GloveEspText.TextColor3 = Color3.new(255, 255, 255)
+						GloveEspText.TextStrokeTransparency = 0
+						GloveEspText.Text = "Glove [ "..v.Glove.Value.." ]"
 					end
 				end
 				task.wait()
@@ -778,7 +815,7 @@ Tab2:AddToggle({
 				if v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
 					v.Enabled = false
 				else
-					v.Parent = nil
+					v:Destroy()
 				end
 			end
 		end
@@ -866,7 +903,6 @@ Tab2:AddToggle({
 			local RagdollValue =  PlrChar:FindFirstChild("Ragdolled")
 			if PlrChar:FindFirstChild("HumanoidRootPart") and PlrChar:FindFirstChild("Torso") and RagdollValue then
 				if RagdollValue and RagdollValue.Value == true then
-					
 					if _G.TypesOfragdoll == "always" then
 						repeat task.wait()
 							if PlrChar:FindFirstChild("Torso") then
@@ -886,7 +922,7 @@ Tab2:AddToggle({
 							until RagdollValue and RagdollValue.Value == false
 							if PlrChar:FindFirstChild("Torso") then
 								pcall(function()
-									PlrChar.Torso.Position = PlrChar.Torso.Position+Vector3.new(0,math.random(4,15),0)
+									PlrChar:MoveTo(PlrChar.Torso.Position+Vector3.new(0,math.random(4,30),0))
 								end)
 								PlrChar.Torso.Anchored = false
 							end
