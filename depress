@@ -1,31 +1,13 @@
-local firetouchtransmit = function(object)
-	local Plr = game:GetService("Players").LocalPlayer
-	if not object then
-		return
-	end
-	if not Plr.Character then
-		repeat 
-			wait()
-		until Plr.Character
-	end
-
-	for i,v in pairs(Plr.Character:GetDescendants()) do
-		if v:IsA("BasePart") then
-			pcall(function()
-				firetouchinterest(v,object,0)
-				firetouchinterest(v,object,1)
-			end)
-		end
-	end
-end
-warn("Loaded AHAHA")
+warn("Loaded AHAHA1")
+local highlighted = {}
 while wait(1) do
 	for i,v in pairs(workspace:WaitForChild("Collectibles"):GetChildren()) do
 		if v:IsA("Part") and v.Name == "C" and v.Color == Color3.fromRGB(110, 244, 239) and v.Transparency == 0 then
 			local decal = v:FindFirstChild("BackDecal") or v:FindFirstChild("FrontDecal")
 			local ObtainTable = {"rbxassetid://1471850677","rbxassetid://2319943273","rbxassetid://1471882621"}
 			if table.find(ObtainTable,decal.Texture) then
-				firetouchtransmit(v)
+				local Plr = game:GetService("Players").LocalPlayer
+				Plr.Character:FindFirstChild("HumanoidRootPart").Position = v.Position
 			end
 		end
 	end
