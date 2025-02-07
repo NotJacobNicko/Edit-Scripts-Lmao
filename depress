@@ -8,7 +8,6 @@ while wait(1) do
 			if table.find(ObtainTable,decal.Texture) and not table.find(highlighted,v) then
 				table.insert(highlighted,v)
 				local highlight = Instance.new("Highlight",v)
-				
 			end
 		end
 	end
