@@ -1,13 +1,14 @@
-warn("Loaded AHAHA1")
+warn("Loaded AHAHA21")
 local highlighted = {}
 while wait(1) do
 	for i,v in pairs(workspace:WaitForChild("Collectibles"):GetChildren()) do
 		if v:IsA("Part") and v.Name == "C" and v.Color == Color3.fromRGB(110, 244, 239) and v.Transparency == 0 then
 			local decal = v:FindFirstChild("BackDecal") or v:FindFirstChild("FrontDecal")
 			local ObtainTable = {"rbxassetid://1471850677","rbxassetid://2319943273","rbxassetid://1471882621"}
-			if table.find(ObtainTable,decal.Texture) then
-				local Plr = game:GetService("Players").LocalPlayer
-				Plr.Character:FindFirstChild("HumanoidRootPart").Position = v.Position
+			if table.find(ObtainTable,decal.Texture) and not table.find(highlighted,v) then
+				table.insert(highlighted,v)
+				local highlight = Instance.new("Highlight",v)
+				
 			end
 		end
 	end
