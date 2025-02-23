@@ -7,28 +7,77 @@ function isAcoin(sample)
 		return false
 	end
 end
-function TouchObj(Instan)
-	local char = game:GetService("Players").LocalPlayer.Character
-	if not char then
+function TouchObj(Object,properties)
+	assert(properties,"Property Table Is Missing!")
+	if type(properties) ~= "table" then
+		error("Property Info Is not a table!")
 		return
 	end
-	local Root = nil
-	local Limbs = {}
-	
-	for i,part in pairs(char:GetChildren()) do
-		if part:IsA("BasePart") then
-			table.insert(Limbs,part)
+	assert(Object,"Instance is missing")
+
+
+	local Data = {}
+
+	local Default = {
+		LimbTouch = nil,
+		BypassMagnitude = false,
+	}
+	for name, value in Default do
+		Data[name] = properties[name] or value
+	end
+
+	local Player = game:GetService("Players").LocalPlayer
+	local Character = Player.Character
+	local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
+	if Character and Humanoid and Humanoid.Health == 0 then
+		return
+	end
+
+
+	local RootPart = Character.PrimaryPart or Character:FindFirstChild("Torso") or Character:FindFirstChild("HumanoidRootPart")
+	if not RootPart then
+		warn("Character Root Is Missing!")
+		return
+	end
+
+	if Data.BypassMagnitude then
+		local OriginPos = Instance.new("Part",workspace)
+		OriginPos.Size = Vector3.new(1,1,1)
+		OriginPos.CanCollide = false
+		OriginPos.Anchored = true
+		RootPart.Anchored = true
+		OriginPos.CFrame = RootPart.CFrame
+		wait()
+		Character:PivotTo(Object.CFrame)
+		if Data.LimbTouch then
+			firetouchinterest(Data.LimbTouch,Object,0)
+			firetouchinterest(Data.LimbTouch,Object,1)
+		else
+			for name,obj in pairs(Character:GetChildren()) do
+				if obj:IsA("BasePart") then
+					firetouchinterest(obj,Object,0)
+					firetouchinterest(obj,Object,1)
+				end
+			end
+		end
+		wait()
+		RootPart.Anchored = false
+		Character:PivotTo(OriginPos.CFrame)
+		game:GetService("Debris"):AddItem(OriginPos,0)
+	else
+		if Data.LimbTouch then
+			firetouchinterest(Data.LimbTouch,Object,0)
+			firetouchinterest(Data.LimbTouch,Object,1)
+		else
+			for name,obj in pairs(Character:GetChildren()) do
+				if obj:IsA("BasePart") then
+					firetouchinterest(obj,Object,0)
+					firetouchinterest(obj,Object,1)
+				end
+			end
 		end
 	end
-	
-	Root = Limbs[math.random(1,#Limbs)] or char:FindFirstChild("Head")
-	
-	if not Root then
-		warn("Root not Found")
-		return
-	end
-	firetouchinterest(Root,Instan,0)
-	firetouchinterest(Root,Instan,1)
+
 end
 local SelectedTable = {}
 local CollectCoins = function()
