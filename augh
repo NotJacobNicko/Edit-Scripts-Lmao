@@ -101,7 +101,7 @@ local CollectCoins = function()
 							table.insert(SelectedTable,Coin)
 							Instance.new("Highlight",Coin).OutlineColor = Color3.new(1, 0.933333, 0)
 						end
-						TouchObj(Coin)
+						TouchObj(Coin,{BypassMagnitude = true})
 					end
 				end)
 			end
@@ -111,7 +111,7 @@ end
 warn("Collecting coins lmao")
 workspace.DescendantAdded:Connect(function(isn) 
 	if isAcoin(isn) then
-		TouchObj(isn)
+		TouchObj(isn,{BypassMagnitude = true})
 	end
 end)
 while wait() do
