@@ -1,13 +1,26 @@
-repeat wait() until game:IsLoaded()
-local Flyye,VELO,BODY = false,nil,nil
-local OriginPos = CFrame.new()
-local plrlol = game:GetService("Players").LocalPlayer
-local Dead = false
-local ExtraBebounfly = false
-local CharacterParented = workspace
+local lplr = game:GetService("Players").LocalPlayer
+local cam = workspace:FindFirstChildWhichIsA("Camera")
+local PlayerModuleMoment = nil
+local RespawnDebounce,Flyingmode = false,false
+local OriginPos = CFrame.new(0,6,0)
+local MainRoot,rootMissing,mainhum = nil,true,nil
+local FlyObjs = {}
 local ISStudio = game:GetService("RunService"):IsStudio()
-local Speed = 60
-local ActiveDeath = false
+FlyObjs["Seperate1"] = nil
+FlyObjs["Seperate2"] = nil
+FlyObjs["WeldRoot"] = nil
+
+local FlySpeed = 60
+local function IsAlive(char)
+	if not char then
+		return false
+	end
+
+	if char:FindFirstChildWhichIsA("Humanoid") and char:FindFirstChildWhichIsA("Humanoid").Health >= 0 then
+		return true
+	end
+	return false
+end
 function randomstring()
 	local e = {}
 	for i = 1,math.random(5,50) do
@@ -15,12 +28,117 @@ function randomstring()
 	end
 	return table.concat(e)
 end
-local LastPos = nil
+
+
+
+local function Refill()
+	if not Flyingmode then
+		return
+	end
+	if not FlyObjs["Seperate2"] or FlyObjs["Seperate2"].Parent ~= workspace then
+		pcall(game.Destroy,FlyObjs["Seperate2"])
+		FlyObjs["Seperate2"] = Instance.new("Part",workspace)
+		FlyObjs["Seperate2"].Name = randomstring()
+		FlyObjs["Seperate2"].CFrame = OriginPos
+		FlyObjs["Seperate2"].Color = Color3.new(0, 0, 1)
+		FlyObjs["Seperate2"].CanCollide = false
+		FlyObjs["Seperate2"].Material = Enum.Material.SmoothPlastic
+		FlyObjs["Seperate2"].Size = Vector3.new(2, 2, 1)
+		FlyObjs["Seperate2"].Transparency = .9
+	else
+		FlyObjs["Seperate2"].CFrame = OriginPos
+	end
+	if FlyObjs["Seperate2"] and MainRoot then
+		if not FlyObjs["WeldRoot"] or FlyObjs["WeldRoot"].Part0 ~= MainRoot or FlyObjs["WeldRoot"].Part1 ~= FlyObjs["Seperate2"] or FlyObjs["WeldRoot"].Parent ~= FlyObjs["Seperate2"] then
+			pcall(game.Destroy,FlyObjs["WeldRoot"])
+			FlyObjs["WeldRoot"] = Instance.new("Weld",FlyObjs["Seperate2"])
+			FlyObjs["WeldRoot"].Name = randomstring()
+			FlyObjs["WeldRoot"].Part0 = MainRoot
+			FlyObjs["WeldRoot"].Part1 = FlyObjs["Seperate2"]
+		else
+			FlyObjs["WeldRoot"].Name = randomstring()
+		end
+	end
+	
+	
+	if not FlyObjs["Seperate1"] or FlyObjs["Seperate1"].Parent ~= workspace then
+		pcall(game.Destroy,FlyObjs["Seperate1"])
+		FlyObjs["Seperate1"] = Instance.new("Part",workspace)
+		FlyObjs["Seperate1"].Name = randomstring()
+		FlyObjs["Seperate1"].CFrame = OriginPos
+		FlyObjs["Seperate1"].Anchored = true
+		FlyObjs["Seperate1"].Color = Color3.new(1, 0, 0)
+		FlyObjs["Seperate1"].CanCollide = false
+		FlyObjs["Seperate1"].Material = Enum.Material.SmoothPlastic
+		FlyObjs["Seperate1"].Size = Vector3.new(2, 2, 1)
+		FlyObjs["Seperate1"].Transparency = .9
+	else
+		OriginPos = FlyObjs["Seperate1"].CFrame
+		FlyObjs["Seperate1"].CFrame = CFrame.new(FlyObjs["Seperate1"].CFrame.X,FlyObjs["Seperate1"].CFrame.Y,FlyObjs["Seperate1"].CFrame.Z)*cam.CFrame.Rotation
+	end
+end
+workspace.DescendantRemoving:Connect(Refill)
+
+
+task.spawn(function()
+	for i,Con in pairs({workspace:GetPropertyChangedSignal("DistributedGameTime"),game:GetService("RunService").RenderStepped,game:GetService("RunService").Heartbeat}) do
+		Con:Connect(function()
+			task.spawn(Refill)
+
+			if not lplr.Character or not lplr.Character:FindFirstChildWhichIsA("Humanoid") then
+				return
+			end
+			local Humanoid = lplr.Character:FindFirstChildWhichIsA("Humanoid")
+			local RootPart = lplr.Character:FindFirstChild("Torso") or lplr.Character:FindFirstChild("HumanoidRootPart")
+			PlayerModuleMoment = lplr:FindFirstChildWhichIsA("PlayerScripts"):FindFirstChild("PlayerModule")
+			mainhum = Humanoid
+			MainRoot = RootPart
+			
+			if Flyingmode then
+				if not MainRoot or not MainRoot.Parent then
+					lplr.Character:PivotTo(OriginPos)
+				end
+				
+				local VELopart = FlyObjs["Seperate1"]
+				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
+					VELopart.CFrame = VELopart.CFrame + (cam.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * FlySpeed))/100
+
+				end
+				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
+					VELopart.CFrame = VELopart.CFrame - (cam.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * FlySpeed))/100
+				end
+				
+						
+				
+				if IsAlive(lplr.Character) then
+					Humanoid.PlatformStand = false
+					if Humanoid.Sit then
+						Humanoid.PlatformStand = false
+						cam.CameraSubject = Humanoid
+						cam.CameraType = Enum.CameraType.Track
+					else
+						Humanoid.PlatformStand = true
+						cam.CameraType = Enum.CameraType.Custom
+					end
+					
+					MainRoot.AssemblyLinearVelocity = Vector3.new(0,0,0)
+					MainRoot.AssemblyAngularVelocity = Vector3.new(0,0,0)
+				end
+			end
+			
+		end)
+	end
+end)
+
+
+
+
+
 local GUI = Instance.new("ScreenGui")
 if not ISStudio then
 	GUI.Parent = game:GetService("CoreGui")
 else
-	GUI.Parent = plrlol.PlayerGui
+	GUI.Parent = lplr.PlayerGui
 end
 GUI.Name = randomstring()
 GUI.ResetOnSpawn = false
@@ -38,284 +156,46 @@ textbox.BackgroundColor3 = Color3.new(0.133333, 1, 0)
 textbox.Position = UDim2.new(0.46, 0,0.77, 0)
 textbox.Visible = true
 textbox.Text = ""
-textbox.PlaceholderText = "Speed:"..Speed
+textbox.PlaceholderText = "Speed:"..FlySpeed
 textbox.PlaceholderColor3 = Color3.new(0, 0, 0)
 textbox:GetPropertyChangedSignal("Text"):Connect(function()
 	local num = tonumber(textbox.Text)
 	if num ~= nil and 10 <= num then
 		textbox.PlaceholderText = "Speed:"..num
-		Speed = num
+		FlySpeed = num
 	end
 end)
 button1.MouseButton1Click:Connect(function()
-	if not Flyye then
+	if not Flyingmode then
 		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
-		Flyye = true
-		ExtraBebounfly = true
-		if not ActiveDeath then
-			print("Injected Character Flight Due To Error")
-			EffectCharacter(plrlol.Character)
+		Flyingmode = true
+		
+		if MainRoot then
+			OriginPos = MainRoot.CFrame 
 		end
 	else
 		button1.BackgroundColor3 = Color3.new(1, 0, 0)
-		Flyye = false
-		ExtraBebounfly = false
-		if LastPos then
-			LastPos:Destroy()
+		Flyingmode = false
+		
+		cam.CameraType = Enum.CameraType.Custom
+		
+		if MainRoot then
+			MainRoot.AssemblyLinearVelocity = Vector3.new(0,0,0)
+			MainRoot.AssemblyAngularVelocity = Vector3.new(0,0,0)
+			OriginPos = MainRoot.CFrame 
 		end
-		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
-			if VELO and BODY then
-				VELO:Destroy()
-				BODY:Destroy()
-				VELO = nil
-				BODY = nil
-				plrlol.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
+		
+		if FlyObjs["WeldRoot"] then
+			FlyObjs["WeldRoot"]:remove()
+		end
+		if mainhum then
+			cam.CameraSubject = mainhum
+			mainhum.PlatformStand = false
+		end
+		for i,Obj in FlyObjs do
+			if Obj then
+				Obj:remove()
 			end
 		end
 	end
 end)
-local PlrCamera = workspace.CurrentCamera
-local weldlol = nil
-local IsAlive = true
-function loopcheck()
-	local function uh()
-		local Humanoid = plrlol.Character:WaitForChild("Humanoid")
-		local RootPart = plrlol.Character:FindFirstChild("HumanoidRootPart")
-		if ExtraBebounfly then
-			pcall(function()
-				if not LastPos or LastPos.Parent ~= workspace then
-					pcall(game.Destroy,LastPos)
-					LastPos = Instance.new("Part",workspace)
-					LastPos.Name = randomstring()
-					LastPos.CFrame = OriginPos
-					LastPos.Color = Color3.new(1, 0, 0)
-					LastPos.CanCollide = false
-					LastPos.Material = Enum.Material.SmoothPlastic
-					LastPos.Size = Vector3.new(2, 2, 1)
-					LastPos.Transparency = .9
-				else
-					LastPos.Name = randomstring()
-					if not IsAlive then
-						LastPos.CFrame = OriginPos
-					end
-				end
-				if not Dead then
-					if LastPos and not VELO or VELO.Parent ~= LastPos then
-						VELO = Instance.new("BodyVelocity",LastPos)
-						VELO.Name = randomstring()
-						VELO.Parent = LastPos
-						VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
-						VELO.Velocity = Vector3.new()
-					else
-						VELO.Name = randomstring()
-					end
-
-					if LastPos and not BODY or BODY.Parent ~= LastPos then
-						BODY = Instance.new("BodyGyro",LastPos)
-						BODY.Name = randomstring()
-						BODY.Parent = LastPos
-						BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-						BODY.P = 1000
-						BODY.D = 200
-					else
-						BODY.Name = randomstring()
-					end
-					
-					if LastPos and RootPart then
-						if not weldlol or weldlol.Part0 ~= RootPart or weldlol.Part1 ~= LastPos or weldlol.Parent ~= RootPart then
-							pcall(game.Destroy,weldlol)
-							weldlol = Instance.new("Weld",RootPart)
-							weldlol.Name = randomstring()
-							weldlol.Part0 = RootPart
-							weldlol.Part1 = LastPos
-						else
-							weldlol.Name = randomstring()
-						end
-					end
-					
-				end
-			end)
-		else
-			if LastPos then
-				LastPos:Destroy()
-			end
-		end
-		local function FastSpam()
-			if Flyye and not Dead then
-				for _, child in pairs(plrlol.Character:GetDescendants()) do
-					if child:IsA("BasePart") and child.CanCollide == true then
-						child.CanCollide = false
-					end
-				end
-			end
-
-			if Flyye and plrlol.PlayerGui:FindFirstChild("TouchGui") then
-				game:GetService("UserInputService").ModalEnabled = false
-				local PlayerModule = require(plrlol:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"))
-				local PlayerControls = PlayerModule:GetControls()
-				local MobileGui = plrlol.PlayerGui:FindFirstChild("TouchGui")
-				local MobileFrame = MobileGui:FindFirstChild("TouchControlFrame")
-				if MobileGui and not MobileGui.Enabled or not MobileGui:FindFirstChild("TouchControlFrame").Visible or not MobileGui:FindFirstChild("TouchControlFrame"):FindFirstChild("JumpButton").Visible or not MobileGui:FindFirstChild("TouchControlFrame"):FindFirstChild("DynamicThumbstickFrame").Visible then
-					MobileGui.Enabled = true
-					MobileFrame.Visible = true
-					MobileFrame:FindFirstChild("JumpButton").Visible = true
-					MobileFrame:FindFirstChild("DynamicThumbstickFrame").Visible = true
-					MobileFrame.ZIndex = 999999
-				end
-				PlayerControls:Enable(true)
-			end
-		end
-		task.spawn(function()
-			FastSpam()
-			for i=1,15 do
-				FastSpam()
-			end
-			FastSpam()
-		end)
-		
-		if not Flyye and RootPart then
-			OriginPos = plrlol.Character:FindFirstChild("HumanoidRootPart").CFrame
-		end
-		
-		if Flyye and plrlol.Character and Humanoid and RootPart then
-			local PlayerModuleMoment = plrlol.PlayerScripts:WaitForChild("PlayerModule")
-			if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart and VELO and BODY then
-				if Humanoid ~= nil then
-					if Humanoid.Sit then
-						Humanoid.PlatformStand = false
-						PlrCamera.CameraSubject = Humanoid
-						PlrCamera.CameraType = Enum.CameraType.Track
-					else
-						Humanoid.PlatformStand = true
-						PlrCamera.CameraType = Enum.CameraType.Custom
-					end
-				else
-					Humanoid = plrlol.Character:FindFirstChildWhichIsA("Humanoid")
-					RootPart = plrlol.Character:FindFirstChild("HumanoidRootPart")
-				end
-				BODY.CFrame = PlrCamera.CFrame
-				VELO.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
-				BODY.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-				VELO.Velocity = Vector3.new()
-				
-
-				if not Dead then
-					if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
-						VELO.Velocity = VELO.Velocity + PlrCamera.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * Speed)
-						if not Dead and ExtraBebounfly then
-							OriginPos = LastPos.CFrame
-						end
-					end
-					if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
-						VELO.Velocity = VELO.Velocity - PlrCamera.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * Speed)
-						if not Dead and ExtraBebounfly then
-							OriginPos = LastPos.CFrame
-						end
-					end
-				end
-				
-			end
-		end
-
-	end
-	uh()
-	coroutine.resume(coroutine.create(function()
-		while wait() do
-			task.defer(function()
-				uh()
-				uh()
-			end)
-		end
-	end))
-	uh()
-end
-function EffectCharacter(Char)
-	local RootPart = Char:FindFirstChild("HumanoidRootPart")
-	local HumanoidChar = Char:FindFirstChild("Humanoid")
-	ActiveDeath = true
-	pcall(function()
-		HumanoidChar.Died:Connect(function()
-			ActiveDeath = false
-			Dead = true
-			IsAlive = false
-			plrlol.CharacterAdded:Connect(function(char)
-				local Character = nil
-				repeat
-					local Human = CharacterParented:FindFirstChild(plrlol.Name):FindFirstChildWhichIsA("Humanoid")
-					if CharacterParented:FindFirstChild(plrlol.Name) and Human and Human.Health ~= 0 then
-						Character = plrlol.Character or char
-						EffectCharacter(Character)
-					end
-					wait()
-				until Character ~= nil
-			end)
-		end)
-	end)
-	CharacterParented.ChildRemoved:Connect(function(model)
-		if model:IsA("Model") and model == Char then
-			Dead = true
-			ActiveDeath = false
-			IsAlive = false
-			local Character = nil
-			repeat
-				local Human = model:FindFirstChildWhichIsA("Humanoid")
-				if CharacterParented:FindFirstChild(plrlol.Name) and Human and Human.Health ~= 0 then
-					Character = plrlol.Character
-					EffectCharacter(Character)
-				end
-				wait()
-			until Character ~= nil
-		end
-	end)
-	Dead = false
-	
-	if Flyye then
-		task.spawn(function()
-			if LastPos then
-				LastPos.Anchored = true
-			end
-			local sucee = pcall(function()
-				repeat
-					if ExtraBebounfly then
-						Char:MoveTo(LastPos.Position)
-					end
-					wait()
-				until (LastPos and (RootPart.Position - OriginPos.Position).Magnitude <= 5) or not LastPos 
-				task.wait(.5)
-				if LastPos then
-					LastPos.Anchored = false
-				end
-				IsAlive = true
-			end)
-			if not sucee then
-				task.wait(.5)
-				if LastPos then
-					LastPos.Anchored = false
-				end
-				IsAlive = true
-			end
-		end)
-		Flyye = false
-		if plrlol.Character and plrlol.Character:FindFirstChildOfClass("Humanoid") and plrlol.Character.Humanoid.RootPart then
-			if VELO and BODY then
-				VELO:Destroy()
-				BODY:Destroy()
-				VELO = nil
-				BODY = nil
-				plrlol.Character:FindFirstChildWhichIsA("Humanoid").PlatformStand = false
-			end
-		end
-		wait()
-		Flyye = true
-	end
-end
-if plrlol.Character then
-	CharacterParented = plrlol.Character.Parent
-	print(CharacterParented.Name)
-else
-	CharacterParented = workspace
-	print("error auto set to workspace")
-end
-OriginPos = plrlol.Character:FindFirstChild("HumanoidRootPart").CFrame or CFrame.new()
-loopcheck()
-EffectCharacter(plrlol.Character)
