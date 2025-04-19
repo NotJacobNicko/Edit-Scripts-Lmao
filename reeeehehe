@@ -6,6 +6,7 @@ local OriginPos = CFrame.new(0,6,0)
 local MainRoot,rootMissing,mainhum = nil,true,nil
 local FlyObjs = {}
 local ISStudio = game:GetService("RunService"):IsStudio()
+local BypassType = "None"
 FlyObjs["Seperate1"] = nil
 FlyObjs["Seperate2"] = nil
 FlyObjs["WeldRoot"] = nil
@@ -59,8 +60,8 @@ local function Refill()
 			FlyObjs["WeldRoot"].Name = randomstring()
 		end
 	end
-	
-	
+
+
 	if not FlyObjs["Seperate1"] or FlyObjs["Seperate1"].Parent ~= workspace then
 		pcall(game.Destroy,FlyObjs["Seperate1"])
 		FlyObjs["Seperate1"] = Instance.new("Part",workspace)
@@ -93,12 +94,12 @@ task.spawn(function()
 			PlayerModuleMoment = lplr:FindFirstChildWhichIsA("PlayerScripts"):FindFirstChild("PlayerModule")
 			mainhum = Humanoid
 			MainRoot = RootPart
-			
+
 			if Flyingmode then
 				if not MainRoot or not MainRoot.Parent then
 					lplr.Character:PivotTo(OriginPos)
 				end
-				
+				local VELopart = FlyObjs["Seperate1"]
 				local VELopart = FlyObjs["Seperate1"]
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
 					VELopart.CFrame = VELopart.CFrame + (cam.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * FlySpeed))/100
@@ -107,25 +108,44 @@ task.spawn(function()
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
 					VELopart.CFrame = VELopart.CFrame - (cam.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * FlySpeed))/100
 				end
-				
-						
-				
-				if IsAlive(lplr.Character) then
-					Humanoid.PlatformStand = false
-					if Humanoid.Sit then
+				-- Extract camera's lookVector (the direction it's looking)
+
+
+
+				if BypassType:lower() == "norotation" then
+					local xAxis,yAxis,zAxis = cam.CFrame:ToOrientation()
+					VELopart.CFrame = CFrame.new(VELopart.Position)*CFrame.Angles(0,yAxis,0)
+					if IsAlive(lplr.Character) then
 						Humanoid.PlatformStand = false
-						cam.CameraSubject = Humanoid
-						cam.CameraType = Enum.CameraType.Track
-					else
-						Humanoid.PlatformStand = true
-						cam.CameraType = Enum.CameraType.Custom
+						if Humanoid.Sit then
+							cam.CameraSubject = Humanoid
+							cam.CameraType = Enum.CameraType.Track
+						else
+							cam.CameraType = Enum.CameraType.Custom
+						end
 					end
-					
-					MainRoot.AssemblyLinearVelocity = Vector3.new(0,0,0)
-					MainRoot.AssemblyAngularVelocity = Vector3.new(0,0,0)
+				else
+					if IsAlive(lplr.Character) then
+						Humanoid.PlatformStand = false
+						if Humanoid.Sit then
+							Humanoid.PlatformStand = false
+							cam.CameraSubject = Humanoid
+							cam.CameraType = Enum.CameraType.Track
+						else
+							Humanoid.PlatformStand = true
+							cam.CameraType = Enum.CameraType.Custom
+						end
+					end
 				end
+
+
+
+
+
+				MainRoot.AssemblyLinearVelocity = Vector3.new(0,0,0)
+				MainRoot.AssemblyAngularVelocity = Vector3.new(0,0,0)
 			end
-			
+
 		end)
 	end
 end)
@@ -143,21 +163,49 @@ end
 GUI.Name = randomstring()
 GUI.ResetOnSpawn = false
 GUI.IgnoreGuiInset = true
-local button1 = Instance.new("TextButton",GUI)
+
+local Frame = Instance.new("Frame",GUI)
+Frame.Name = randomstring()
+Frame.Size = UDim2.new(0,262,0,57)
+Frame.Position = UDim2.new(0.342, 0,0.728, 0)
+Frame.BackgroundColor3 = Color3.new(0,0,0)
+
+
+local button1 = Instance.new("TextButton",Frame)
 button1.Name = randomstring()
 button1.Size = UDim2.new(0,60,0,20)
 button1.BackgroundColor3 = Color3.new(1, 0, 0)
-button1.Position = UDim2.new(0.467, 0,0.728, 0)
+button1.Position = UDim2.new(0.045, 0,0.344, 0)
 button1.Text = "Fly"
 button1.Visible = true
-local textbox = Instance.new("TextBox",GUI)
+
+local textbox = Instance.new("TextBox",Frame)
 textbox.Size = UDim2.new(0,75,0,32)
 textbox.BackgroundColor3 = Color3.new(0.133333, 1, 0)
-textbox.Position = UDim2.new(0.46, 0,0.77, 0)
+textbox.Position = UDim2.new(0.325, 0,0.235, 0)
 textbox.Visible = true
 textbox.Text = ""
 textbox.PlaceholderText = "Speed:"..FlySpeed
 textbox.PlaceholderColor3 = Color3.new(0, 0, 0)
+
+local textbox1 = Instance.new("TextBox",Frame)
+textbox1.Size = UDim2.new(0,75,0,32)
+textbox1.BackgroundColor3 = Color3.new(0.133333, 1, 0)
+textbox1.Position = UDim2.new(0.662, 0,0.235, 0)
+textbox1.Visible = true
+textbox1.Text = ""
+textbox1.TextScaled = true
+textbox1.PlaceholderText = "Method"
+textbox1.PlaceholderColor3 = Color3.new(0, 0, 0)
+
+textbox1:GetPropertyChangedSignal("Text"):Connect(function()
+	local Type = textbox1.Text
+	if Type ~= "" and Type ~= " " then
+		textbox1.PlaceholderText = "Methods:"..Type
+		BypassType = Type
+	end
+end)
+
 textbox:GetPropertyChangedSignal("Text"):Connect(function()
 	local num = tonumber(textbox.Text)
 	if num ~= nil and 10 <= num then
@@ -169,22 +217,22 @@ button1.MouseButton1Click:Connect(function()
 	if not Flyingmode then
 		button1.BackgroundColor3 = Color3.new(0.14902, 1, 0)
 		Flyingmode = true
-		
+
 		if MainRoot then
 			OriginPos = MainRoot.CFrame 
 		end
 	else
 		button1.BackgroundColor3 = Color3.new(1, 0, 0)
 		Flyingmode = false
-		
+
 		cam.CameraType = Enum.CameraType.Custom
-		
+
 		if MainRoot then
 			MainRoot.AssemblyLinearVelocity = Vector3.new(0,0,0)
 			MainRoot.AssemblyAngularVelocity = Vector3.new(0,0,0)
 			OriginPos = MainRoot.CFrame 
 		end
-		
+
 		if FlyObjs["WeldRoot"] then
 			FlyObjs["WeldRoot"]:remove()
 		end
