@@ -101,7 +101,6 @@ task.spawn(function()
 			end
 			
 			if LimboMode then
-				RootPart.Anchored = true
 				local VELopart = FlyObjs["Seperate1"]
 				cam.CameraSubject = VELopart
 		
@@ -112,6 +111,8 @@ task.spawn(function()
 				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
 					VELopart.CFrame = VELopart.CFrame - (cam.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * FlySpeed))/100
 				end
+				RootPart.CFrame = VELopart.CFrame
+
 				task.spawn(function()
 					for i,Objs in workspace:GetDescendants() do
 						if Objs:IsA("Seat") or Objs:IsA("VehicleSeat") then
