@@ -1,0 +1,219 @@
+local NearbySeats,Temporary = {},{}
+local LimboMode = false
+
+local lplr = game:GetService("Players").LocalPlayer
+local Mouse = lplr:GetMouse()
+local cam = workspace:FindFirstChildWhichIsA("Camera")
+local PlayerModuleMoment,CamSubjectlast
+local OriginPos = CFrame.new(0,6,0)
+local MainRoot,rootMissing,mainhum = nil,true,nil
+local Chosen,pending = nil,nil
+local FlyObjs = {}
+FlyObjs["Seperate1"] = nil
+local ISStudio = game:GetService("RunService"):IsStudio()
+
+
+local FlySpeed = 800
+local function IsAlive(char)
+	if not char then
+		return false
+	end
+
+	if char:FindFirstChildWhichIsA("Humanoid") and char:FindFirstChildWhichIsA("Humanoid").Health >= 0 then
+		return true
+	end
+	return false
+end
+function randomstring()
+	local e = {}
+	for i = 1,math.random(5,50) do
+		table.insert(e,utf8.char(math.random(10,100)))
+	end
+	return table.concat(e)
+end
+
+
+
+local function Refill()
+	if not LimboMode then
+		return
+	end
+
+	if not FlyObjs["Seperate1"] or FlyObjs["Seperate1"].Parent ~= workspace then
+		pcall(game.Destroy,FlyObjs["Seperate1"])
+		FlyObjs["Seperate1"] = Instance.new("Part",workspace)
+		FlyObjs["Seperate1"].Name = randomstring()
+		FlyObjs["Seperate1"].CFrame = OriginPos
+		FlyObjs["Seperate1"].Anchored = true
+		FlyObjs["Seperate1"].Color = Color3.new(1, 0, 0)
+		FlyObjs["Seperate1"].CanCollide = false
+		FlyObjs["Seperate1"].Material = Enum.Material.SmoothPlastic
+		FlyObjs["Seperate1"].Size = Vector3.new(2, 2, 1)
+		FlyObjs["Seperate1"].Transparency = .9
+	else
+		OriginPos = FlyObjs["Seperate1"].CFrame
+		FlyObjs["Seperate1"].CFrame = CFrame.new(FlyObjs["Seperate1"].CFrame.X,FlyObjs["Seperate1"].CFrame.Y,FlyObjs["Seperate1"].CFrame.Z)*cam.CFrame.Rotation
+	end
+end
+workspace.DescendantRemoving:Connect(Refill)
+
+
+task.spawn(function()
+	for i,Con in pairs({workspace:GetPropertyChangedSignal("DistributedGameTime"),game:GetService("RunService").RenderStepped,game:GetService("RunService").Heartbeat}) do
+		Con:Connect(function()
+			task.spawn(Refill)
+
+			if not lplr.Character or not lplr.Character:FindFirstChildWhichIsA("Humanoid") then
+				return
+			end
+			local Humanoid = lplr.Character:FindFirstChildWhichIsA("Humanoid")
+			local RootPart = lplr.Character:FindFirstChild("Torso") or lplr.Character:FindFirstChild("HumanoidRootPart")
+			PlayerModuleMoment = lplr:FindFirstChildWhichIsA("PlayerScripts"):FindFirstChild("PlayerModule")
+			mainhum = Humanoid
+			MainRoot = RootPart
+			
+			if Chosen then
+				
+				if Chosen.Occupant ~= Humanoid then
+					RootPart.Anchored = false
+					if Humanoid.Sit then
+						Humanoid.Jump = true
+						return
+					end
+					MainRoot.CFrame = Chosen.CFrame
+				else
+					pcall(game.Destroy,FlyObjs["Seperate1"])
+					Chosen = nil
+					LimboMode = false
+					cam.CameraSubject = Humanoid
+					RootPart.Anchored = false
+					NearbySeats = {}
+
+					for i,Objs in Temporary do
+						if Objs then
+							Objs:Destroy()
+						end
+					end
+					Temporary = {}
+				end
+
+				return
+			end
+			
+			if LimboMode then
+				RootPart.Anchored = true
+				local VELopart = FlyObjs["Seperate1"]
+				cam.CameraSubject = VELopart
+		
+				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X < 0 then
+					VELopart.CFrame = VELopart.CFrame + (cam.CFrame.RightVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().X * FlySpeed))/100
+
+				end
+				if require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z > 0 or require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z < 0 then
+					VELopart.CFrame = VELopart.CFrame - (cam.CFrame.LookVector * (require(PlayerModuleMoment:WaitForChild("ControlModule")):GetMoveVector().Z * FlySpeed))/100
+				end
+				task.spawn(function()
+					for i,Objs in workspace:GetDescendants() do
+						if Objs:IsA("Seat") or Objs:IsA("VehicleSeat") then
+							local Highlight = nil or Temporary[Objs]
+							if not Highlight or Highlight.Parent ~= Objs then
+								pcall(game.Destroy,Highlight)
+								Highlight = Instance.new("Highlight",Objs)
+								Temporary[Objs] = Highlight
+								Highlight.Name = ""
+								Highlight.Enabled = true
+								Highlight.OutlineColor = Color3.new(1, 1, 1)
+								Highlight.FillColor = Color3.new(0, 0, 0)
+								Highlight.FillTransparency = 0
+							end
+							
+							
+							if Objs.Occupant or not Objs.CanTouch then
+								Highlight.FillColor = Color3.new(1,0,0)
+								if pending == Objs then
+									pending = nil
+								end
+								if table.find(NearbySeats,Objs) then
+									for Num,info in NearbySeats do
+										if info == Objs then
+											table.remove(NearbySeats,Num)
+										end
+									end
+								end
+							else
+								Highlight.FillColor = Color3.new(0,1,0)
+								if not table.find(NearbySeats,Objs) then
+									table.insert(NearbySeats,Objs)
+								end
+							end
+							
+							if pending == Objs then
+								Highlight.FillColor = Color3.new(0,0,1)
+							end
+						end
+					end
+				end)
+				
+			else
+				cam.CameraSubject = Humanoid
+				RootPart.Anchored = false
+				NearbySeats = {}
+				
+				for i,Objs in Temporary do
+					if Objs then
+						Objs:Destroy()
+					end
+				end
+				Temporary = {}
+			end
+
+		end)
+	end
+end)
+
+
+Mouse.Button1Down:Connect(function()
+	local Target = Mouse.Target
+	if Target and Target:IsA("BasePart") and LimboMode then
+		if table.find(NearbySeats,Target) then
+			pending = Target
+		end
+	end
+end)
+
+
+local GUI = Instance.new("ScreenGui")
+if not ISStudio then
+	GUI.Parent = game:GetService("CoreGui")
+else
+	GUI.Parent = lplr.PlayerGui
+end
+GUI.Name = randomstring()
+GUI.ResetOnSpawn = false
+GUI.IgnoreGuiInset = true
+local button1 = Instance.new("TextButton",GUI)
+button1.Name = randomstring()
+button1.Size = UDim2.new(0,60,0,20)
+button1.BackgroundColor3 = Color3.new(1, 0, 0)
+button1.Position = UDim2.new(0.467, 0,0.728, 0)
+button1.Text = "Limbo"
+button1.Visible = true
+
+
+button1.MouseButton1Click:Connect(function()
+	if not LimboMode then
+		button1.BackgroundColor3 = Color3.new(0, 1, 0)
+		if MainRoot then
+			OriginPos = MainRoot.CFrame
+		end
+		LimboMode = true
+		Chosen = nil
+		pending = nil
+	else
+		button1.BackgroundColor3 = Color3.new(1, 0, 0)
+		LimboMode = false
+		if pending then
+			Chosen = pending
+		end
+	end
+end)
