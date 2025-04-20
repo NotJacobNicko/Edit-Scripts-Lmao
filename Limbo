@@ -73,9 +73,9 @@ task.spawn(function()
 			MainRoot = RootPart
 			
 			if Chosen then
-				
 				if Chosen.Occupant ~= Humanoid then
 					RootPart.Anchored = false
+					Chosen.CanTouch = true
 					if Humanoid.Sit then
 						Humanoid.Jump = true
 						return
@@ -129,7 +129,7 @@ task.spawn(function()
 							end
 							
 							
-							if Objs.Occupant or not Objs.CanTouch then
+							if Objs.Occupant then
 								Highlight.FillColor = Color3.new(1,0,0)
 								if pending == Objs then
 									pending = nil
