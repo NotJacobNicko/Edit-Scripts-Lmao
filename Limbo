@@ -14,6 +14,17 @@ local ISStudio = game:GetService("RunService"):IsStudio()
 
 
 local FlySpeed = 800
+
+function Notifyclient(Text)
+	local goofynotiids = {6823153536,6823153536,7991347388,6879335951,217548941,4891171429,17660225827,6879335951}
+	local Notisong = Instance.new("Sound",game:GetService("SoundService"))
+	Notisong.SoundId = "rbxassetid://"..goofynotiids[math.random(1,#goofynotiids)]
+	Notisong.Volume = 4
+	Notisong.PlayOnRemove = true
+	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "System",Text = Text,Icon = "rbxassetid://18584222941",Duration = 5})
+	Notisong:Destroy()
+end
+
 local function IsAlive(char)
 	if not char then
 		return false
@@ -120,6 +131,7 @@ task.spawn(function()
 							if not Highlight or Highlight.Parent ~= Objs then
 								pcall(game.Destroy,Highlight)
 								Highlight = Instance.new("Highlight",Objs)
+								Notifyclient("Highlighted Parts")
 								Temporary[Objs] = Highlight
 								Highlight.Name = ""
 								Highlight.Enabled = true
