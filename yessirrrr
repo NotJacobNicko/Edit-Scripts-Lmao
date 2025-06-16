@@ -43,7 +43,7 @@ if not S or S == nil then
 	
 	local Theme = Instance.new("Sound",S)
 	Theme.Name = "Jazz"
-	Theme.Looped = true
+	Theme.Looped = false
 	Theme.Volume = 10
 	task.spawn(function()
 		local Chill,Section = {1845341094,9043887091,9046862941,9046865270,1842802040},0
@@ -1029,10 +1029,19 @@ Tab2:AddToggle({
 									PlrChar.Torso.Anchored = true
 								end
 							until RagdollValue and RagdollValue.Value == false
+							
 							if math.random(3) == 1 then
 								task.wait(math.random()*2)
 							end
 							
+							task.spawn(function()
+								for i,Parts in pairs(PlrChar:GetChildren()) do
+									if Parts:IsA("BasePart") then
+										Parts.AssemblyLinearVelocity = Vector3.new(0,0,0)
+										Parts.AssemblyAngularVelocity = Vector3.new(0,0,0)
+									end
+								end
+							end)
 							local function GetNear(pos)
 								local maxDistance = 65
 								local nearestTarget
