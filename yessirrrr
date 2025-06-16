@@ -2,7 +2,7 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 repeat wait() until game:GetService("Players").LocalPlayer
-local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
+local OrionLib = script.ModuleScript --loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 
@@ -28,10 +28,11 @@ bypass = hookmetamethod(game, "__namecall", function(method, ...)
 	end
 	return bypass(method, ...)
 end)
----Safe---
 
-if workspace:FindFirstChild("SafeBox") == nil then
-	local S = Instance.new("Part")
+---Safe---
+local S,BobWalk1
+if not S or S == nil then
+	S = Instance.new("Part")
 	S.Name = "SafeBox"
 	S.Anchored = true
 	S.CanCollide = true
@@ -47,7 +48,7 @@ if workspace:FindFirstChild("SafeBox") == nil then
 	S1.Transparency = .5
 	S1.Position = Vector3.new(-5499.91, -4991.5, -4989.09)
 	S1.Size = Vector3.new(20, 13, 2)
-	S1.Parent = workspace:FindFirstChild("SafeBox")
+	S1.Parent = S
 
 	local S2 = Instance.new("Part")
 	S2.Name = "S2"
@@ -57,7 +58,7 @@ if workspace:FindFirstChild("SafeBox") == nil then
 	S2.Position = Vector3.new(-5510.27979, -4991.5, -5000.08984, -4.47034836e-07, 0, 0.999999881, 0, 1, 0, -0.999999881, 0, -3.69319451e-07)
 	S2.Size = Vector3.new(21, 14, 2)
 	S2.Rotation = Vector3.new(0, -90, 0)
-	S2.Parent = workspace:FindFirstChild("SafeBox")
+	S2.Parent = S
 
 	local S3 = Instance.new("Part")
 	S3.Name = "S3"
@@ -66,7 +67,7 @@ if workspace:FindFirstChild("SafeBox") == nil then
 	S3.Transparency = .5
 	S3.Position = Vector3.new(-5499.3, -4991.5, -5011.12)
 	S3.Size = Vector3.new(21, 13, 2)
-	S3.Parent = workspace:FindFirstChild("SafeBox")
+	S3.Parent = S
 
 	local S4 = Instance.new("Part")
 	S4.Name = "S4"
@@ -76,7 +77,7 @@ if workspace:FindFirstChild("SafeBox") == nil then
 	S4.Position = Vector3.new(-5489.97559, -4991.5, -4999.52637, -4.37113883e-08, 0, 1, 0, 1, 0, -1, 0, -4.37113883e-08)
 	S4.Size = Vector3.new(22, 13, 2)
 	S4.Rotation = Vector3.new(0, -90, 0)
-	S4.Parent = workspace:FindFirstChild("SafeBox")
+	S4.Parent = S
 
 	local S5 = Instance.new("Part")
 	S5.Name = "S5"
@@ -85,11 +86,11 @@ if workspace:FindFirstChild("SafeBox") == nil then
 	S5.Transparency = .5
 	S5.Position = Vector3.new(-5499.39, -4984, -5000.07)
 	S5.Size = Vector3.new(24, 3, 24)
-	S5.Parent = workspace:FindFirstChild("SafeBox")
+	S5.Parent = S
 end
 
-if workspace:FindFirstChild("BobWalk1") == nil then
-	local BobWalk1 = Instance.new("Part", workspace)
+if BobWalk1 == nil then
+	BobWalk1 = Instance.new("Part", workspace)
 	BobWalk1.CanCollide = false
 	BobWalk1.Anchored = true
 	BobWalk1.CFrame = CFrame.new(23.2798462, -19.8447475, 1.83554196, -1, 0, 0, 0, -1, 0, 0, 0, 1)
@@ -330,7 +331,7 @@ Tab7:AddSlider({
 	Name = "Reach HitBox",
 	Min = 2,
 	Max = 30,
-	Default = 15,
+	Default = 8,
 	Color = Color3.fromRGB(255,255,255),
 	Increment = 1,
 	ValueName = "Reach",
@@ -378,8 +379,8 @@ Tab7:AddSlider({
 
 Tab7:AddDropdown({
 	Name = "Extend Option",
-	Default = "Meat Stick",
-	Options = {"Meat Stick","Pancake","Growth","North Korea Wall","Slight Extend"},
+	Default = "long ahh rod",
+	Options = {"Meat Stick","Pancake","Growth","North Korea Wall","Slight Extend","long ahh rod"},
 	Callback = function(Value)
 		_G.GloveExtendOption = Value
 	end    
@@ -405,6 +406,8 @@ table.insert(ShouldEnable,Tab7:AddToggle({
 								Glove.Size = Vector3.new(_G.GloveExtendReach,0,_G.GloveExtendReach)
 							elseif _G.GloveExtendOption == "Slight Extend" then
 								Glove.Size = Vector3.new(3, 3, 3.7)
+							elseif _G.GloveExtendOption == "long ahh rod" then
+								Glove.Size = Vector3.new(1, _G.GloveExtendReach, 1)
 							end
 							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
 								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
@@ -669,7 +672,7 @@ game:GetService("Players").PlayerAdded:Connect(function(v)
 			KillESPText.TextStrokeTransparency = 0.5
 			KillESPText.Text = "![Admin]!"
 		end
-		
+
 		local InfoPlayer = {
 			["PlrName"] = v.Name.."{@"..v.DisplayName.."}",
 			["Slaps"] = v:FindFirstChild("leaderstats"):FindFirstChild("Slaps").Value or "??",
@@ -680,8 +683,9 @@ game:GetService("Players").PlayerAdded:Connect(function(v)
 		_G.SlappleFarm = false
 	end
 end)
+
 table.insert(ShouldEnable,Tab2:AddToggle({
-	Name = "Notify High Rank",
+	Name = "Notify Staff Rank",
 	Default = false,
 	Callback = function(Value)
 		_G.AntiMods = Value  
@@ -689,26 +693,50 @@ table.insert(ShouldEnable,Tab2:AddToggle({
 		while _G.AntiMods do
 			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 				if v and v:GetRankInGroup(9950771) >= 2 then
+					local RankNo = v:GetRankInGroup(9950771)
 					
-					if v.Character.Head:FindFirstChild("AdminTagger") == nil then
-						KillESP = Instance.new("BillboardGui", v.Character.Head)
-						KillESP.Adornee = v.Character.Head
-						KillESP.Name = "AdminTagger"
-						KillESP.Size = UDim2.new(0, 100, 0, 150)
-						KillESP.StudsOffset = Vector3.new(0, 1, 0)
-						KillESP.AlwaysOnTop = true
-						KillESP.StudsOffset = Vector3.new(0, 4, 0)
-						KillESPText = Instance.new("TextLabel", KillESP)
-						KillESPText.BackgroundTransparency = 1
-						KillESPText.Size = UDim2.new(0, 100, 0, 100)
-						KillESPText.TextSize = 20
-						KillESPText.Font = Enum.Font.FredokaOne
-						KillESPText.TextColor3 = Color3.new(1, 1, 1)
-						KillESPText.TextStrokeTransparency = 0.5
-						KillESPText.Text = "![Admin]!"
+					if RankNo >= 5 then
+						if v.Character.Head:FindFirstChild("THISISSTAFF") == nil then
+							KillESP = Instance.new("BillboardGui", v.Character.Head)
+							KillESP.Adornee = v.Character.Head
+							KillESP.Name = "THISISSTAFF"
+							KillESP.Size = UDim2.new(0, 100, 0, 150)
+							KillESP.StudsOffset = Vector3.new(0, 1, 0)
+							KillESP.AlwaysOnTop = true
+							KillESP.StudsOffset = Vector3.new(0, 4, 0)
+							KillESPText = Instance.new("TextLabel", KillESP)
+							KillESPText.BackgroundTransparency = 1
+							KillESPText.Size = UDim2.new(0, 100, 0, 100)
+							KillESPText.TextSize = 20
+							KillESPText.Font = Enum.Font.FredokaOne
+							KillESPText.TextColor3 = Color3.new(1, 0, 0)
+							KillESPText.TextStrokeTransparency = 0.5
+							KillESPText.Text = "![High Staff]!"
+						end
+					else
+						if v.Character.Head:FindFirstChild("Rank") == nil then
+							KillESP = Instance.new("BillboardGui", v.Character.Head)
+							KillESP.Adornee = v.Character.Head
+							KillESP.Name = "Rank"
+							KillESP.Size = UDim2.new(0, 100, 0, 150)
+							KillESP.StudsOffset = Vector3.new(0, 1, 0)
+							KillESP.AlwaysOnTop = true
+							KillESP.StudsOffset = Vector3.new(0, 4, 0)
+							KillESPText = Instance.new("TextLabel", KillESP)
+							KillESPText.BackgroundTransparency = 1
+							KillESPText.Size = UDim2.new(0, 100, 0, 100)
+							KillESPText.TextSize = 20
+							KillESPText.Font = Enum.Font.FredokaOne
+							KillESPText.TextColor3 = Color3.new(1, 1, 1)
+							KillESPText.TextStrokeTransparency = 0.5
+							KillESPText.Text = "!["..v:GetRoleInGroup(9950771).."]!"
+						end
 					end
 					
 					
+				
+
+
 					task.spawn(function()
 						if not table.find(TaggedTable,v) then
 							table.insert(TaggedTable,v)
@@ -735,7 +763,7 @@ Tab2:AddToggle({
 		_G.KickWhenStaffJoins = Value
 		while _G.KickWhenStaffJoins do
 			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-				if v:GetRankInGroup(9950771) >= 2 then
+				if v:GetRankInGroup(9950771) >= 8 then
 					_G.AntiKick = false
 					local InfoPlayer = {
 						["PlrName"] = v.Name.."{@"..v.DisplayName.."}",
@@ -784,11 +812,19 @@ Tab2:AddToggle({
 		end
 	end    
 })
+local Tagged = {}
 Tab2:AddToggle({
 	Name = "No Lighting",
 	Default = false,
 	Callback = function(Value)
 		_G.ByeLighting = Value
+		if not _G.ByeLighting then
+			for i,Obj in pairs(Tagged) do
+				if Obj then
+					Obj.Enabled = true
+				end
+			end
+		end
 		while _G.ByeLighting do
 			task.wait()
 			if workspace.CurrentCamera then
@@ -810,9 +846,10 @@ Tab2:AddToggle({
 			Lighting.FogColor = Color3.fromRGB(255, 255, 255)
 			Lighting.FogStart = 0
 			Lighting.FogEnd = math.huge
-			
+
 			for i,v in pairs(Lighting:GetChildren()) do
 				if v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
+					table.insert(Tagged,v)
 					v.Enabled = false
 				else
 					v:Destroy()
@@ -893,6 +930,7 @@ Tab2:AddDropdown({
 	end    
 })
 local Tagged = {}
+
 Tab2:AddToggle({
 	Name = "Anti Ragdoll",
 	Default = false,
@@ -914,19 +952,59 @@ Tab2:AddToggle({
 						end
 					elseif _G.TypesOfragdoll == "fake lag" and not table.find(Tagged,RagdollValue) then
 						table.insert(Tagged,RagdollValue)
-						if math.random(1,3) == 1 then
-							repeat task.wait()
+						if math.random(1,2) == 1 then
+							task.wait(math.random())
+							repeat 
+								task.wait()
 								if PlrChar:FindFirstChild("Torso") then
 									PlrChar.Torso.Anchored = true
 								end
 							until RagdollValue and RagdollValue.Value == false
-							if PlrChar:FindFirstChild("Torso") then
-								pcall(function()
-									PlrChar:MoveTo(PlrChar.Torso.Position+Vector3.new(0,math.random(4,30),0))
-								end)
-								PlrChar.Torso.Anchored = false
+							if math.random(1,3) then
+								task.wait(math.random()*2)
 							end
+							
+							local function GetNear(pos)
+								local maxDistance = 65
+								local nearestTarget
+								local PlrChar = game:GetService("Players").LocalPlayer.Character
+								for i,Chars in pairs(workspace:GetDescendants()) do
+									if Chars:IsA("Model") and Chars:FindFirstChildWhichIsA("Humanoid") and Chars ~= PlrChar then
+										local Humanoid = Chars:FindFirstChildWhichIsA("Humanoid")
+										local Root = Chars:FindFirstChild("Torso") or Chars:FindFirstChild("HumanoidRootPart") or Chars:FindFirstChild("Head")
+										if Root and Humanoid.Health > 0 then
+											local distance = (pos - Root.Position).Magnitude
+											if distance < maxDistance then
+												nearestTarget = Chars
+												maxDistance = distance
+											end
+										end
+									end
+								end
+								return nearestTarget
+							end
+							
+							
+							local Varients = math.random(1,3)
+							if Varients == 1 then
+								local PlrRoot = PlrChar:FindFirstChild("Torso") or PlrChar:FindFirstChild("HumanoidRootPart") or PlrChar:FindFirstChild("Head")
+								local NearChar = GetNear(PlrRoot.Position)
+								if NearChar then
+									local Root = NearChar:FindFirstChild("Torso") or NearChar:FindFirstChild("HumanoidRootPart") or NearChar:FindFirstChild("Head")
+									local FilteredPos = Vector3.new(Root.Position.X,PlrRoot.Position.Y,Root.Position.Z)
+									PlrChar:MoveTo(FilteredPos+Vector3.new(0,0,3+math.random(7)))
+								end
+							else
+								if PlrChar:FindFirstChild("Torso") then
+									pcall(function()
+										PlrChar:MoveTo(PlrChar.Torso.Position+Vector3.new(0,math.random(10,50),0))
+									end)
+								end
+							end
+							PlrChar.Torso.Anchored = false
 						end
+						
+						
 					end
 				end
 			end
@@ -935,7 +1013,7 @@ Tab2:AddToggle({
 	end    
 })
 
-wait(.5)
+task.wait(.5)
 for i,v in ShouldEnable do
 	task.spawn(function()
 		pcall(function()
