@@ -13,7 +13,6 @@ function Notifyclient(Text)
 	Notisong:Destroy()
 end
 if not game:IsLoaded() then
-	Notifyclient("loading please wait")
 	game.Loaded:Wait()
 end
 local Window = OrionLib:MakeWindow({IntroText = (GameName), IntroIcon = "rbxassetid://15315284749",Name = ("Slap Battles"),IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = true, ConfigFolder = "slap battles"})
@@ -442,8 +441,8 @@ Tab7:AddSlider({
 
 Tab7:AddDropdown({
 	Name = "Extend Option",
-	Default = "long ahh rod",
-	Options = {"Meat Stick","Pancake","Growth","North Korea Wall","Slight Extend","long ahh rod"},
+	Default = "Sideway Poll",
+	Options = {"Meat Stick","Pancake","Growth","North Korea Wall","Slight Extend","Sideway Poll"},
 	Callback = function(Value)
 		_G.GloveExtendOption = Value
 	end    
@@ -469,8 +468,8 @@ table.insert(ShouldEnable,Tab7:AddToggle({
 								Glove.Size = Vector3.new(_G.GloveExtendReach,0,_G.GloveExtendReach)
 							elseif _G.GloveExtendOption == "Slight Extend" then
 								Glove.Size = Vector3.new(3, 3, 3.7)
-							elseif _G.GloveExtendOption == "long ahh rod" then
-								Glove.Size = Vector3.new(1, _G.GloveExtendReach, 1)
+							elseif _G.GloveExtendOption == "Sideway Poll" then
+								Glove.Size = Vector3.new(2, _G.GloveExtendReach, 2)
 							end
 							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
 								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
@@ -494,6 +493,8 @@ table.insert(ShouldEnable,Tab7:AddToggle({
 								Glove.Size = Vector3.new(_G.GloveExtendReach,0,_G.GloveExtendReach)
 							elseif _G.GloveExtendOption == "Slight Extend" then
 								Glove.Size = Vector3.new(3, 3, 3.7)
+							elseif _G.GloveExtendOption == "Sideway Poll" then
+								Glove.Size = Vector3.new(2, _G.GloveExtendReach, 2)
 							end
 							if Glove:IsA("Part") and Glove:FindFirstChildWhichIsA("SpecialMesh") then
 								Glove:FindFirstChildWhichIsA("SpecialMesh").Scale = Vector3.new(Glove.Size.X/4,Glove.Size.Y/4,Glove.Size.Z/2)
@@ -542,12 +543,23 @@ Tab7:AddButton({
 		local teleportFunc = queueonteleport or queue_on_teleport
 		if teleportFunc then
 			teleportFunc([[
-        		if not game:IsLoaded() then
-				game.Loaded:Wait()
-			end
-			repeat wait() until game:GetService("Players").LocalPlayer
-			wait(1)
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/refs/heads/main/yessirrrr"))()
+			function Notifyclient(Text)
+	local goofynotiids = {6823153536,6823153536,7991347388,6879335951,217548941,4891171429,17660225827,6879335951}
+	local Notisong = Instance.new("Sound",game:GetService("SoundService"))
+	Notisong.SoundId = "rbxassetid://"..goofynotiids[math.random(1,#goofynotiids)]
+	Notisong.Volume = 4
+	Notisong.PlayOnRemove = true
+	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "HX?H Guide",Text = Text,Icon = "rbxassetid://18584222941",Duration = 5})
+	Notisong:Destroy()
+end
+if not game:IsLoaded() then
+	Notifyclient("your client is loading please wait")
+	game.Loaded:Wait()
+end
+repeat wait() until game:GetService("Players").LocalPlayer
+Notifyclient("Loading hub back")
+task.wait(1)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NotJacobNicko/Edit-Scripts-Lmao/refs/heads/main/yessirrrr"))()
     		]])
 			local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 			if httprequest then
