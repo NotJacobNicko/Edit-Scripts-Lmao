@@ -1028,6 +1028,14 @@ Tab2:AddToggle({
 								if PlrChar:FindFirstChild("Torso") then
 									PlrChar.Torso.Anchored = true
 								end
+								task.spawn(function()
+									for i,Parts in pairs(PlrChar:GetChildren()) do
+										if Parts:IsA("BasePart") then
+											Parts.AssemblyLinearVelocity = Vector3.new(0,0,0)
+											Parts.AssemblyAngularVelocity = Vector3.new(0,0,0)
+										end
+									end
+								end)
 							until RagdollValue and RagdollValue.Value == false
 							
 							if math.random(3) == 1 then
