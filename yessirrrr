@@ -998,6 +998,7 @@ Tab2:AddDropdown({
 	end    
 })
 local TouchCon,CurrentObj = {},{}
+
 Tab2:AddToggle({
 	Name = "Auto Safety",
 	Default = false,
@@ -1029,9 +1030,8 @@ Tab2:AddToggle({
 			table.insert(CurrentObj,Cloned)
 			Cloned.Name = "Part"
 			Cloned.Transparency = .7
-			Cloned.Position = Vector3.new(obj.Position.X,obj.Position.Y+5,obj.Position.Z)
-			Cloned.CanTouch = true
 			Cloned.Parent = workspace.Terrain
+			Cloned.CanTouch = true
 			task.spawn(function()
 				repeat 
 					task.wait()
@@ -1039,30 +1039,31 @@ Tab2:AddToggle({
 				obj.CanTouch = true
 			end)
 			table.insert(TouchCon,Cloned.Touched:Connect(function(obj)
-				if obj:IsA("BasePart") and (obj.Parent and obj.Parent:IsA("Model")) then
+				if obj:IsA("BasePart") and obj.Parent and (obj.Parent:FindFirstChildWhichIsA("Humanoid") and obj.Parent:FindFirstChildWhichIsA("Humanoid").Health > 0) then
 					if obj.Parent == PlrChar then
-						local Humanoid = PlrChar:FindFirstChildWhichIsA("Humanoid")
-						if Humanoid.Health > 0 then
-							if not TouchDebounce then
-								TouchDebounce = true
-								task.spawn(function()
-									local Randomfunnyaudio =  {8080941676,73207009484146,8057582619,7147349812}
-									local goofySound = Instance.new("Sound",workspace)
-									goofySound.PlayOnRemove = true
-									goofySound.Volume = 5
-									goofySound.SoundId = "rbxassetid://"..Randomfunnyaudio[math.random(1,#Randomfunnyaudio)]
-									goofySound:Remove()
-								end)
-								
+						if not TouchDebounce then
+							TouchDebounce = true
+							task.spawn(function()
+								local Randomfunnyaudio =  {8080941676,73207009484146,8057582619,7147349812}
+								local goofySound = Instance.new("Sound",workspace)
+								goofySound.PlayOnRemove = true
+								goofySound.Volume = 5
+								goofySound.SoundId = "rbxassetid://"..Randomfunnyaudio[math.random(1,#Randomfunnyaudio)]
+								goofySound:Remove()
+							end)
+
+							task.spawn(function()
 								if _G.LocationToTeleport == "slapple" then
 									PlrRoot.CFrame = workspace.Arena.island5.Union.CFrame * CFrame.new(0,10,0)
 								else
 									PlrRoot.CFrame = S.CFrame * CFrame.new(0,5,0)
 								end
-								task.wait(1)
-								TouchDebounce = false
-							end
+							end)
+							task.wait(1)
+							TouchDebounce = false
 						end
+					else
+						warn(obj.Parent.Name)
 					end
 				end
 			end))
@@ -1075,7 +1076,6 @@ Tab2:AddToggle({
 		ApplyAnti(workspace.DEATHBARRIER)
 		ApplyAnti(workspace.DEATHBARRIER2)
 		ApplyAnti(workspace.dedBarrier)
-		ApplyAnti(workspace.ArenaBarrier)
 	end    
 })
 
