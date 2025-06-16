@@ -54,7 +54,7 @@ if not S or S == nil then
 					Section = 1
 				end
 				Theme.PlaybackSpeed = .9
-				Theme.SoundId = "rbxassetid://"..Chill[1]
+				Theme.SoundId = "rbxassetid://"..Chill[Section]
 				Theme:Play()
 			end
 		end
