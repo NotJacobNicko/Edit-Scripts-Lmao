@@ -1018,8 +1018,6 @@ Tab2:AddToggle({
 			end
 			return
 		end
-		local PlrChar = game:GetService("Players").LocalPlayer.Character
-		local PlrRoot = PlrChar:FindFirstChild("Torso") or PlrChar:FindFirstChild("HumanoidRootPart") or PlrChar:FindFirstChild("Head")
 		local TouchDebounce = false
 		local function ApplyAnti(obj)
 			if not obj then
@@ -1040,6 +1038,8 @@ Tab2:AddToggle({
 			end)
 			table.insert(TouchCon,Cloned.Touched:Connect(function(obj)
 				if obj:IsA("BasePart") and obj.Parent and (obj.Parent:FindFirstChildWhichIsA("Humanoid") and obj.Parent:FindFirstChildWhichIsA("Humanoid").Health > 0) then
+					local PlrChar = game:GetService("Players").LocalPlayer.Character
+					local PlrRoot = PlrChar:FindFirstChild("Torso") or PlrChar:FindFirstChild("HumanoidRootPart") or PlrChar:FindFirstChild("Head")
 					if obj.Parent == PlrChar then
 						if not TouchDebounce then
 							TouchDebounce = true
@@ -1062,8 +1062,6 @@ Tab2:AddToggle({
 							task.wait(1)
 							TouchDebounce = false
 						end
-					else
-						warn(obj.Parent.Name)
 					end
 				end
 			end))
