@@ -328,22 +328,16 @@ Tab7:AddDropdown({
 	end    
 })
 local lastpos = Vector3.new()
-Tab7:AddToggle({
+
+Tab7:AddButton({
 	Name = "Chill Room",
-	Default = false,
-	Callback = function(Value)
-		_G.JustChillRoom = Value
+	Callback = function()
 		local PlrChar = game:GetService("Players").LocalPlayer.Character
 		local Root = PlrChar:FindFirstChild("Torso") or PlrChar:FindFirstChild("HumanoidRootPart") or PlrChar:FindFirstChild("Head")
-		
-		if _G.JustChillRoom then
-			Root.CFrame = S.CFrame * CFrame.new(0,5,0)
-		else
-			Root.CFrame = workspace.Origo.CFrame * CFrame.new(0,50,0)
-		end
-		
-	end    
+		Root.CFrame = S.CFrame * CFrame.new(0,5,0)
+	end 
 })
+
 Tab7:AddToggle({
 	Name = "Phase/Jet/Siphon Orb Grind",
 	Default = false,
