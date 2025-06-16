@@ -1073,7 +1073,6 @@ Tab2:AddToggle({
 		end
 		ApplyAnti(workspace.DEATHBARRIER)
 		ApplyAnti(workspace.DEATHBARRIER2)
-		ApplyAnti(workspace.dedBarrier)
 	end    
 })
 
