@@ -1027,8 +1027,11 @@ Tab2:AddToggle({
 			obj.CanTouch = false
 			local Cloned = obj:Clone()
 			table.insert(CurrentObj,Cloned)
+			Cloned.Name = "Part"
+			Cloned.Transparency = .7
 			Cloned.Position = Vector3.new(obj.Position.X,obj.Position.Y+5,obj.Position.Z)
 			Cloned.CanTouch = true
+			Cloned.Parent = workspace.Terrain
 			task.spawn(function()
 				repeat 
 					task.wait()
