@@ -1021,7 +1021,7 @@ Tab2:AddToggle({
 						end
 					elseif _G.TypesOfragdoll == "fake lag" and not table.find(Tagged,RagdollValue) then
 						table.insert(Tagged,RagdollValue)
-						if math.random(1,2) == 1 then
+						if math.random(2) ~= 1 then
 							task.wait(math.random())
 							repeat 
 								task.wait()
@@ -1029,7 +1029,7 @@ Tab2:AddToggle({
 									PlrChar.Torso.Anchored = true
 								end
 							until RagdollValue and RagdollValue.Value == false
-							if math.random(1,3) then
+							if math.random(3) == 1 then
 								task.wait(math.random()*2)
 							end
 							
