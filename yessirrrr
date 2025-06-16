@@ -989,6 +989,92 @@ Tab2:AddToggle({
 		end
 	end    
 })
+Tab2:AddDropdown({
+	Name = "Location When Saved",
+	Default = "safe room",
+	Options = {"slapple","safe room"},
+	Callback = function(Value)
+		_G.LocationToTeleport = Value
+	end    
+})
+local TouchCon,CurrentObj = {},{}
+Tab2:AddToggle({
+	Name = "Auto Safety",
+	Default = false,
+	Callback = function(Value)
+		_G.ActiveSafeRoom = Value
+		if not _G.ActiveSafeRoom then
+			for i,Connection in pairs(TouchCon) do
+				if Connection then
+					Connection:Disconnect()
+				end
+			end
+			for i,Obj in pairs(CurrentObj) do
+				if Obj then
+					pcall(game.Destroy,Obj)
+					pcall(game.Remove,Obj)
+				end
+			end
+			return
+		end
+		local PlrChar = game:GetService("Players").LocalPlayer.Character
+		local PlrRoot = PlrChar:FindFirstChild("Torso") or PlrChar:FindFirstChild("HumanoidRootPart") or PlrChar:FindFirstChild("Head")
+		local TouchDebounce = false
+		local function ApplyAnti(obj)
+			if not obj then
+				return
+			end
+			obj.CanTouch = false
+			local Cloned = obj:Clone()
+			table.insert(CurrentObj,Cloned)
+			Cloned.Position = Vector3.new(obj.Position.X,obj.Position.Y+5,obj.Position.Z)
+			Cloned.CanTouch = true
+			task.spawn(function()
+				repeat 
+					task.wait()
+				until not Cloned or not Cloned.Parent
+				obj.CanTouch = true
+			end)
+			table.insert(TouchCon,Cloned.Touched:Connect(function(obj)
+				if obj:IsA("BasePart") and (obj.Parent and obj.Parent:IsA("Model")) then
+					if obj.Parent == PlrChar then
+						local Humanoid = PlrChar:FindFirstChildWhichIsA("Humanoid")
+						if Humanoid.Health > 0 then
+							if not TouchDebounce then
+								TouchDebounce = true
+								task.spawn(function()
+									local Randomfunnyaudio =  {8080941676,73207009484146,8057582619,7147349812}
+									local goofySound = Instance.new("Sound",workspace)
+									goofySound.PlayOnRemove = true
+									goofySound.Volume = 5
+									goofySound.SoundId = "rbxassetid://"..Randomfunnyaudio[math.random(1,#Randomfunnyaudio)]
+									goofySound:Remove()
+								end)
+								
+								if _G.LocationToTeleport == "slapple" then
+									PlrRoot.CFrame = workspace.Arena.island5.Union.CFrame * CFrame.new(0,10,0)
+								else
+									PlrRoot.CFrame = S.CFrame * CFrame.new(0,5,0)
+								end
+								task.wait(1)
+								TouchDebounce = false
+							end
+						end
+					end
+				end
+			end))
+		end
+		for i,v in pairs(workspace.DEATHBARRIER:GetChildren()) do
+			if v.ClassName == "Part" and v.Name == "BLOCK" then
+				ApplyAnti(v)
+			end
+		end
+		ApplyAnti(workspace.DEATHBARRIER)
+		ApplyAnti(workspace.DEATHBARRIER2)
+		ApplyAnti(workspace.dedBarrier)
+		ApplyAnti(workspace.ArenaBarrier)
+	end    
+})
 
 Tab2:AddDropdown({
 	Name = "Ragdoll Type",
