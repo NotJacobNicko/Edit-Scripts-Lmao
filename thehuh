@@ -61,7 +61,15 @@ AntiTab:AddToggle({
 		while PublicTable.StealClaim do
 			local PlrChar = plr.Character
 			if PublicTable.PersonalPlot and PlrChar then
-				firetouchinterest(PlrChar.HumanoidRootPart,PublicTable.PersonalPlot:FindFirstChild("CashMultiDisplay"), 0)
+				for i,Parts in pairs(PlrChar:GetChildren()) do
+					if Parts:IsA("BasePart") then
+						firetouchinterest(Parts,PublicTable.PersonalPlot:FindFirstChild("CashMultiDisplay"), 0)
+					end
+				end
+			else
+				if not PublicTable.PersonalPlot then
+					warn("failed to get your plot")
+				end
 			end
 			task.wait(math.random())
 		end
@@ -78,8 +86,12 @@ AntiTab:AddToggle({
 			end
 			local PlrChar = plr.Character
 			if PublicTable.PersonalPlot and PlrChar then
-				
-				firetouchinterest(PlrChar.HumanoidRootPart,PublicTable.PersonalPlot:FindFirstChild("LockButton"), 0)
+				local Limbs = {}
+				for i,Parts in pairs(PlrChar:GetChildren()) do
+					if Parts:IsA("BasePart") then
+						firetouchinterest(Parts,PublicTable.PersonalPlot:FindFirstChild("LockButton"), 0)
+					end
+				end
 			end
 
 		end
