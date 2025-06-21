@@ -43,10 +43,10 @@ local AntiTab = Window:MakeTab({
 })
 
 AntiTab:AddButton({
-	Name = "No Steal Cooldown",
+	Name = "No Prompt Cooldown",
 	Callback = function()
 		for i,Prompt in pairs(PublicTable.Plots:GetDescendants()) do
-			if Prompt:IsA("ProximityPrompt") and Prompt.Name == "StealProx" then
+			if Prompt:IsA("ProximityPrompt") then
 				Prompt.HoldDuration = 0
 			end
 		end
@@ -57,8 +57,8 @@ AntiTab:AddToggle({
 	Name = "Auto Steal Claim",
 	Default = false,
 	Callback = function(Value)
-		PublicTable.AutoLock = Value
-		while PublicTable.AutoLock do
+		PublicTable.StealClaim = Value
+		while PublicTable.StealClaim do
 			local PlrChar = plr.Character
 			if PublicTable.PersonalPlot and PlrChar then
 				firetouchinterest(PlrChar.HumanoidRootPart,PublicTable.PersonalPlot:FindFirstChild("CashMultiDisplay"), 0)
@@ -78,9 +78,11 @@ AntiTab:AddToggle({
 			end
 			local PlrChar = plr.Character
 			if PublicTable.PersonalPlot and PlrChar then
+				
 				firetouchinterest(PlrChar.HumanoidRootPart,PublicTable.PersonalPlot:FindFirstChild("LockButton"), 0)
 			end
 
 		end
 	end      
 })
+
