@@ -150,7 +150,7 @@ AntiTab:AddToggle({
 					local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
 					if Humanoid and Humanoid.Health > 0 then
 						local LastPos = Root.Position
-						Root.Position = PublicTable.PersonalPlot.CashMultiDisplay.Position
+						PlrChar:MoveTo(PublicTable.PersonalPlot.CashMultiDisplay.Position)
 						for i,Parts in pairs(PlrChar:GetChildren()) do
 							if Parts:IsA("BasePart") then
 								firetouchinterest(Parts,PublicTable.PersonalPlot.CashMultiDisplay, 1)
@@ -160,7 +160,7 @@ AntiTab:AddToggle({
 						repeat 
 							task.wait()
 						until PlrChar and not PlrChar:FindFirstChild(Character.Name)
-						Root.Position = LastPos
+						PlrChar:MoveTo(LastPos)
 					end
 				end
 			end
@@ -184,7 +184,7 @@ AntiTab:AddToggle({
 				if Button and Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text == "Lock Base" then
 					local LastPos = Root.Position
 					repeat 
-						Root.Position = Button.Position
+						PlrChar:MoveTo(Button.Position)
 						for i,Parts in pairs(PlrChar:GetChildren()) do
 							if Parts:IsA("BasePart") then
 								warn("OK")
@@ -194,7 +194,7 @@ AntiTab:AddToggle({
 						end
 						task.wait()
 					until Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text ~= "Lock Base"
-					Root.Position = LastPos
+					PlrChar:MoveTo(LastPos)
 				end
 			end
 
