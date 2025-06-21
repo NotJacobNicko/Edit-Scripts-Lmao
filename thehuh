@@ -60,15 +60,17 @@ AntiTab:AddToggle({
 		PublicTable.StealClaim = Value
 		while PublicTable.StealClaim do
 			local PlrChar = plr.Character
+			
+			if not PublicTable.PersonalPlot then
+				warn("failed to get your plot")
+			else
+				warn("have plot")
+			end
 			if PublicTable.PersonalPlot and PlrChar then
 				for i,Parts in pairs(PlrChar:GetChildren()) do
 					if Parts:IsA("BasePart") then
 						firetouchinterest(Parts,PublicTable.PersonalPlot:FindFirstChild("CashMultiDisplay"), 0)
 					end
-				end
-			else
-				if not PublicTable.PersonalPlot then
-					warn("failed to get your plot")
 				end
 			end
 			task.wait(math.random())
