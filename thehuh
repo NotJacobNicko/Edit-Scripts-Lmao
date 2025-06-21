@@ -1,0 +1,86 @@
+local plr = game:GetService("Players").LocalPlayer
+
+local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
+local Window = OrionLib:MakeWindow({IntroText = "Nicko's Hub", IntroIcon = "rbxassetid://15315284749",Name = "Nicko's Hub",IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = false, ConfigFolder = "NickosAssetsDontTouch"})
+
+local Names = {} -- you can add them Lol
+local PublicTable = {} -- this one gets all the information when you interact the options
+PublicTable.Actualmap = workspace:WaitForChild("Map")
+PublicTable.Plots = PublicTable.Actualmap:WaitForChild("Plots")
+PublicTable.PersonalPlot = nil
+
+task.spawn(function()
+	if PublicTable.Plots then
+		for Num,Section in pairs(PublicTable.Plots:GetChildren()) do
+			if Section:IsA("Model") and Section:FindFirstChild("NameBoard") then
+				local NameBoard = Section:FindFirstChild("NameBoard")
+				local Surface = NameBoard:FindFirstChildWhichIsA("SurfaceGui")
+				if NameBoard:IsA("Part") and Surface and Surface:FindFirstChildWhichIsA("TextLabel") then
+					local Title = Surface:FindFirstChildWhichIsA("TextLabel")
+					if Title.Text == plr.DisplayName.."'s Base" then
+						PublicTable.PersonalPlot = Section
+						break
+					end
+				end
+			end
+		end
+	end
+end)
+
+
+
+local PerTab = Window:MakeTab({
+	Name = "Personal",
+	Icon = "rbxassetid://4370318685",
+	PremiumOnly = false
+})
+
+
+local AntiTab = Window:MakeTab({
+	Name = "Anti",
+	Icon = "rbxassetid://7734056608",
+	PremiumOnly = false
+})
+
+AntiTab:AddButton({
+	Name = "No Steal Cooldown",
+	Callback = function()
+		for i,Prompt in pairs(PublicTable.Plots:GetDescendants()) do
+			if Prompt:IsA("ProximityPrompt") and Prompt.Name == "StealProx" then
+				Prompt.HoldDuration = 0
+			end
+		end
+
+	end    
+})
+AntiTab:AddToggle({
+	Name = "Auto Steal Claim",
+	Default = false,
+	Callback = function(Value)
+		PublicTable.AutoLock = Value
+		while PublicTable.AutoLock do
+			local PlrChar = plr.Character
+			if PublicTable.PersonalPlot and PlrChar then
+				firetouchinterest(PlrChar.HumanoidRootPart,PublicTable.PersonalPlot:FindFirstChild("CashMultiDisplay"), 0)
+			end
+			task.wait(math.random())
+		end
+	end      
+})
+AntiTab:AddToggle({
+	Name = "Auto Lock",
+	Default = false,
+	Callback = function(Value)
+		PublicTable.AutoLock = Value
+		while task.wait(1) do
+			if not PublicTable.AutoLock then
+				break
+			end
+			local PlrChar = plr.Character
+			if PublicTable.PersonalPlot and PlrChar then
+				firetouchinterest(PlrChar.HumanoidRootPart,PublicTable.PersonalPlot:FindFirstChild("LockButton"), 0)
+			end
+
+		end
+	end      
+})
