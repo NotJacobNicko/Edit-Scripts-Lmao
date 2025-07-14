@@ -156,6 +156,7 @@ public static class FishUtility
     }
 
     public static bool NotMain(this Transform instance) => instance.parent.name.ToUpper().Contains("WORLD") && instance.parent.name.ToUpper().Contains("MAP") && !MapRegistry.GetAllMaps().Any(map => map.name == instance.parent.name.Replace("(Clone)", ""));
+    
     internal static void NextFrameCoroutine(Action action, int frames = 1)
     {
         if (frames <= 0)
@@ -163,6 +164,7 @@ public static class FishUtility
         else
             Invoker.StartCoroutine(Utils.NextFrameCoroutine(() => NextFrameCoroutine(action, frames - 1)));
     }
+
     internal static void NextFixedUpdateCoroutine(Action action) => Invoker.StartCoroutine(NextFixedFrameCoroutine(() => TryCatchAction(action)));
 
     private static IEnumerator NextFixedFrameCoroutine(Action action)
@@ -2913,6 +2915,30 @@ public static class FishUtility
             }
         }
 
+    public class Invoker : MonoBehaviour
+    {
+        private static Invoker _instance;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void Init()
+        {
+            if (_instance != null) return;
+
+            var go = new GameObject("Invoker")
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            UnityEngine.Object.DontDestroyOnLoad(go);
+            _instance = go.AddComponent<Invoker>();
+        }
+
+        public static Coroutine StartCoroutine(IEnumerator coroutine)
+        {
+            Init();
+            return _instance.StartCoroutine(coroutine);
+        }
+    }
+
         public void RemoveSlowEffect(GameObject other)
         {
             if (other == null || !slowedObjects.TryGetValue(other, out var slowInfo)) return;
@@ -3015,7 +3041,7 @@ public static class FishUtility
 
     public class ObjectInfo
     {
-           public GameObject Instance { get; private set; }
+        public GameObject Instance { get; private set; }
         private Vector3 localSacle;
         public bool antiGravity { get; private set; } = true;
         public bool IsAndroid { get; private set; } = true;
@@ -3280,7 +3306,77 @@ public static class FishUtility
 
             CheckComponent(Instance, except);
         }
+        
+public static class PowerfulCoroutineUtility
+{
+    public static MonoBehaviour CoroutineHost;
 
+    public static void Initialize(MonoBehaviour host)
+    {
+        CoroutineHost = host;
+    }
+
+    public static void StartScheduledLoops(List<ObjectInfo> instances)
+    {
+        CoroutineHost.StartCoroutine(RunLoop(instances));
+    }
+
+    private static IEnumerator RunLoop(List<ObjectInfo> instances)
+    {
+        while (true)
+        {
+            for (int i = instances.Count - 1; i >= 0; i--)
+            {
+                var x = instances[i];
+                if (x?.Instance == null || x.Limbs.Count == 0)
+                {
+                    instances.RemoveAt(i);
+                    continue;
+                }
+
+                // Equivalent of Update
+                x.Update();
+                x.Invincible();
+
+                yield return null;
+
+                // LateUpdate
+                x.LateUpdate();
+                x.Invincible();
+
+                yield return new WaitForFixedUpdate();
+
+                // FixedUpdate
+                x.HealBone();
+                x.FixedUpdate();
+                x.FakeInvincible();
+                if (x.antiGravity)
+                    x.AntiGravity();
+            }
+
+            yield return null;
+        }
+    }
+
+    public static void Schedule(Action action, int frames = 1)
+    {
+        CoroutineHost.StartCoroutine(InvokeAfterFrames(action, frames));
+    }
+
+    public static IEnumerator InvokeAfterFrames(Action action, int frames)
+    {
+        while (frames-- > 0)
+            yield return null;
+
+        TryCatchAction(action);
+    }
+
+    private static void TryCatchAction(Action action)
+    {
+        try { action(); }
+        catch (Exception ex) { Debug.LogError($"[PowerfulCoroutine] {ex}"); }
+    }
+}
         public void FakeInvincible()
         {
             BodiesInfo.ForEach(status =>
@@ -3403,6 +3499,54 @@ public static class FishUtility
             this.StartProgress = when;
         }
     }
+    public static class PowerfulCoroutineUtility
+{
+    public static MonoBehaviour CoroutineHost;
+
+    public static void Initialize(MonoBehaviour host)
+    {
+        CoroutineHost = host;
+    }
+
+    public static void StartScheduledLoops(List<ObjectInfo> instances)
+    {
+        CoroutineHost.StartCoroutine(RunLoop(instances));
+    }
+
+    private static IEnumerator RunLoop(List<ObjectInfo> instances)
+    {
+        while (true)
+        {
+            for (int i = instances.Count - 1; i >= 0; i--)
+            {
+                var x = instances[i];
+                if (x?.Instance == null || x.Limbs.Count == 0)
+                {
+                    instances.RemoveAt(i);
+                    continue;
+                }
+
+                x.Update();
+                x.Invincible();
+
+                yield return null;
+
+                x.LateUpdate();
+                x.Invincible();
+
+                yield return new WaitForFixedUpdate();
+
+                x.HealBone();
+                x.FixedUpdate();
+                x.FakeInvincible();
+                if (x.antiGravity)
+                    x.AntiGravity();
+            }
+
+            yield return null;
+        }
+    }
+}
 
     public class InvincibleHelper : MonoBehaviour
     {
@@ -3410,13 +3554,22 @@ public static class FishUtility
         {
             Helper = this;
             DontDestroyOnLoad(base.gameObject);
-            DontDestroyOnLoad(this);
+
             Setup();
+ 
+            PowerfulCoroutineUtility.Initialize(this);
+            PowerfulCoroutineUtility.StartScheduledLoops(Instances);
         }
 
         public static InvincibleHelper Helper { get; private set; }
-        private static List<ObjectInfo> Instances => (InvincibleTargets.RemoveAll(x => x.Instance == null || x.Limbs.Count == 0), InvincibleTargets).Item2;
-
+        private static List<ObjectInfo> Instances
+{
+    get
+    {
+        InvincibleTargets.RemoveAll(x => x.Instance == null || x.Limbs.Count == 0);
+        return InvincibleTargets;
+    }
+}
         public void Add(ObjectInfo info)
         {
             if (!HasInstance(info.Instance))
@@ -3426,15 +3579,7 @@ public static class FishUtility
 
         public void Remove(GameObject instance) => InvincibleTargets.RemoveAll(x => x.Instance == instance);
         public bool HasInstance(GameObject obj) => Instances.Any(x => x.Instance == obj.transform.root.gameObject);
-
         private void Setup() => Instances.ForEach(x => x.Invincible());
-
-        private void Update() => Instances.ForEach(x => { x.Update(); x.Invincible(); });
-
-        private void LateUpdate() => Instances.ForEach(x => { x.LateUpdate(); x.Invincible(); });
-
-        private void FixedUpdate() => Instances.ForEach(x => { x.HealBone(); x.FixedUpdate(); x.FakeInvincible(); if (x.antiGravity) x.AntiGravity(); });
-
         void OnDisable() => gameObject.Destroy();
         void OnDestroy() => m_helper = CreateHelper<InvincibleHelper>("InvincibleHelper");
     }
