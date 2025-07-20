@@ -1,0 +1,89 @@
+local AlreadyStolen = {}
+
+local plr = game:GetService("Players").LocalPlayer
+local Folder = script:FindFirstChild("Asset") or game:GetObjects("rbxassetid://94604060019032")[1]
+local IsStudio = game:GetService("RunService"):IsStudio()
+
+task.wait()
+
+local UI = Folder:FindFirstChild("gui"):Clone()
+UI.Parent = IsStudio and plr.PlayerGui or game.CoreGui
+
+local RunService = game:GetService("RunService")
+
+local function AddToTheList(ID, Type)
+	local Section = Folder:FindFirstChild("Section"):Clone()
+	local Hub = UI:FindFirstChild("Hub")
+	local viewport = Section:FindFirstChild("Preview")
+
+	-- Clone rig
+	local Rig
+	if Type == "R15" then
+		Rig = Folder:FindFirstChild("R15"):Clone()
+	else
+		Rig = Folder:FindFirstChild("R6"):Clone()
+	end
+	Rig.Name = "PreviewRig"
+	Rig.Parent = viewport:FindFirstChild("Animated")
+	
+	local humanoid = Rig:FindFirstChildWhichIsA("Humanoid")
+	local camera = Instance.new("Camera",viewport)
+	camera.Name = "OrbitCam"
+	camera.CFrame = CFrame.new(Vector3.new(0, 2, 5), Vector3.new(0, 2, 0))
+	viewport.CurrentCamera = camera
+
+	local anim = Instance.new("Animation",Rig)
+	anim.AnimationId = "rbxassetid://" .. ID
+	local track
+	task.spawn(function()
+		local angle = 0
+		local radius = 5
+		local height = 4
+
+		while viewport and viewport.Parent and camera do
+			angle += math.rad(1)
+			local x = math.sin(angle) * radius
+			local z = math.cos(angle) * radius
+			camera.CFrame = CFrame.new(Vector3.new(x, height, z), Vector3.new(0, height, 0))
+			RunService.RenderStepped:Wait()
+		end
+	end)
+	task.spawn(function()
+		while task.wait() do
+			if not track or not track.IsPlaying then
+				track = humanoid:LoadAnimation(anim)
+				track.Looped = true
+				track:Play()
+			end
+		end
+	end)
+
+	Section.ID.Text = ID
+	Section.ID:GetPropertyChangedSignal("Text"):Connect(function()
+		Section.ID.Text = ID
+	end)
+	Hub.CanvasSize = UDim2.new(0, 0, Hub.CanvasSize.Y.Scale + 3, 0)
+	Section.Parent = Hub
+end
+
+
+
+while task.wait() do
+	for i,Humanoids in pairs(game:GetDescendants()) do
+		if Humanoids and Humanoids:IsA("Humanoid") then
+			for i,obj in pairs(Humanoids:GetPlayingAnimationTracks()) do
+				if obj and obj.Animation then
+					local fullId = obj.Animation.AnimationId
+					if fullId and fullId ~= "" then
+						local animationId = tonumber(fullId:match("%d+"))
+						if animationId and animationId > 913402848 and not table.find(AlreadyStolen,animationId) then
+							table.insert(AlreadyStolen,animationId)
+							AddToTheList(animationId,Humanoids.RigType.Name)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
