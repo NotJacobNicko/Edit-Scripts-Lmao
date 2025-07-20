@@ -1,4 +1,5 @@
 local AlreadyStolen = {}
+local IgnoreStuff = {180435571,180426354,125750702,180436148,180436334,178130996,148840371,507766666,507777826,507767714,507765000,507767968,507765644,507785072,507784897,2506281703,128777973,128853357,129423131,129423030,182435998,182491037,182491065}
 local RunService = game:GetService("RunService")
 local plr = game:GetService("Players").LocalPlayer
 local IsStudio = RunService:IsStudio()
@@ -97,11 +98,10 @@ local function AddToTheList(ID, Type)
 	Section.ID:GetPropertyChangedSignal("Text"):Connect(function()
 		Section.ID.Text = ID
 	end)
-	Sare += .5
+	Sare += 1
 	Hub.CanvasSize = UDim2.new(0, 0,Sare/2, 0)
 	Section.Parent = Hub
 end
-
 local function Hook(Humanoids)
 	if Humanoids then
 		local HasAnim = false
@@ -112,7 +112,7 @@ local function Hook(Humanoids)
 						local fullId = obj.Animation.AnimationId
 						if fullId and fullId ~= "" then
 							local animationId = tonumber(fullId:match("%d+"))
-							if animationId and animationId > 100000 and not table.find(AlreadyStolen,animationId) then
+							if animationId and animationId > 100000 and not table.find(AlreadyStolen,animationId) and not table.find(IgnoreStuff,animationId) then
 								table.insert(AlreadyStolen,animationId)
 								HasAnim = true
 								AddToTheList(animationId,Humanoids.RigType.Name)
