@@ -1,8 +1,8 @@
 local AlreadyStolen = {}
-
+local RunService = game:GetService("RunService")
 local plr = game:GetService("Players").LocalPlayer
+local IsStudio = RunService:IsStudio()
 local Folder = script:FindFirstChild("Asset") or game:GetObjects("rbxassetid://94604060019032")[1]
-local IsStudio = game:GetService("RunService"):IsStudio()
 Folder.Parent = nil
 task.wait()
 
@@ -45,8 +45,6 @@ spawn(function()
 		end
 	end)
 end)
-
-local RunService = game:GetService("RunService")
 local Sare = 0
 local function AddToTheList(ID, Type)
 	local Section = Folder:FindFirstChild("Section"):Clone()
@@ -74,8 +72,8 @@ local function AddToTheList(ID, Type)
 	local track
 	task.spawn(function()
 		local angle = 0
-		local radius = 5
-		local height = 4
+		local radius = 6
+		local height = 3
 
 		while viewport and viewport.Parent and camera do
 			angle += math.rad(1)
@@ -104,24 +102,47 @@ local function AddToTheList(ID, Type)
 	Section.Parent = Hub
 end
 
-
-
-while task.wait() do
-	for i,Humanoids in pairs(game:GetDescendants()) do
-		if Humanoids and Humanoids:IsA("Humanoid") then
-			for i,obj in pairs(Humanoids:GetPlayingAnimationTracks()) do
-				if obj and obj.Animation then
-					local fullId = obj.Animation.AnimationId
-					if fullId and fullId ~= "" then
-						local animationId = tonumber(fullId:match("%d+"))
-						if animationId and animationId > 100000 and not table.find(AlreadyStolen,animationId) then
-							table.insert(AlreadyStolen,animationId)
-							AddToTheList(animationId,Humanoids.RigType.Name)
+local function Hook(Humanoids)
+	if Humanoids then
+		local HasAnim = false
+		local Connection = RunService.Heartbeat:Connect(function()
+			if Humanoids then
+				for i,obj in pairs(Humanoids:GetPlayingAnimationTracks()) do
+					if obj and obj.Animation then
+						local fullId = obj.Animation.AnimationId
+						if fullId and fullId ~= "" then
+							local animationId = tonumber(fullId:match("%d+"))
+							if animationId and animationId > 100000 and not table.find(AlreadyStolen,animationId) then
+								table.insert(AlreadyStolen,animationId)
+								HasAnim = true
+								AddToTheList(animationId,Humanoids.RigType.Name)
+							end
 						end
 					end
 				end
 			end
-		end
+		end)
+		task.delay(3,function()
+			if not HasAnim then
+				if Connection then
+					Connection:Disconnect()
+				end
+			end
+		end)
+		Humanoids.Died:Connect(function()
+			if Connection then
+				Connection:Disconnect()
+			end
+		end)
 	end
 end
-
+for i,Hums in pairs(game:GetDescendants()) do
+	if Hums:IsA("Humanoid") then
+		Hook(Hums)
+	end
+end
+game.DescendantAdded:Connect(function(obj)
+	if obj and obj:IsA("Humanoid") then
+		Hook(obj)
+	end
+end)
