@@ -3,14 +3,51 @@ local AlreadyStolen = {}
 local plr = game:GetService("Players").LocalPlayer
 local Folder = script:FindFirstChild("Asset") or game:GetObjects("rbxassetid://94604060019032")[1]
 local IsStudio = game:GetService("RunService"):IsStudio()
-
+Folder.Parent = nil
 task.wait()
 
 local UI = Folder:FindFirstChild("gui"):Clone()
 UI.Parent = IsStudio and plr.PlayerGui or game.CoreGui
 
-local RunService = game:GetService("RunService")
+spawn(function()
+	local UserInputService = game:GetService("UserInputService")
+	local gui = UI.Hub
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
 
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end)
+
+local RunService = game:GetService("RunService")
+local Sare = 0
 local function AddToTheList(ID, Type)
 	local Section = Folder:FindFirstChild("Section"):Clone()
 	local Hub = UI:FindFirstChild("Hub")
@@ -62,7 +99,8 @@ local function AddToTheList(ID, Type)
 	Section.ID:GetPropertyChangedSignal("Text"):Connect(function()
 		Section.ID.Text = ID
 	end)
-	Hub.CanvasSize = UDim2.new(0, 0, Hub.CanvasSize.Y.Scale + 3, 0)
+	Sare += .5
+	Hub.CanvasSize = UDim2.new(0, 0,Sare/2, 0)
 	Section.Parent = Hub
 end
 
@@ -76,7 +114,7 @@ while task.wait() do
 					local fullId = obj.Animation.AnimationId
 					if fullId and fullId ~= "" then
 						local animationId = tonumber(fullId:match("%d+"))
-						if animationId and animationId > 913402848 and not table.find(AlreadyStolen,animationId) then
+						if animationId and animationId > 100000 and not table.find(AlreadyStolen,animationId) then
 							table.insert(AlreadyStolen,animationId)
 							AddToTheList(animationId,Humanoids.RigType.Name)
 						end
