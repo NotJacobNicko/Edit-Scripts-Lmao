@@ -326,21 +326,18 @@ AntiTab:AddToggle({
 							local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
 							if Humanoid and Humanoid.Health > 0 then
 								local LastPos = Root.Position
-								PlrChar:MoveTo(PublicTable.PersonalPlot.CashMultiDisplay.Position)
-								for i,Parts in pairs(PlrChar:GetChildren()) do
-									if Parts:IsA("BasePart") then
-										firetouchinterest(Parts,PublicTable.PersonalPlot.CashMultiDisplay, 1)
-										firetouchinterest(Parts,PublicTable.PersonalPlot.CashMultiDisplay, 0)
-									end
-								end
 								repeat 
+									PlrChar:MoveTo(PublicTable.PersonalPlot.CashMultiDisplay.Position)
+									for i,Parts in pairs(PlrChar:GetChildren()) do
+										if Parts:IsA("BasePart") then
+											firetouchinterest(Parts,PublicTable.PersonalPlot.CashMultiDisplay, 1)
+											firetouchinterest(Parts,PublicTable.PersonalPlot.CashMultiDisplay, 0)
+										end
+									end
 									task.wait()
-								until PlrChar and not PlrChar:FindFirstChild(Character.Name)
+								until PlrChar and not PlrChar:FindFirstChildWhichIsA("Model")
 								PlrChar:MoveTo(LastPos)
 								PublicTable.StealClaim = AutoStealval
-								
-								
-								
 							end
 						else
 							Notifyclient("failed to steal")
