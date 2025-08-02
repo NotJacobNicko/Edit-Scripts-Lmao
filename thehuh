@@ -297,7 +297,7 @@ AntiTab:AddToggle({
 					local Button = BrosPlot.LockButton
 					local TheStealPromp = PublicTable.TheStealPromp
 					local text = Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text
-					if Button and string.find(text,"| 0s") then
+					if Button and (string.find(text,"| 0s") or text == "Lock Base") then
 						pcall(game.Remove,PublicTable.SelectedGuy)
 						Notifyclient("base is unlock wait.")
 						TheStealPromp.HoldDuration = 0
