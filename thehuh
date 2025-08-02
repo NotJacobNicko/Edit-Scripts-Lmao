@@ -208,19 +208,24 @@ AntiTab:AddToggle({
 		end
 	end      
 })
-AntiTab:AddToggle({
+AntiTab:AddButton({
 	Name = "Select",
-	Default = false,
-	Callback = function(Value)
-		PublicTable.SelectingToSteal = Value
-		while PublicTable.SelectingToSteal do
+	Callback = function()
+		if PublicTable.SelectingToSteal then
+			Notifyclient("you already in the select mode goober")
+			return
+		end
+		
+		PublicTable.SelectingToSteal = true
+		local connection 
+		connection = mouse.Button1Down:Connect(function()
 			local target = mouse.Target
-			
+
 			if target and target:IsA("BasePart") and target.Parent then
 				if target.Parent and target.Parent:FindFirstChildWhichIsA("Humanoid") then
 					local char = target.Parent
 					local TargetPlot,Parented = nil,char
-					
+
 					while not TargetPlot do
 						if Parented then
 							local Yes = false
@@ -244,7 +249,7 @@ AntiTab:AddToggle({
 					PublicTable.SelectingToSteal = false
 					if not TargetPlot or TargetPlot == PublicTable.PersonalPlot then
 						Notifyclient("cannot grab this thing")
-						break
+						return
 					end
 					pcall(game.Remove,PublicTable.SelectedGuy)
 					local showselect = Instance.new("Highlight",char)
@@ -253,15 +258,16 @@ AntiTab:AddToggle({
 					showselect.FillTransparency = Color3.new(0,1,0)
 					PublicTable.SelectedGuy = showselect
 					
+					if connection then
+						connection:Disconnect()
+					end
 					PublicTable.TargetPlot = TargetPlot
 					PublicTable.TheGoods = char
 					Notifyclient("Selected "..char.Name)
-					
-					break
 				end
 			end
-			task.wait()
-		end
+		end)
+
 	end      
 })
 AntiTab:AddToggle({
@@ -297,7 +303,7 @@ AntiTab:AddToggle({
 					local Button = BrosPlot.LockButton
 					local TheStealPromp = PublicTable.TheStealPromp
 					local text = Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text
-					if Button and (string.find(text,"| 0s") or text == "Lock Base") then
+					if Button and string.find(text,"| 0s") or text == "Lock Base" then
 						pcall(game.Remove,PublicTable.SelectedGuy)
 						Notifyclient("base is unlock wait.")
 						TheStealPromp.HoldDuration = 0
@@ -332,6 +338,9 @@ AntiTab:AddToggle({
 								until PlrChar and not PlrChar:FindFirstChild(Character.Name)
 								PlrChar:MoveTo(LastPos)
 								PublicTable.StealClaim = AutoStealval
+								
+								
+								
 							end
 						else
 							Notifyclient("failed to steal")
@@ -341,6 +350,7 @@ AntiTab:AddToggle({
 						Notifyclient("sucessfully stolen")
 						break
 					end
+
 				end
 				
 				
