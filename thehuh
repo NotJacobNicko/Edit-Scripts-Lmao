@@ -255,7 +255,7 @@ AntiTab:AddToggle({
 					
 					PublicTable.TargetPlot = TargetPlot
 					PublicTable.TheGoods = char
-					
+					Notifyclient("Selected "..char.Name)
 					
 					break
 				end
@@ -281,20 +281,23 @@ AntiTab:AddToggle({
 			if PublicTable.TargetPlot and PublicTable.TheGoods and (PlrChar and Root) then
 				local BrosPlot = PublicTable.TargetPlot
 				local Char = PublicTable.TheGoods
-				local TheStealPromp
-				for i,Prox in pairs(Char:GetDescendants()) do
-					if Prox:IsA("ProximityPrompt") then
-						if string.find(Prox.ObjectText:lower(),"steal") or string.find(Prox.ActionText:lower(),"steal") then
-							TheStealPromp = Prox
-							break
+				task.spawn(function()
+					for i,Prox in pairs(Char:GetDescendants()) do
+						if Prox:IsA("ProximityPrompt") then
+							if string.find(Prox.ObjectText:lower(),"steal") or string.find(Prox.ActionText:lower(),"steal") then
+								PublicTable.TheStealPromp = Prox
+								break
+							end
 						end
 					end
-				end
+				end)
 				
 				
 				if BrosPlot and PlrChar and PublicTable.TheStealPromp then
 					local Button = BrosPlot.LockButton
-					if Button and Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text == "Lock Base" then
+					local TheStealPromp = PublicTable.TheStealPromp
+					local text = Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text
+					if Button and string.find(text,"| 0s") then
 						pcall(game.Remove,PublicTable.SelectedGuy)
 						Notifyclient("base is unlock wait.")
 						TheStealPromp.HoldDuration = 0
@@ -305,12 +308,12 @@ AntiTab:AddToggle({
 						local AutoStealval = PublicTable.StealClaim
 						PublicTable.StealClaim = false
 						repeat 
-							task.wait()
 							if TheStealPromp then
 								PlrChar:MoveTo(TheRoot.Position)
 								fireproximityprompt(TheStealPromp)
 							end
-						until PlrChar:FindFirstChildWhichIsA("Model") or Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text ~= "Lock Base"
+							task.wait()
+						until PlrChar:FindFirstChildWhichIsA("Model") or (not string.find(text,"| 0s") and Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text ~= "Lock Base")
 						PlrChar:MoveTo(LastPos)
 						if PlrChar:FindFirstChildWhichIsA("Model") then
 							local Character = PlrChar:FindFirstChildWhichIsA("Model")
