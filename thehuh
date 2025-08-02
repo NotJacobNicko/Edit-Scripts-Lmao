@@ -2,6 +2,15 @@ local plr = game:GetService("Players").LocalPlayer
 local mouse = plr:GetMouse()
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Giangplay/Script/main/Orion_Library_PE_V2.lua")))()
 local Window = OrionLib:MakeWindow({IntroText = "Nicko's Hub", IntroIcon = "rbxassetid://15315284749",Name = "Nicko's Hub",IntroToggleIcon = "rbxassetid://7734091286", HidePremium = false, SaveConfig = false, IntroEnabled = false, ConfigFolder = "NickosAssetsDontTouch"})
+function Notifyclient(Text)
+	local goofynotiids = {6823153536,6823153536,7991347388,6879335951,217548941,4891171429,17660225827,6879335951}
+	local Notisong = Instance.new("Sound",game:GetService("SoundService"))
+	Notisong.SoundId = "rbxassetid://"..goofynotiids[math.random(1,#goofynotiids)]
+	Notisong.Volume = 4
+	Notisong.PlayOnRemove = true
+	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "HX?H Guide",Text = Text,Icon = "rbxassetid://18584222941",Duration = 5})
+	Notisong:Destroy()
+end
 
 local PublicTable = {} -- this one gets all the information when you interact the options
 PublicTable.Actualmap = workspace:WaitForChild("Map")
@@ -232,11 +241,11 @@ AntiTab:AddToggle({
 							end
 						end
 					end
-					
+					PublicTable.SelectingToSteal = false
 					if not TargetPlot or TargetPlot == PublicTable.PersonalPlot then
+						Notifyclient("cannot grab this thing")
 						break
 					end
-					PublicTable.SelectingToSteal = false
 					pcall(game.Remove,PublicTable.SelectedGuy)
 					local showselect = Instance.new("Highlight",char)
 					showselect.FillTransparency = 0.5
@@ -287,7 +296,7 @@ AntiTab:AddToggle({
 					local Button = BrosPlot.LockButton
 					if Button and Button:FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("BillboardGui"):FindFirstChildWhichIsA("TextLabel").Text == "Lock Base" then
 						pcall(game.Remove,PublicTable.SelectedGuy)
-
+						Notifyclient("base is unlock wait.")
 						TheStealPromp.HoldDuration = 0
 						local LastPos = Root.Position
 						
@@ -321,7 +330,12 @@ AntiTab:AddToggle({
 								PlrChar:MoveTo(LastPos)
 								PublicTable.StealClaim = AutoStealval
 							end
+						else
+							Notifyclient("failed to steal")
+							break
 						end
+						
+						Notifyclient("sucessfully stolen")
 						break
 					end
 				end
