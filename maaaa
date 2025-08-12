@@ -27,7 +27,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
 	if Plr.Character then
 		for i,obj in pairs(Plr.Character:GetDescendants()) do
 			if obj:IsA("BasePart") then
-				obj = true
+				obj.Anchored = true
 			end
 		end
 		Plr.Character:MoveTo(Position+Vector3.new(math.random(-100,100),math.random(20,200),math.random(-100,100)))
