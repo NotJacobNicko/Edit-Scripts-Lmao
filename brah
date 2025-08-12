@@ -119,11 +119,11 @@ function HollowPurple()
 								if GameCreator == 102068705 or GameCreator == 9950771 then
 									for i=1,5 do
 										task.spawn(function()
-											
+
 											pcall(function()
 												game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(ROOTHAHA)
 											end)
-											
+
 											pcall(function()
 												if Plr.Backpack:FindFirstChild("Lantern") then
 													Plr.Backpack:FindFirstChild("Lantern").Parent = Plr.Character
@@ -148,6 +148,16 @@ function HollowPurple()
 													end
 												end
 											end)
+										end)
+										pcall(function()
+											Plr.Character:FindFirstChild("Lantern"):Activate()
+											if Plr.Character:FindFirstChild("Lantern") and Plr.Character.Lantern:FindFirstChild("Network") then
+												for i,obj in pairs(CaughtChar:GetChildren()) do
+													if obj:IsA("BasePart") then
+														Plr.Character.Lantern.Network:FireServer("Hit",obj)
+													end
+												end
+											end
 										end)
 										wait(.5)
 									end
@@ -190,10 +200,10 @@ function HollowPurple()
 				end
 			end
 		end
-		
+
 		task.spawn(function()
 			local SepPos = i*i/15
-			
+
 			if RayInfo and RayInfo.Instance then
 				FUNCTION.Rocks((Position*CFrame.new(math.random(-75,75),0,0)).Position,2,Vector3.new(0,-100,0),true,-180,180,80,350,5,25,6.5)
 				local GroundPart = RayInfo.Instance
@@ -239,7 +249,7 @@ Button.MouseButton1Click:Connect(function()
 	if not Active then
 		Active = true
 		OrginJumpPos = Plr.Character:FindFirstChildWhichIsA("Humanoid").JumpPower
-		
+
 		Plr.Character:FindFirstChildWhichIsA("Humanoid").JumpPower = 0
 		local SoundAhh = Instance.new("Sound",game:GetService("SoundService"))
 		SoundAhh.SoundId = "rbxassetid://6667923288"
