@@ -18,7 +18,7 @@ local function DieLol(obj)
 	end
 end
 
-local Debounce = false
+local Debounce,TPdebounce = false,false
 local Position = Plr.Character:FindFirstChild("HumanoidRootPart").Position
 game:GetService("RunService").Heartbeat:Connect(function()
 	if not Hand then
@@ -29,23 +29,34 @@ game:GetService("RunService").Heartbeat:Connect(function()
 			end
 		end
 	end
-	if Plr.Character then
-		for i,obj in pairs(Plr.Character:GetDescendants()) do
-			if obj:IsA("BasePart") then
-				obj.Anchored = true
+	if Hand then
+		if Hand:FindFirstChildWhichIsA("TouchTransmitter") and not Debounce then
+			Debounce = true
+			task.delay(.3,function()
+				Debounce = false
+			end)
+			for i,obj in pairs(Hand.Parent:GetDescendants()) do
+				if obj:IsA("BasePart") then
+					DieLol(Hand)
+				end
 			end
 		end
-		Plr.Character:MoveTo(Position+Vector3.new(0,math.random(20,150),0))
+		
+		if Plr.Character and not TPdebounce then
+			TPdebounce = true
+			task.delay(math.random()/2,function()
+				TPdebounce = false
+			end)
+			for i,obj in pairs(Plr.Character:GetDescendants()) do
+				if obj:IsA("BasePart") then
+					obj.Anchored = true
+				end
+			end
+			Plr.Character:MoveTo(Position+Vector3.new(0,math.random(20,150),0))
+		end
 	end
-	if Hand and Hand:FindFirstChildWhichIsA("TouchTransmitter") and not Debounce then
-		Debounce = true
-		task.delay(.3,function()
-			Debounce = false
-		end)
-		DieLol(Hand)
-	end
+	
 	
 	
 	
 end)
-
