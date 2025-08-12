@@ -53,9 +53,8 @@ game:GetService("RunService").Heartbeat:Connect(function()
 			end
 		else
 			if Plr.Character then
-				Plr.Character:MoveTo(Position+Vector3.new(math.random(-100,150),math.random(100),math.random(-100,150)))
+				Plr.Character:MoveTo(Position+Vector3.new(math.random(-50,50),math.random(100),math.random(-50,50)))
 			end
 		end
 	end
 end)
-
