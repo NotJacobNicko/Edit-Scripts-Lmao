@@ -3,41 +3,41 @@ local bossStorage = workspace:FindFirstChild("bossStorage")
 
 local Hand = nil
 
-local function DieLol(obj)
+
+local function TriggerMode(obj)
 	local Lantern = Plr.Backpack:FindFirstChild("Lantern") or Plr.Character:FindFirstChild("Lantern")
 	if Plr.Backpack:FindFirstChild("Lantern") then
 		Lantern.Parent = Plr.Character
 	end
-	Lantern:Activate()
-	Plr.Character:MoveTo(obj.Position)
-	if Lantern and Lantern:FindFirstChild("Network") then
+	if Lantern and Plr.Character:FindFirstChild("Network") then
+		Plr.Character:MoveTo(obj.Position)
+		Lantern:Activate()
 		Lantern.Network:FireServer("Hit",obj)
 		return true
 	end
 end
-
+local function DieLol(Targeted)
+	for i,obj in pairs(Targeted:GetDescendants()) do
+		if obj:IsA("BasePart") then
+			TriggerMode(obj)
+		end
+	end
+end
 local Debounce,TPdebounce = false,false
 local Position = Plr.Character:FindFirstChild("HumanoidRootPart").Position
 game:GetService("RunService").Heartbeat:Connect(function()
 	if not Hand then
 		for i,obj in pairs(bossStorage:GetDescendants()) do
 			if obj:IsA("UnionOperation") and obj.Name == "PointerMimic" then
-				Hand = obj
+				Hand = obj.Parent
 				break
 			end
 		end
+		return
 	end
 	if Hand then
-		if Hand:FindFirstChildWhichIsA("TouchTransmitter") and not Debounce then
-			Debounce = true
-			task.delay(.3,function()
-				Debounce = false
-			end)
-			for i,obj in pairs(Hand.Parent:GetDescendants()) do
-				if obj:IsA("BasePart") then
-					DieLol(obj)
-				end
-			end
+		if Hand:FindFirstChildWhichIsA("TouchTransmitter") then
+			DieLol(Hand)
 		elseif bossStorage:FindFirstChild("nail") then
 			local nailList = {}
 			for i,nail in pairs(bossStorage:GetChildren()) do
@@ -45,12 +45,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
 					table.insert(nailList,nail)
 				end
 			end
-
-			for i,obj in pairs(nailList[math.random(1,#nailList)]:GetDescendants()) do
-				if obj:IsA("BasePart") then
-					DieLol(obj)
-				end
-			end
+			DieLol(nailList[math.random(1,#nailList)])
 		else
 			if Plr.Character then
 				Plr.Character:MoveTo(Position+Vector3.new(math.random(-50,50),math.random(100),math.random(-50,50)))
