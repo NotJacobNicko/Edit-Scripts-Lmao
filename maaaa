@@ -1,64 +1,78 @@
-local Plr = game:GetService("Players").LocalPlayer
+local plr = game:GetService("Players").LocalPlayer
 local bossStorage = workspace:FindFirstChild("bossStorage")
-
-local Hand = nil
-
-
+local SnippedNail,Nightmarehand = nil,nil
 local function TriggerMode(obj)
-	local Lantern = Plr.Backpack:FindFirstChild("Lantern") or Plr.Character:FindFirstChild("Lantern")
-	if Plr.Backpack:FindFirstChild("Lantern") then
-		Lantern.Parent = Plr.Character
-	end
-	for i,obj in pairs(Lantern:GetDescendants()) do
-		if obj:IsA("BasePart") then
-			obj.Size = Vector3.new(5,5,5)
-		end
+	local Lantern = plr.Backpack:FindFirstChild("Lantern") or plr.Character:FindFirstChild("Lantern")
+	if plr.Backpack:FindFirstChild("Lantern") then
+		Lantern.Parent = plr.Character
 	end
 	if Lantern and Lantern:FindFirstChild("Network") then
-		Plr.Character:PivotTo(CFrame.new(obj.Position+Vector3.new(3,0,0))*CFrame.fromEulerAnglesXYZ(0,math.rad(90),0))
 		Lantern:Activate()
-		Lantern.Network:FireServer("Hit",obj)
 	end
 end
-local function DieLol(Targeted)
-	for i,obj in pairs(Targeted:GetDescendants()) do
-		if obj:IsA("BasePart") then
-			obj.CanTouch = false
-			TriggerMode(obj)
-		end
-	end
-end
-local Debounce,TPdebounce = false,false
-local Position = Plr.Character:FindFirstChild("HumanoidRootPart").Position
-local LockInNail = nil
-game:GetService("RunService").Heartbeat:Connect(function()
-	if not Hand then
+
+
+local Lastposition = Vector3.new()
+game:GetService("RunService").RenderStepped:Connect(function()
+	local char = plr.Character
+	local root = char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
+	
+	if not Nightmarehand then
 		for i,obj in pairs(bossStorage:GetDescendants()) do
 			if obj:IsA("UnionOperation") and obj.Name == "PointerMimic" then
-				Hand = obj
+				Nightmarehand = obj
 				break
 			end
 		end
-		return
+		--return
 	end
-	if Hand then
-		if Hand:FindFirstChildWhichIsA("TouchTransmitter") then
-			DieLol(Hand.Parent)
-		elseif bossStorage:FindFirstChild("nail") then
-			local nailList = {}
-			for i,nail in pairs(bossStorage:GetChildren()) do
-				if nail:IsA("Model") and nail.Name == "nail" then
-					table.insert(nailList,nail)
-				end
-			end
-			if not LockInNail or LockInNail.Parent ~= bossStorage then
-				LockInNail = nailList[math.random(1,#nailList)]
-			end
-			DieLol(LockInNail)
-		else
-			if Plr.Character then
-				Plr.Character:MoveTo(Position+Vector3.new(math.random(-50,50),math.random(100),math.random(-50,50)))
+	
+	
+	if Nightmarehand and Nightmarehand:FindFirstChildWhichIsA("TouchTransmitter") then
+		Nightmarehand.CanTouch = false
+		TriggerMode()
+		char:PivotTo(CFrame.new(Nightmarehand.Position))
+	elseif bossStorage:FindFirstChild("nail") then
+		local nailList = {}
+		for i,nail in pairs(bossStorage:GetChildren()) do
+			if nail:IsA("Model") and nail.Name == "nail" then
+				table.insert(nailList,nail)
 			end
 		end
+		if not SnippedNail or SnippedNail.Parent ~= bossStorage then
+			SnippedNail = nailList[math.random(1,#nailList)]
+		end
+		TriggerMode()
+		char:PivotTo(CFrame.new(SnippedNail:FindFirstChildWhichIsA("BasePart").Position))
+	else
+		if Lastposition == Vector3.new() then
+			Lastposition = root.Position
+		end
+		local TargetPos = Lastposition+Vector3.new(math.random(-50,50),math.random(100),math.random(-50,50))
+		if root.Position.Y < Lastposition.Y+10 then
+			TargetPos = Lastposition+Vector3.new(math.random(-50,50),60,math.random(-50,50))
+		end
+		
+		local NoNo = {"nail"}
+		for i,Models in pairs(bossStorage:GetChildren()) do
+			if Models:IsA("Model") and not table.find(NoNo,Models.Name) then
+				for i,Obj in pairs(Models:GetDescendants()) do
+					if Obj:IsA("BasePart") then
+						local Magnitude = (TargetPos - Obj.Position).Magnitude
+						local maxDimension = math.max(Obj.Size.X, Obj.Size.Y, Obj.Size.Z)
+						if Magnitude <= maxDimension+20 then
+							TargetPos = Lastposition+Vector3.new(maxDimension,Obj.Position.Y+maxDimension,maxDimension)
+							break
+						end
+					end
+				end
+			end
+		end
+		char:MoveTo(TargetPos)
 	end
+	
+	
+	
+	
+	
 end)
