@@ -52,7 +52,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
 					obj.Anchored = true
 				end
 			end
-			Plr.Character:MoveTo(Position+Vector3.new(0,math.random(20,150),0))
+			Plr.Character:MoveTo(Position+Vector3.new(math.random(-100,100),30,math.random(-100,100)))
 		end
 	end
 	
