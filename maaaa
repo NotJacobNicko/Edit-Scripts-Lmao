@@ -52,10 +52,9 @@ game:GetService("RunService").Heartbeat:Connect(function()
 			
 			for i,obj in pairs(nailList[math.random(1,#nailList)]:GetDescendants()) do
 				if obj:IsA("BasePart") then
-					
+					DieLol(obj)
 				end
 			end
-			DieLol(nailList[math.random(1,#nailList)])
 		end
 		
 		
