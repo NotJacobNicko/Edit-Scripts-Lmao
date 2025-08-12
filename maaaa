@@ -34,7 +34,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
 	if not Hand then
 		for i,obj in pairs(bossStorage:GetDescendants()) do
 			if obj:IsA("UnionOperation") and obj.Name == "PointerMimic" then
-				Hand = obj
+				Hand = obj.Parent
 				break
 			end
 		end
@@ -58,3 +58,4 @@ game:GetService("RunService").Heartbeat:Connect(function()
 		end
 	end
 end)
+
