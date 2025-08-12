@@ -21,7 +21,7 @@ local function TriggerMode(obj)
 	end
 end
 local function DieLol(Targeted)
-	for i,obj in pairs(workspace:GetDescendants()) do
+	for i,obj in pairs(Targeted:GetDescendants()) do
 		if obj:IsA("BasePart") then
 			obj.CanTouch = false
 			TriggerMode(obj)
@@ -34,7 +34,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
 	if not Hand then
 		for i,obj in pairs(bossStorage:GetDescendants()) do
 			if obj:IsA("UnionOperation") and obj.Name == "PointerMimic" then
-				Hand = obj.Parent
+				Hand = obj
 				break
 			end
 		end
