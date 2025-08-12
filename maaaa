@@ -9,16 +9,21 @@ local function TriggerMode(obj)
 	if Plr.Backpack:FindFirstChild("Lantern") then
 		Lantern.Parent = Plr.Character
 	end
-	if Lantern and Plr.Character:FindFirstChild("Network") then
-		Plr.Character:MoveTo(obj.Position)
+	for i,obj in pairs(Lantern:GetDescendants()) do
+		if obj:IsA("BasePart") then
+			obj.Size = Vector3.new(5,5,5)
+		end
+	end
+	if Lantern and Lantern:FindFirstChild("Network") then
+		Plr.Character:PivotTo(CFrame.new(obj.Position+Vector3.new(0,3,0))*CFrame.fromEulerAnglesXYZ(-math.rad(90),0,0))
 		Lantern:Activate()
 		Lantern.Network:FireServer("Hit",obj)
-		return true
 	end
 end
 local function DieLol(Targeted)
-	for i,obj in pairs(Targeted:GetDescendants()) do
+	for i,obj in pairs(workspace:GetDescendants()) do
 		if obj:IsA("BasePart") then
+			obj.CanTouch = false
 			TriggerMode(obj)
 		end
 	end
