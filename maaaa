@@ -29,7 +29,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	
 	
 	if Nightmarehand and Nightmarehand:FindFirstChildWhichIsA("TouchTransmitter") then
-		Nightmarehand.CanTouch = false
 		TriggerMode()
 		char:PivotTo(CFrame.new(Nightmarehand.Position))
 	elseif bossStorage:FindFirstChild("nail") then
