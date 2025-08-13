@@ -10,30 +10,31 @@ local function TriggerMode(obj)
 		Lantern:Activate()
 	end
 end
-local Ignore = {}
-local function NotOnGround(object)
-	local halfHeight = object.Size.Y / 2
-	local bottomPosition = object.Position - Vector3.new(0, halfHeight, 0)
+local function IsObjectTouchingFloor(object, tolerance)
+	tolerance = tolerance or 0 -- Allowed gap before counting as touching
 
-	-- Ray direction (down)
-	local direction = Vector3.new(0, -100, 0) -- Long enough to hit ground
+	-- Get half height in world space (rotation-safe)
+	local halfHeight = object.CFrame.UpVector * (object.Size.Y/2)
+
+	local topPosition = object.Position + halfHeight
+	local bottomPosition = object.Position - halfHeight
+
+	local direction = bottomPosition - topPosition
 
 	local raycastParams = RaycastParams.new()
-	raycastParams.FilterDescendantsInstances = {object} -- Ignore itself
+	raycastParams.FilterDescendantsInstances = {object}
 	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-
-	local result = workspace:Raycast(bottomPosition, direction, raycastParams)
-
+	local result = workspace:Raycast(topPosition, direction, raycastParams)
 	if result then
-		local distance = (bottomPosition - result.Position).Magnitude
-		if distance > 0.3 then
-			return true
+		local Mag = (bottomPosition - result.Position).Magnitude
+		if Mag <= tolerance then
+			return false
 		end
-	else
-		return true
 	end
-	return false
+
+	return true 
 end
+
 local Lastposition = Vector3.new()
 local Phases = ""
 game:GetService("RunService").RenderStepped:Connect(function()
@@ -59,18 +60,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		Phases = "Phase2"
 		local nailList = {}
 		for i,nail in pairs(bossStorage:GetChildren()) do
-			if nail:IsA("Model") and nail.Name == "nail" and not table.find(Ignore,nail) then
+			if nail:IsA("Model") and nail.Name == "nail" then
 				table.insert(nailList,nail)
 			end
 		end
-		if not SnippedNail or SnippedNail.Parent ~= bossStorage or NotOnGround(SnippedNail:FindFirstChildWhichIsA("BasePart")) then
+		if not SnippedNail or SnippedNail.Parent ~= bossStorage or IsObjectTouchingFloor(SnippedNail:FindFirstChildWhichIsA("BasePart"),0) then
 			SnippedNail = nailList[math.random(1,#nailList)]
 		end
 		
 		local Base = SnippedNail:FindFirstChildWhichIsA("BasePart")
-		if NotOnGround(Base) then
-			table.insert(Ignore,SnippedNail)
-		end
 		TriggerMode()
 		char:PivotTo(CFrame.new(Base.Position))
 	else
