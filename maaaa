@@ -10,9 +10,32 @@ local function TriggerMode(obj)
 		Lantern:Activate()
 	end
 end
+local Ignore = {}
+local function NotOnGround(object)
+	local halfHeight = object.Size.Y / 2
+	local bottomPosition = object.Position - Vector3.new(0, halfHeight, 0)
 
+	-- Ray direction (down)
+	local direction = Vector3.new(0, -100, 0) -- Long enough to hit ground
 
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterDescendantsInstances = {object} -- Ignore itself
+	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+	local result = workspace:Raycast(bottomPosition, direction, raycastParams)
+
+	if result then
+		local distance = (bottomPosition - result.Position).Magnitude
+		if distance > 0.3 then
+			return true
+		end
+	else
+		return true
+	end
+	return false
+end
 local Lastposition = Vector3.new()
+local Phases = ""
 game:GetService("RunService").RenderStepped:Connect(function()
 	local char = plr.Character
 	local root = char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
@@ -29,21 +52,27 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	
 	
 	if Nightmarehand and Nightmarehand:FindFirstChildWhichIsA("TouchTransmitter") then
+		Phases = "Phase1"
 		TriggerMode()
 		char:PivotTo(CFrame.new(Nightmarehand.Position+Vector3.new(-5,0,15)))
 	elseif bossStorage:FindFirstChild("nail") then
+		Phases = "Phase2"
 		local nailList = {}
 		for i,nail in pairs(bossStorage:GetChildren()) do
-			if nail:IsA("Model") and nail.Name == "nail" then
+			if nail:IsA("Model") and nail.Name == "nail" and not table.find(Ignore,nail) then
 				table.insert(nailList,nail)
 			end
 		end
-		if not SnippedNail or SnippedNail.Parent ~= bossStorage then
+		if not SnippedNail or SnippedNail.Parent ~= bossStorage or NotOnGround(SnippedNail:FindFirstChildWhichIsA("BasePart")) then
+			SnippedNail = nailList[math.random(1,#nailList)]
 		end
-		SnippedNail = nailList[math.random(1,#nailList)]
 		
+		local Base = SnippedNail:FindFirstChildWhichIsA("BasePart")
+		if NotOnGround(Base) then
+			table.insert(Ignore,SnippedNail)
+		end
 		TriggerMode()
-		char:PivotTo(CFrame.new(SnippedNail:FindFirstChildWhichIsA("BasePart").Position))
+		char:PivotTo(CFrame.new(Base.Position))
 	else
 		if Lastposition == Vector3.new() then
 			Lastposition = root.Position
@@ -61,7 +90,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 						local Magnitude = (TargetPos - Obj.Position).Magnitude
 						local maxDimension = math.max(Obj.Size.X, Obj.Size.Y, Obj.Size.Z)
 						if Magnitude <= maxDimension+20 then
-							TargetPos = Lastposition+Vector3.new(maxDimension,Obj.Position.Y+maxDimension,maxDimension)
+							TargetPos = Lastposition+Vector3.new(maxDimension+10,Obj.Position.Y+maxDimension,maxDimension+10)
 							break
 						end
 					end
