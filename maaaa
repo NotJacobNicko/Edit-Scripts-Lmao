@@ -1,13 +1,6 @@
 local plr = game:GetService("Players").LocalPlayer
 local bossStorage = workspace:FindFirstChild("bossStorage")
-
-
-local Nightmarehand = nil
-
-
-local RightHand
-local Phase = 1
-
+local SnippedNail,Nightmarehand = nil,nil
 local function TriggerMode(obj)
 	local Lantern = plr.Backpack:FindFirstChild("Lantern") or plr.Character:FindFirstChild("Lantern")
 	if plr.Backpack:FindFirstChild("Lantern") then
@@ -17,96 +10,91 @@ local function TriggerMode(obj)
 		Lantern:Activate()
 	end
 end
+local function IsObjectTouchingFloor(object, tolerance)
+	tolerance = tolerance or 0 -- Allowed gap before counting as touching
+
+	-- Get half height in world space (rotation-safe)
+	local halfHeight = object.CFrame.UpVector * (object.Size.Y/2)
+
+	local topPosition = object.Position + halfHeight
+	local bottomPosition = object.Position - halfHeight
+
+	local direction = bottomPosition - topPosition
+
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterDescendantsInstances = {object}
+	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+	local result = workspace:Raycast(topPosition, direction, raycastParams)
+	if result then
+		local Mag = (bottomPosition - result.Position).Magnitude
+		if Mag <= tolerance then
+			return false
+		end
+	end
+
+	return true 
+end
+
 local Lastposition = Vector3.new()
-local otherplr = nil
-game:GetService("RunService").Heartbeat:Connect(function()
+local Phases = ""
+game:GetService("RunService").RenderStepped:Connect(function()
 	local char = plr.Character
 	local root = char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
-
-	if not Nightmarehand and not RightHand then
+	
+	if not Nightmarehand then
 		for i,obj in pairs(bossStorage:GetDescendants()) do
 			if obj:IsA("UnionOperation") and obj.Name == "PointerMimic" then
 				Nightmarehand = obj
-			end
-			
-			if obj:IsA("MeshPart") and not RightHand then
-				if obj.Name:lower() == "masterhandright" then
-					RightHand = obj
-				end
-			end
-		end
-		return
-	end
-	if not RightHand or not Nightmarehand then
-		return
-	end
-	if not otherplr then
-		for i,othe in pairs(game:GetService("Players"):GetPlayers()) do
-			if othe ~= plr then
-				otherplr = othe
 				break
 			end
 		end
+		return
 	end
+	
+	
 	if Nightmarehand and Nightmarehand:FindFirstChildWhichIsA("TouchTransmitter") then
-		Phase = 1
-		char:PivotTo(Nightmarehand.CFrame*CFrame.new(0,Nightmarehand.Position.Y/2+3,0))
+		Phases = "Phase1"
 		TriggerMode()
+		char:PivotTo(CFrame.new(Nightmarehand.Position+Vector3.new(-5,0,15)))
 	elseif bossStorage:FindFirstChild("nail") then
-		Phase = 2
-	else
-		if otherplr and otherplr.Character and Phase == 2 then
-			local otherchar = otherplr.Character
-			local otheroot = otherchar:FindFirstChild("HumanoidRootPart")
-			local Found = false
-			for i,Prox in pairs(workspace:GetDescendants()) do
-				if Prox:IsA("ProximityPrompt") then
-					local Parented = Prox.Parent
-					local Mag = (otheroot.Position - Parented.Position).Magnitude
-					if Mag <= 15 then
-						Found = true
-						local backpack = plr:FindFirstChildWhichIsA("Backpack")
-						local List = {}
-						for i,Obj in pairs(backpack:GetChildren()) do
-							if Obj:IsA("Tool") then
-								table.insert(List,Obj)
-							end
-						end
-						if plr.Character:FindFirstChildWhichIsA("Tool") then
-							plr.Character:FindFirstChildWhichIsA("Tool").Parent = backpack
-						end
-						plr.Character:MoveTo(otheroot.Position+Vector3.new(0,1,0))
-						List[math.random(1,#List)].Parent = plr.Character
-						Prox.HoldDuration = 0
-						--fireproximityprompt(Prox)
-						break
-					end
-				end
-			end
-			
-			if Found then
-				return
+		Phases = "Phase2"
+		local nailList = {}
+		for i,nail in pairs(bossStorage:GetChildren()) do
+			if nail:IsA("Model") and nail.Name == "nail" then
+				table.insert(nailList,nail)
 			end
 		end
+		if not SnippedNail or SnippedNail.Parent ~= bossStorage or IsObjectTouchingFloor(SnippedNail:FindFirstChildWhichIsA("BasePart"),0) then
+			SnippedNail = nailList[math.random(1,#nailList)]
+		end
 		
+		local Base = SnippedNail:FindFirstChildWhichIsA("BasePart")
+		TriggerMode()
+		char:PivotTo(CFrame.new(Base.Position))
+	else
 		if Lastposition == Vector3.new() then
 			Lastposition = root.Position
 		end
-		
-		local highestY = Nightmarehand.Position.Y/2
-		if RightHand then
-			highestY = math.max(Nightmarehand.Position.Y, RightHand.Position.Y)
+		local TargetPos = Lastposition+Vector3.new(math.random(-50,50),math.random(100),math.random(-50,50))
+		if root.Position.Y < Lastposition.Y+10 then
+			TargetPos = Lastposition+Vector3.new(math.random(-50,50),60,math.random(-50,50))
 		end
 		
-		
-		if highestY > 200 then
-			highestY = Lastposition.Y
+		local NoNo = {"nail"}
+		for i,Models in pairs(bossStorage:GetChildren()) do
+			if Models:IsA("Model") and not table.find(NoNo,Models.Name) then
+				for i,Obj in pairs(Models:GetDescendants()) do
+					if Obj:IsA("BasePart") then
+						local Magnitude = (TargetPos - Obj.Position).Magnitude
+						local maxDimension = math.max(Obj.Size.X, Obj.Size.Y, Obj.Size.Z)
+						if Magnitude <= maxDimension+20 then
+							TargetPos = Lastposition+Vector3.new(maxDimension+10,Obj.Position.Y+maxDimension,maxDimension+10)
+							break
+						end
+					end
+				end
+			end
 		end
-		
-		plr.Character:MoveTo(Lastposition+Vector3.new(math.random(-50,50),highestY+50,math.random(-50,50)))
-
-		
+		char:MoveTo(TargetPos)
 	end
-
-		
 end)
