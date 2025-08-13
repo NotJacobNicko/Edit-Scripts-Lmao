@@ -1,6 +1,6 @@
 local plr = game:GetService("Players").LocalPlayer
 local bossStorage = workspace:FindFirstChild("bossStorage")
-local SnippedNail,Nightmarehand = nil,workspace:FindFirstChild("bossStorage").handmodel:WaitForChild("Hand")
+local SnippedNail,Nightmarehand = nil,nil
 local function TriggerMode(obj)
 	local Lantern = plr.Backpack:FindFirstChild("Lantern") or plr.Character:FindFirstChild("Lantern")
 	if plr.Backpack:FindFirstChild("Lantern") then
