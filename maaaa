@@ -1,12 +1,12 @@
 local plr = game:GetService("Players").LocalPlayer
 local bossStorage = workspace:FindFirstChild("bossStorage")
-local SnippedNail,Nightmarehand = nil,nil
+local SnippedNail,Nightmarehand = nil,workspace:FindFirstChild("bossStorage").handmodel:WaitForChild("Hand")
 local function TriggerMode(obj)
 	local Lantern = plr.Backpack:FindFirstChild("Lantern") or plr.Character:FindFirstChild("Lantern")
 	if plr.Backpack:FindFirstChild("Lantern") then
 		Lantern.Parent = plr.Character
 	end
-	if Lantern and Lantern:FindFirstChild("Network") then
+	if Lantern and Lantern:FindFirstChild("Network") and Lantern.Parent == plr.Character then
 		Lantern:Activate()
 	end
 end
@@ -24,13 +24,13 @@ game:GetService("RunService").RenderStepped:Connect(function()
 				break
 			end
 		end
-		--return
+		return
 	end
 	
 	
 	if Nightmarehand and Nightmarehand:FindFirstChildWhichIsA("TouchTransmitter") then
 		TriggerMode()
-		char:PivotTo(CFrame.new(Nightmarehand.Position))
+		char:PivotTo(CFrame.new(Nightmarehand.Position+Vector3.new(-5,0,15)))
 	elseif bossStorage:FindFirstChild("nail") then
 		local nailList = {}
 		for i,nail in pairs(bossStorage:GetChildren()) do
@@ -39,8 +39,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
 			end
 		end
 		if not SnippedNail or SnippedNail.Parent ~= bossStorage then
-			SnippedNail = nailList[math.random(1,#nailList)]
 		end
+		SnippedNail = nailList[math.random(1,#nailList)]
+		
 		TriggerMode()
 		char:PivotTo(CFrame.new(SnippedNail:FindFirstChildWhichIsA("BasePart").Position))
 	else
