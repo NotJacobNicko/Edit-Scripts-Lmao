@@ -1,104 +1,53 @@
 local plr = game:GetService("Players").LocalPlayer
-local bossStorage = workspace:FindFirstChild("bossStorage")
-local SnippedNail,Nightmarehand = nil,nil
-local function TriggerMode(obj)
-	local Lantern = plr.Backpack:FindFirstChild("Lantern") or plr.Character:FindFirstChild("Lantern")
-	if plr.Backpack:FindFirstChild("Lantern") then
-		Lantern.Parent = plr.Character
+
+
+local Otherplr = nil
+
+local proxymipromp = {}
+
+workspace.DescendantAdded:Connect(function(obj)
+	if obj:IsA("ProximityPrompt") then
+		table.insert(proxymipromp,obj)
 	end
-	if Lantern and Lantern:FindFirstChild("Network") and Lantern.Parent == plr.Character then
-		Lantern:Activate()
-	end
-end
-local function IsObjectTouchingFloor(object, tolerance)
-	tolerance = tolerance or 0 -- Allowed gap before counting as touching
-
-	-- Get half height in world space (rotation-safe)
-	local halfHeight = object.CFrame.UpVector * (object.Size.Y/2)
-
-	local topPosition = object.Position + halfHeight
-	local bottomPosition = object.Position - halfHeight
-
-	local direction = bottomPosition - topPosition
-
-	local raycastParams = RaycastParams.new()
-	raycastParams.FilterDescendantsInstances = {object}
-	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-	local result = workspace:Raycast(topPosition, direction, raycastParams)
-	if result then
-		local Mag = (bottomPosition - result.Position).Magnitude
-		if Mag <= tolerance then
-			return false
-		end
-	end
-
-	return true 
-end
-
-local Lastposition = Vector3.new()
-local Phases = ""
-game:GetService("RunService").RenderStepped:Connect(function()
-	local char = plr.Character
-	local root = char:FindFirstChild("Torso") or char:FindFirstChild("HumanoidRootPart")
-	
-	if not Nightmarehand then
-		for i,obj in pairs(bossStorage:GetDescendants()) do
-			if obj:IsA("UnionOperation") and obj.Name == "PointerMimic" then
-				Nightmarehand = obj
+end)
+game:GetService("RunService").Heartbeat:Connect(function()
+	if not Otherplr then
+		for i,plaer in pairs(game:GetService("Players"):GetPlayers()) do
+			if plaer ~= plr then 
+				Otherplr = plaer
 				break
 			end
 		end
-		return
 	end
-	
-	
-	if Nightmarehand and Nightmarehand:FindFirstChildWhichIsA("TouchTransmitter") then
-		Phases = "Phase1"
-		TriggerMode()
-		char:PivotTo(CFrame.new(Nightmarehand.Position+Vector3.new(-5,0,15)))
-	elseif bossStorage:FindFirstChild("nail") then
-		Phases = "Phase2"
-		local nailList = {}
-		for i,nail in pairs(bossStorage:GetChildren()) do
-			if nail:IsA("Model") and nail.Name == "nail" then
-				table.insert(nailList,nail)
+	task.spawn(function()
+		for i,proxy in pairs(workspace:GetDescendants()) do
+			if proxy:IsA("ProximityPrompt") and not table.find(proxymipromp,proxy) then
+				table.insert(proxymipromp,proxy)
 			end
 		end
-		if not SnippedNail or SnippedNail.Parent ~= bossStorage or IsObjectTouchingFloor(SnippedNail:FindFirstChildWhichIsA("BasePart"),0) then
-			SnippedNail = nailList[math.random(1,#nailList)]
+	end)
+	if plr.Character then
+		local plrroot = plr.Character:FindFirstChild("HumanoidRootPart")
+		if Otherplr and Otherplr.Character then
+			local otherroot = Otherplr.Character:FindFirstChild("HumanoidRootPart")
+			plr.Character:MoveTo(otherroot.Position+Vector3.new(0,5,0))
 		end
 		
-		local Base = SnippedNail:FindFirstChildWhichIsA("BasePart")
-		TriggerMode()
-		char:PivotTo(CFrame.new(Base.Position))
-	else
-		if Lastposition == Vector3.new() then
-			Lastposition = root.Position
-		end
-		local TargetPos = Lastposition+Vector3.new(math.random(-50,50),math.random(100),math.random(-50,50))
-		if root.Position.Y < Lastposition.Y+10 then
-			TargetPos = Lastposition+Vector3.new(math.random(-50,50),60,math.random(-50,50))
-		end
-		
-		local NoNo = {"nail"}
-		for i,Models in pairs(bossStorage:GetChildren()) do
-			if Models:IsA("Model") and not table.find(NoNo,Models.Name) then
-				for i,Obj in pairs(Models:GetDescendants()) do
-					if Obj:IsA("BasePart") then
-						local Magnitude = (TargetPos - Obj.Position).Magnitude
-						local maxDimension = math.max(Obj.Size.X, Obj.Size.Y, Obj.Size.Z)
-						if Magnitude <= maxDimension+20 then
-							TargetPos = Lastposition+Vector3.new(maxDimension+10,Obj.Position.Y+maxDimension,maxDimension+10)
-							break
-						end
+		for i,prox in pairs(proxymipromp) do
+			if prox then
+				local basePart = prox.Parent
+				if basePart and basePart:IsA("BasePart") then
+					local Mag = (plrroot.Position - basePart.Position).Magnitude
+					
+					if Mag <= 20 then
+						prox.HoldDuration = 0
+						fireproximityprompt(prox)
+						break
 					end
 				end
 			end
 		end
-		char:MoveTo(TargetPos)
 	end
-	
-	
 	
 	
 	
