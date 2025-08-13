@@ -5,7 +5,7 @@ local bossStorage = workspace:FindFirstChild("bossStorage")
 local Nightmarehand = nil
 
 
-local Lefthand,RightHand
+local RightHand
 local Phase = 1
 
 local function TriggerMode(obj)
@@ -17,6 +17,7 @@ local function TriggerMode(obj)
 		Lantern:Activate()
 	end
 end
+local Lastposition = Vector3.new()
 local otherplr = nil
 game:GetService("RunService").Heartbeat:Connect(function()
 	local char = plr.Character
@@ -25,7 +26,6 @@ game:GetService("RunService").Heartbeat:Connect(function()
 	if not Nightmarehand and not RightHand then
 		for i,obj in pairs(bossStorage:GetDescendants()) do
 			if obj:IsA("UnionOperation") and obj.Name == "PointerMimic" then
-				Lefthand = obj.Parent:FindFirstChildWhichIsA("MeshPart")
 				Nightmarehand = obj
 			end
 			
@@ -37,7 +37,9 @@ game:GetService("RunService").Heartbeat:Connect(function()
 		end
 		return
 	end
-	
+	if not RightHand or not Nightmarehand then
+		return
+	end
 	if not otherplr then
 		for i,othe in pairs(game:GetService("Players"):GetPlayers()) do
 			if othe ~= plr then
@@ -46,10 +48,9 @@ game:GetService("RunService").Heartbeat:Connect(function()
 			end
 		end
 	end
-	
 	if Nightmarehand and Nightmarehand:FindFirstChildWhichIsA("TouchTransmitter") then
 		Phase = 1
-		char:PivotTo(Nightmarehand.CFrame*CFrame.new(0,Nightmarehand.Y/2+3,0))
+		char:PivotTo(Nightmarehand.CFrame*CFrame.new(0,Nightmarehand.Position.Y/2+3,0))
 		TriggerMode()
 	elseif bossStorage:FindFirstChild("nail") then
 		Phase = 2
@@ -77,7 +78,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
 						plr.Character:MoveTo(otheroot.Position+Vector3.new(0,1,0))
 						List[math.random(1,#List)].Parent = plr.Character
 						Prox.HoldDuration = 0
-						fireproximityprompt(Prox)
+						--fireproximityprompt(Prox)
 						break
 					end
 				end
@@ -86,15 +87,24 @@ game:GetService("RunService").Heartbeat:Connect(function()
 			if Found then
 				return
 			end
-			
-			local highestY = math.max(Lefthand.Position.Y, RightHand.Position.Y)
-			plr.Character:MoveTo(Vector3.new(math.random(-50,50),highestY+50,math.random(-50,50)))
-			
-			
-			
+		end
+		
+		if Lastposition == Vector3.new() then
+			Lastposition = root.Position
+		end
+		
+		local highestY = Nightmarehand.Position.Y/2
+		if RightHand then
+			highestY = math.max(Nightmarehand.Position.Y, RightHand.Position.Y)
 		end
 		
 		
+		if highestY > 200 then
+			highestY = Lastposition.Y
+		end
+		
+		plr.Character:MoveTo(Lastposition+Vector3.new(math.random(-50,50),highestY+50,math.random(-50,50)))
+
 		
 	end
 
