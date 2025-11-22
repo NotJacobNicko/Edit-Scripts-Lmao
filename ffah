@@ -1,0 +1,63 @@
+if not game:IsLoaded() then
+	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Info",Text = "Waiting for your client to load in",Icon = "rbxassetid://7733658504",Duration = 5})
+	game.Loaded:Wait()
+	game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Info",Text = "Executing...",Icon = "rbxassetid://7733658504",Duration = 5})
+end
+local plr = game:GetService("Players").LocalPlayer
+
+local function ResponcibleChar(char)
+	local Root = char:FindFirstChild("Torso") or char:FindFirstChild("HmmanoidRootPart")
+	local Humanoid = char:FindFirstChildWhichIsA("Humanoid")
+	local Sword
+	repeat 
+		local tool = char:FindFirstChildWhichIsA("Tool")
+		if tool and tool ~= Sword then
+			local Count = 0
+			local handle = tool:FindFirstChild("Handle")
+			if string.match(tool.Name:lower(),"sword") then
+				Count += 1
+			end
+			if handle then
+				Count += 1
+				local Mesh = handle:FindFirstChildWhichIsA("SpecialMesh")
+				if Mesh and Mesh.MeshId == "rbxasset://fonts/sword.mesh" then
+					Count += 2
+				end
+				if Count >= 3 then
+					warn("Verified")
+					Sword = tool
+				end
+			end
+		end
+		task.wait()
+	until Sword or (Humanoid and Humanoid.Health < 1)
+	if Sword and Sword.Parent == char then
+		local handle = Sword:FindFirstChild("Handle")
+		local Mesh = handle:FindFirstChildWhichIsA("SpecialMesh")
+		Mesh.Parent = Sword
+		handle.Massless = true
+		handle.Size = Vector3.new(2,50,2)
+		local Activate = false
+		Sword.Activated:Connect(function()
+			if Activate then
+				return 
+			end
+			Activate = true
+			handle.Size = Vector3.new(10,2,100)
+			task.delay(1,function()
+				Activate = false
+				handle.Size = Vector3.new(5,100,2)
+			end)
+		end)
+	end
+	Humanoid.WalkSpeed = 100
+	local Spin = Instance.new("BodyAngularVelocity",Root)
+	Spin.MaxTorque = Vector3.new(0, math.huge, 0)
+	Spin.AngularVelocity = Vector3.new(0,150,0)
+end
+plr.CharacterAdded:Connect(ResponcibleChar)
+
+repeat 
+	task.wait()
+until plr.Character
+ResponcibleChar(plr.Character)
