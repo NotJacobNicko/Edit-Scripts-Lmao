@@ -19,7 +19,22 @@ function mouse1click(pos)
 	VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
 	VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 0)
 end
-
+local function DragItem(Item)
+	task.spawn(function()
+		for _, tool in pairs(game:GetService("Players").LocalPlayer.Inventory:GetChildren()) do
+			if tool:IsA("Model") and tool:GetAttribute("NumberItems")  and tool:GetAttribute("Capacity") and tool:GetAttribute("NumberItems") < tool:GetAttribute("Capacity") then
+				task.spawn(function()
+					local args = {
+						tool,
+						Item
+					}
+					game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("RequestBagStoreItem"):InvokeServer(unpack(args))
+					task.wait(0.1)
+				end)
+			end
+		end
+	end)
+end
 local function Bring(Model,Pos)
 	if typeof(Pos) ~= "CFrame" then
 		return
@@ -30,10 +45,7 @@ local function Bring(Model,Pos)
 	if Model and Model:IsA("Model") then
 		Model:PivotTo(Pos)
 		task.wait()
-		local camera = workspace.CurrentCamera
-		local screenPoint, onScreen = camera:WorldToScreenPoint(Pos.Position)
-		VirtualInputManager:SendMouseMoveEvent(screenPoint.X, screenPoint.Y, game)
-		mouse1click(screenPoint)
+		DragItem(Model)
 	end
 end
 local Blacklisted = {"Carrot","Grape"}
@@ -43,7 +55,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 
 	if ItemFol then
 		for i,Obj in pairs(ItemFol:GetChildren()) do
-			if Obj:IsA("Model") and not table.find(TransportedItem,Obj) and not table.find(Blacklisted,Obj.Name) then
+			if Obj:IsA("Model") and Obj.PrimaryPart and Obj.Name == "Coal" then
 				table.insert(TransportedItem,Obj)
 				warn(Obj.Name)
 				Bring(Obj,plr.Character:FindFirstChild("Torso").Position)
